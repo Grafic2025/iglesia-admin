@@ -14,14 +14,31 @@ export default function AdminDashboard() {
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password === 'Iglesia2026') setAuthorized(true)
-    else alert('Contraseña incorrecta')
-  }
-
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
+  // 1. PERSISTENCIA DE SESIÓN
+  useEffect(() => {
+    const isAuth = localStorage.getItem('admin_auth')
+    if (isAuth === 'true') setAuthorized(true)
+  }, [])
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === 'Iglesia2026') {
+      setAuthorized(true)
+      localStorage.setItem('admin_auth', 'true')
+    } else {
+      alert('Contraseña incorrecta')
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_auth')
+    setAuthorized(false)
+    setPassword('')
+  }
+
+  // 2. CARGA DE DATOS CON RACHA DE FIDELIDAD
   useEffect(() => {
     if (authorized) {
       fetchAsistencias();
@@ -31,12 +48,27 @@ export default function AdminDashboard() {
   }, [authorized, fechaSeleccionada])
 
   const fetchAsistencias = async () => {
+    const hace30Dias = new Date();
+    hace30Dias.setDate(hace30Dias.getDate() - 30);
+    const fechaLimite = hace30Dias.toISOString().split('T')[0];
+
     const { data } = await supabase
       .from('asistencias')
-      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, token_notificacion, created_at)`)
+      .select(`
+        id, miembro_id, horario_reunion, hora_entrada, fecha, 
+        miembros (nombre, apellido, created_at, asistencias(fecha))
+      `)
       .eq('fecha', fechaSeleccionada)
       .order('hora_entrada', { ascending: false })
-    if (data) setAsistencias(data)
+
+    if (data) {
+      const procesados = data.map(asistencia => {
+        const historial = asistencia.miembros?.asistencias || [];
+        const racha = historial.filter((h: any) => h.fecha >= fechaLimite).length;
+        return { ...asistencia, racha };
+      });
+      setAsistencias(procesados);
+    }
   }
 
   const exportarCSV = () => {
@@ -82,32 +114,31 @@ export default function AdminDashboard() {
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif', color: '#fff', background: '#121212', minHeight: '100vh' }}>
       
-      {/* HEADER DINÁMICO */}
+      {/* HEADER CON BOTÓN SALIR */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ color: '#A8D500', marginBottom: '5px' }}>Iglesia del Salvador</h1>
           <p style={{ color: '#aaa', margin: 0 }}>Gestión de Asistencia y Membresía</p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input type="date" value={fechaSeleccionada} onChange={(e) => setFechaSeleccionada(e.target.value)} style={{ padding: '10px', borderRadius: '10px', background: '#333', color: '#fff', border: 'none' }} />
           <button onClick={exportarCSV} style={{ padding: '10px 20px', borderRadius: '10px', background: '#fff', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}>📥 Excel</button>
+          <button onClick={handleLogout} style={{ padding: '10px 15px', borderRadius: '10px', background: '#ff4444', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>SALIR</button>
         </div>
       </div>
 
-      {/* TARJETAS DE ESTADÍSTICAS */}
+      {/* TARJETAS INTELIGENTES */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '30px' }}>
-        <StatCard label="Total en Fecha" value={asistencias.length} color="#A8D500" />
-        <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" />
-        <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" />
-        <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" />
+        <StatCard label="Total en Fecha" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} />
+        <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
+        <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
+        <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
       </div>
 
-      {/* PANEL DE NOTIFICACIONES MEJORADO */}
+      {/* NOTIFICACIONES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-          <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} />
-        </div>
+        <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
         <textarea placeholder="Escribe el mensaje aquí..." value={mensajePush} onChange={(e) => setMensajePush(e.target.value)} style={{ width: '100%', padding: '12px', height: '70px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px' }} />
         <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN'}</button>
         {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}
@@ -131,7 +162,7 @@ export default function AdminDashboard() {
               <th style={{ padding: '15px' }}>Miembro</th>
               <th style={{ padding: '15px' }}>Reunión</th>
               <th style={{ padding: '15px' }}>Hora</th>
-              <th style={{ padding: '15px' }}>Info</th>
+              <th style={{ padding: '15px' }}>Info / Fidelidad</th>
             </tr>
           </thead>
           <tbody>
@@ -146,8 +177,9 @@ export default function AdminDashboard() {
                   <td style={{ padding: '15px' }}><span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '6px', background: '#333' }}>{a.horario_reunion}</span></td>
                   <td style={{ padding: '15px' }}>{a.hora_entrada}</td>
                   <td style={{ padding: '15px' }}>
-                     {/* Aquí podrías sumar el contador de racha si lo deseas */}
-                     <span style={{ color: '#666', fontSize: '12px' }}>Fiel</span>
+                    <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
+                      {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
+                    </span>
                   </td>
                 </tr>
               )
@@ -159,11 +191,14 @@ export default function AdminDashboard() {
   )
 }
 
-function StatCard({ label, value, color }: any) {
+function StatCard({ label, value, color, isActive }: any) {
   return (
-    <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center' }}>
+    <div style={{ 
+      background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', 
+      textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' 
+    }}>
       <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
-      <div style={{ fontSize: '28px', fontWeight: 'bold', color: color }}>{value}</div>
+      <div style={{ fontSize: '28px', fontWeight: 'bold', color: isActive ? color : '#555' }}>{value}</div>
     </div>
   )
 }
