@@ -117,7 +117,7 @@ export default function AdminDashboard() {
         <h3 style={{ color: '#000', marginTop: 0 }}>📢 Enviar Notificación Push</h3>
         <p style={{ fontSize: '0.9rem', color: '#333', marginBottom: '15px' }}>
           Destinatarios: <strong style={{ textDecoration: 'underline' }}>
-            {filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `GRUPO ${filtroHorario}`}
+            {filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `REUNION ${filtroHorario}`}
           </strong>
         </p>
         <input 
