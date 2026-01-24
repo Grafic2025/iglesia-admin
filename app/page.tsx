@@ -16,6 +16,7 @@ export default function AdminDashboard() {
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
+  // Persistencia de sesión (LocalStorage)
   useEffect(() => {
     const isAuth = localStorage.getItem('admin_auth')
     if (isAuth === 'true') setAuthorized(true)
@@ -46,26 +47,14 @@ export default function AdminDashboard() {
   }, [authorized, fechaSeleccionada])
 
   const fetchAsistencias = async () => {
-    // 1. Traemos las asistencias del día seleccionado
+    // 1. Traer asistencias del día
     const { data, error } = await supabase
       .from('asistencias')
-      .select(`
-        id, 
-        miembro_id, 
-        horario_reunion, 
-        hora_entrada, 
-        fecha, 
-        miembros (nombre, apellido, created_at)
-      `)
+      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at)`)
       .eq('fecha', fechaSeleccionada)
       .order('hora_entrada', { ascending: false });
 
-    if (error) {
-      console.error("Error cargando asistencias:", error);
-      return;
-    }
-
-    // 2. Para calcular la racha, traemos TODOS los registros de asistencia de los últimos 30 días
+    // 2. Traer historial de 30 días para calcular la Racha
     const hace30Dias = new Date();
     hace30Dias.setDate(hace30Dias.getDate() - 30);
     const fechaLimite = hace30Dias.toISOString().split('T')[0];
@@ -77,7 +66,6 @@ export default function AdminDashboard() {
 
     if (data) {
       const listaFinal = data.map(asist => {
-        // Contamos cuántas veces aparece este miembro_id en el historial de 30 días
         const racha = historial ? historial.filter(h => h.miembro_id === asist.miembro_id).length : 0;
         return { ...asist, racha };
       });
@@ -131,6 +119,7 @@ export default function AdminDashboard() {
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif', color: '#fff', background: '#121212', minHeight: '100vh' }}>
       
+      {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ color: '#A8D500', margin: 0 }}>Iglesia del Salvador</h1>
@@ -143,6 +132,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* TARJETAS ESTADÍSTICAS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '30px' }}>
         <StatCard label="Total Hoy" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} />
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
@@ -150,14 +140,21 @@ export default function AdminDashboard() {
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
       </div>
 
+      {/* PANEL DE NOTIFICACIONES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
         <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
-        <textarea placeholder="Mensaje..." value={mensajePush} onChange={(e) => setMensajePush(e.target.value)} style={{ width: '100%', padding: '12px', height: '70px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px' }} />
+        <textarea 
+          placeholder="Escribe el mensaje aquí..." 
+          value={mensajePush} 
+          onChange={(e) => setMensajePush(e.target.value)} 
+          style={{ width: '100%', padding: '15px', height: '150px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px', fontSize: '16px', resize: 'vertical' }} 
+        />
         <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN'}</button>
         {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}
       </div>
 
+      {/* BUSCADOR Y FILTROS */}
       <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
         <input placeholder="🔍 Buscar miembro..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ flex: 3, padding: '15px', borderRadius: '12px', background: '#1E1E1E', color: '#fff', border: '1px solid #333' }} />
         <select value={filtroHorario} onChange={(e) => setFiltroHorario(e.target.value)} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: '#A8D500', color: '#000', fontWeight: 'bold', border: 'none' }}>
@@ -168,13 +165,15 @@ export default function AdminDashboard() {
         </select>
       </div>
 
+      {/* TABLA DE ASISTENCIAS */}
       <div style={{ background: '#1E1E1E', borderRadius: '20px', overflow: 'hidden', border: '1px solid #333' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ background: '#252525', textAlign: 'left' }}>
               <th style={{ padding: '15px' }}>Miembro</th>
               <th style={{ padding: '15px' }}>Reunión</th>
-              <th style={{ padding: '15px' }}>Info / Racha (30d)</th>
+              <th style={{ padding: '15px' }}>Entrada</th>
+              <th style={{ padding: '15px' }}>Info</th>
             </tr>
           </thead>
           <tbody>
@@ -184,9 +183,12 @@ export default function AdminDashboard() {
                 <tr key={a.id} style={{ borderBottom: '1px solid #252525' }}>
                   <td style={{ padding: '15px' }}>
                     <div style={{ fontWeight: 'bold' }}>{a.miembros?.nombre} {a.miembros?.apellido}</div>
-                    {esNuevo && <span style={{ fontSize: '10px', background: '#A8D500', color: '#000', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>NUEVO</span>}
+                    {esNuevo && <span style={{ fontSize: '10px', background: '#A8D500', color: '#000', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold', display: 'inline-block', marginTop: '4px' }}>NUEVO</span>}
                   </td>
-                  <td style={{ padding: '15px' }}>{a.horario_reunion} - {a.hora_entrada}</td>
+                  <td style={{ padding: '15px' }}>
+                    <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '6px', background: '#333' }}>{a.horario_reunion}</span>
+                  </td>
+                  <td style={{ padding: '15px', color: '#888' }}>{a.hora_entrada}</td>
                   <td style={{ padding: '15px' }}>
                     <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
                       {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
@@ -204,8 +206,8 @@ export default function AdminDashboard() {
 
 function StatCard({ label, value, color, isActive }: any) {
   return (
-    <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3 }}>
-      <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px' }}>{label}</div>
+    <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' }}>
+      <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
       <div style={{ fontSize: '28px', fontWeight: 'bold', color: isActive ? color : '#555' }}>{value}</div>
     </div>
   )
