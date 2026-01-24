@@ -139,6 +139,59 @@ export default function AdminDashboard() {
         <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
       </div>
+	  
+	  {/* NUEVO: PANEL DE PROGRAMACIÓN (Avisos y Versículos) */}
+      <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
+        <h3 style={{ marginTop: 0, color: '#FFB400' }}>⏰ Programar Avisos y Versículo</h3>
+        <p style={{ fontSize: '13px', color: '#888', marginTop: '-10px' }}>
+          Escribe <b>VERSICULO</b> para enviar uno automático de la Biblia.
+        </p>
+        
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <input 
+            placeholder="Mensaje o 'VERSICULO'" 
+            id="prog-msj"
+            style={{ flex: 2, minWidth: '200px', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} 
+          />
+          <select id="prog-dia" style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444' }}>
+            <option>Todos los días</option>
+            <option>Lunes</option>
+            <option>Martes</option>
+            <option>Miércoles</option>
+            <option>Jueves</option>
+            <option>Viernes</option>
+            <option>Sábado</option>
+            <option>Domingo</option>
+          </select>
+          <input 
+            type="time" 
+            id="prog-hora"
+            style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444' }} 
+          />
+          <button 
+            onClick={async () => {
+              const mensaje = (document.getElementById('prog-msj') as HTMLInputElement).value;
+              const dia = (document.getElementById('prog-dia') as HTMLSelectElement).value;
+              const hora = (document.getElementById('prog-hora') as HTMLInputElement).value;
+              
+              if(!mensaje || !hora) return alert('Completa mensaje y hora');
+
+              const { error } = await supabase.from('programaciones').insert([
+                { mensaje, dia_semana: dia, hora, activo: true }
+              ]);
+
+              if (error) alert('Error al programar');
+              else {
+                alert('¡Programado con éxito!');
+                (document.getElementById('prog-msj') as HTMLInputElement).value = '';
+              }
+            }}
+            style={{ padding: '12px 25px', background: '#FFB400', color: '#000', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', border: 'none' }}
+          >
+            PROGRAMAR
+          </button>
+        </div>
+      </div>
 
       {/* PANEL DE NOTIFICACIONES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
