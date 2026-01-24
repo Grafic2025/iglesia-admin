@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const [busqueda, setBusqueda] = useState('')
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
+  const [enviando, setEnviando] = useState(false) // Estado para el botón
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -43,6 +44,52 @@ export default function AdminDashboard() {
     return cumpleHorario && cumpleBusqueda
   })
 
+  // --- FUNCIÓN MAESTRA DE ENVÍO ---
+  const enviarNotificaciones = async () => {
+    if (!mensajePush.trim()) return alert("Escribe un mensaje antes de enviar.");
+
+    // 1. Extraer tokens únicos de la lista que estamos viendo en pantalla
+    const tokens = [...new Set(datosFiltrados
+      .map(item => item.miembros?.token_notificacion)
+      .filter(token => token && token.startsWith('ExponentPushToken')))];
+
+    if (tokens.length === 0) {
+      return alert("No hay dispositivos registrados en este filtro para recibir mensajes.");
+    }
+
+    if (!confirm(`¿Enviar este mensaje a ${tokens.length} personas?`)) return;
+
+    setEnviando(true);
+
+    try {
+      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          to: tokens,
+          title: tituloPush,
+          body: mensajePush,
+          sound: 'default',
+        }),
+      });
+
+      if (response.ok) {
+        alert("✅ ¡Notificaciones enviadas con éxito!");
+        setMensajePush(''); // Limpia el mensaje
+      } else {
+        alert("❌ Error al enviar a través de Expo.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error de conexión.");
+    } finally {
+      setEnviando(false);
+    }
+  };
+
   if (!authorized) {
     return (
       <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
@@ -68,7 +115,6 @@ export default function AdminDashboard() {
         <button onClick={() => setAuthorized(false)} style={{ background: '#333', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Sesión</button>
       </header>
 
-      {/* TARJETAS CON COLORES FIJOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
         <div style={{ padding: '20px', background: '#cfe2ff', borderRadius: '10px', border: '1px solid #9ec5fe' }}>
           <h4 style={{ margin: 0, color: '#084298' }}>Total Registrados</h4>
@@ -80,10 +126,13 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* BLOQUE DE NOTIFICACIONES (FONDO GRIS CLARO PARA QUE RESALTE) */}
       <div style={{ background: '#f8f9fa', padding: '25px', borderRadius: '12px', border: '2px solid #000', marginBottom: '40px' }}>
         <h3 style={{ color: '#000', marginTop: 0 }}>📢 Enviar Notificación Push</h3>
-        <p style={{ fontSize: '0.9rem', color: '#333', marginBottom: '15px' }}>Destinatarios: <strong style={{ textDecoration: 'underline' }}>{filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `GRUPO ${filtroHorario}`}</strong></p>
+        <p style={{ fontSize: '0.9rem', color: '#333', marginBottom: '15px' }}>
+          Destinatarios: <strong style={{ textDecoration: 'underline' }}>
+            {filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `GRUPO ${filtroHorario}`}
+          </strong>
+        </p>
         <input 
           type="text" 
           value={tituloPush} 
@@ -97,14 +146,23 @@ export default function AdminDashboard() {
           style={{ width: '100%', padding: '12px', height: '100px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', marginBottom: '15px' }}
         />
         <button 
-          onClick={() => alert("Función de envío activada")}
-          style={{ width: '100%', padding: '15px', background: '#000', color: '#fff', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}
+          onClick={enviarNotificaciones}
+          disabled={enviando}
+          style={{ 
+            width: '100%', 
+            padding: '15px', 
+            background: enviando ? '#666' : '#000', 
+            color: '#fff', 
+            borderRadius: '8px', 
+            fontWeight: 'bold', 
+            cursor: enviando ? 'not-allowed' : 'pointer', 
+            fontSize: '1rem' 
+          }}
         >
-          ENVIAR AHORA
+          {enviando ? 'ENVIANDO...' : 'ENVIAR AHORA'}
         </button>
       </div>
 
-      {/* FILTROS CON BORDES NEGROS */}
       <div style={{ marginBottom: '25px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
         <input 
           type="text" 
@@ -126,7 +184,6 @@ export default function AdminDashboard() {
         </select>
       </div>
 
-      {/* TABLA CON CONTRASTE ALTO */}
       <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #000' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead style={{ background: '#000' }}>
@@ -134,13 +191,14 @@ export default function AdminDashboard() {
               <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Nombre Completo</th>
               <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Horario Reunion</th>
               <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Hora Ingreso</th>
-              <th style={{ textAlign: 'left', padding: '15px' }}>Asistió</th>
             </tr>
           </thead>
           <tbody>
             {datosFiltrados.map((asistencia) => (
               <tr key={asistencia.id} style={{ borderTop: '1px solid #000' }}>
-                <td style={{ padding: '15px', color: '#000', fontWeight: '500' }}>{asistencia.miembros?.nombre} {asistencia.miembros?.apellido}</td>
+                <td style={{ padding: '15px', color: '#000', fontWeight: '500' }}>
+                  {asistencia.miembros?.nombre} {asistencia.miembros?.apellido}
+                </td>
                 <td style={{ padding: '15px' }}>
                   <span style={{ padding: '4px 10px', background: '#eee', borderRadius: '20px', fontSize: '0.85rem', color: '#000', border: '1px solid #ccc' }}>
                     {asistencia.horario_reunion}
