@@ -8,9 +8,11 @@ export default function AdminDashboard() {
   const [asistencias, setAsistencias] = useState<any[]>([])
   const [filtroHorario, setFiltroHorario] = useState('Todas')
   const [busqueda, setBusqueda] = useState('')
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
   const [enviando, setEnviando] = useState(false)
+  const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,186 +20,150 @@ export default function AdminDashboard() {
     else alert('Contraseña incorrecta')
   }
 
+  const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+
   useEffect(() => {
-    if (authorized) fetchAsistencias()
-  }, [authorized])
+    if (authorized) {
+      fetchAsistencias();
+      const channel = supabase.channel('cambios').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe();
+      return () => { supabase.removeChannel(channel) };
+    }
+  }, [authorized, fechaSeleccionada])
 
   const fetchAsistencias = async () => {
     const { data } = await supabase
       .from('asistencias')
-      .select(`
-        id,
-        miembro_id,
-        horario_reunion,
-        hora_entrada,
-        fecha,
-        miembros (nombre, apellido, token_notificacion)
-      `)
-      .order('fecha', { ascending: false })
+      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, token_notificacion, created_at)`)
+      .eq('fecha', fechaSeleccionada)
+      .order('hora_entrada', { ascending: false })
     if (data) setAsistencias(data)
   }
 
-  const datosFiltrados = asistencias.filter(item => {
-    const cumpleHorario = filtroHorario === 'Todas' || item.horario_reunion === filtroHorario
-    const nombreCompleto = `${item.miembros?.nombre} ${item.miembros?.apellido}`.toLowerCase()
-    const cumpleBusqueda = nombreCompleto.includes(busqueda.toLowerCase())
-    return cumpleHorario && cumpleBusqueda
-  })
-
-  // --- FUNCIÓN DE ENVÍO CORREGIDA (LLAMA A TU API) ---
-  const enviarNotificaciones = async () => {
-    if (!mensajePush.trim()) return alert("Por favor, escribe un mensaje");
-
-    setEnviando(true);
-
-    try {
-      const response = await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: tituloPush,        // Usa el estado del input
-          message: mensajePush,     // Usa el estado del textarea
-          horario: filtroHorario    // Usa el estado del select ("Todas", "09:00", etc)
-        }),
-      });
-
-      const resData = await response.json();
-
-      if (response.ok) {
-        alert(`✅ ¡Enviado con éxito!`);
-        setMensajePush(""); // Limpia el texto después de enviar
-      } else {
-        alert("❌ Error: " + (resData.error || "Fallo en el envío"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("❌ Fallo crítico de conexión con el servidor.");
-    } finally {
-      setEnviando(false);
-    }
-  };
-
-  if (!authorized) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
-        <form onSubmit={handleLogin} style={{ padding: '40px', background: '#f8f9fa', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.2)', textAlign: 'center', border: '1px solid #ddd' }}>
-          <h2 style={{ color: '#000' }}>⛪ Acceso Admin</h2>
-          <input 
-            type="password" 
-            placeholder="Contraseña Maestra" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ padding: '12px', width: '250px', borderRadius: '6px', border: '1px solid #000', marginBottom: '20px', display: 'block', color: '#000', backgroundColor: '#fff' }}
-          />
-          <button type="submit" style={{ background: '#0070f3', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Entrar</button>
-        </form>
-      </div>
-    )
+  const exportarCSV = () => {
+    const encabezados = ["Nombre", "Apellido", "Reunion", "Hora Ingreso", "Fecha\n"];
+    const filas = asistencias.map(a => `${a.miembros?.nombre},${a.miembros?.apellido},${a.horario_reunion},${a.hora_entrada},${a.fecha}`).join("\n");
+    const blob = new Blob([encabezados + filas], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Asistencias_${fechaSeleccionada}.csv`;
+    link.click();
   }
 
+  const enviarNotificacion = async () => {
+    if (!mensajePush) return;
+    setEnviando(true);
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: tituloPush, message: mensajePush, horario: filtroHorario }),
+    });
+    const result = await res.json();
+    setNotificacionStatus({ show: true, message: res.ok ? `✅ Enviado a ${result.total} personas` : `❌ ${result.error}`, error: !res.ok });
+    if (res.ok) setMensajePush('');
+    setEnviando(false);
+    setTimeout(() => setNotificacionStatus({ show: false, message: '', error: false }), 4000);
+  }
+
+  const datosFiltrados = asistencias.filter(a => {
+    const nombre = `${a.miembros?.nombre} ${a.miembros?.apellido}`.toLowerCase();
+    return nombre.includes(busqueda.toLowerCase()) && (filtroHorario === 'Todas' || a.horario_reunion === filtroHorario);
+  });
+
+  if (!authorized) return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#121212' }}>
+      <form onSubmit={handleLogin} style={{ background: '#1E1E1E', padding: '40px', borderRadius: '20px', textAlign: 'center', border: '1px solid #333' }}>
+        <h2 style={{ color: '#A8D500', marginBottom: '20px' }}>Acceso Admin</h2>
+        <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', padding: '12px', marginBottom: '20px', borderRadius: '8px', border: '1px solid #444', background: '#222', color: '#fff' }} />
+        <button type="submit" style={{ width: '100%', padding: '12px', background: '#A8D500', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>ENTRAR</button>
+      </form>
+    </div>
+  )
+
   return (
-    <main style={{ padding: '30px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'system-ui', backgroundColor: '#ffffff', minHeight: '100vh', color: '#000' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
-        <h1 style={{ color: '#000' }}>Panel de Asistencia</h1>
-        <button onClick={() => setAuthorized(false)} style={{ background: '#333', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Sesión</button>
-      </header>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <div style={{ padding: '20px', background: '#cfe2ff', borderRadius: '10px', border: '1px solid #9ec5fe' }}>
-          <h4 style={{ margin: 0, color: '#084298' }}>Total Registrados</h4>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '10px 0', color: '#084298' }}>{asistencias.length}</p>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif', color: '#fff', background: '#121212', minHeight: '100vh' }}>
+      
+      {/* HEADER DINÁMICO */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
+        <div>
+          <h1 style={{ color: '#A8D500', marginBottom: '5px' }}>Iglesia del Salvador</h1>
+          <p style={{ color: '#aaa', margin: 0 }}>Gestión de Asistencia y Membresía</p>
         </div>
-        <div style={{ padding: '20px', background: '#d1e7dd', borderRadius: '10px', border: '1px solid #a3cfbb' }}>
-          <h4 style={{ margin: 0, color: '#0f5132' }}>Vistos en Filtro</h4>
-          <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '10px 0', color: '#0f5132' }}>{datosFiltrados.length}</p>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <input type="date" value={fechaSeleccionada} onChange={(e) => setFechaSeleccionada(e.target.value)} style={{ padding: '10px', borderRadius: '10px', background: '#333', color: '#fff', border: 'none' }} />
+          <button onClick={exportarCSV} style={{ padding: '10px 20px', borderRadius: '10px', background: '#fff', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}>📥 Excel</button>
         </div>
       </div>
 
-      <div style={{ background: '#f8f9fa', padding: '25px', borderRadius: '12px', border: '2px solid #000', marginBottom: '40px' }}>
-        <h3 style={{ color: '#000', marginTop: 0 }}>📢 Enviar Notificación Push</h3>
-        <p style={{ fontSize: '0.9rem', color: '#333', marginBottom: '15px' }}>
-          Destinatarios: <strong style={{ textDecoration: 'underline' }}>
-            {filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `REUNION ${filtroHorario}`}
-          </strong>
-        </p>
-        <input 
-          type="text" 
-          placeholder="Título de la notificación"
-          value={tituloPush} 
-          onChange={(e) => setTituloPush(e.target.value)}
-          style={{ width: '100%', padding: '12px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000' }}
-        />
-        <textarea 
-          placeholder="Escribe el mensaje aquí..."
-          value={mensajePush}
-          onChange={(e) => setMensajePush(e.target.value)}
-          style={{ width: '100%', padding: '12px', height: '100px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', marginBottom: '15px' }}
-        />
-        <button 
-          onClick={enviarNotificaciones}
-          disabled={enviando}
-          style={{ 
-            width: '100%', 
-            padding: '15px', 
-            background: enviando ? '#666' : '#000', 
-            color: '#fff', 
-            borderRadius: '8px', 
-            fontWeight: 'bold', 
-            cursor: enviando ? 'not-allowed' : 'pointer', 
-            fontSize: '1rem' 
-          }}
-        >
-          {enviando ? 'ENVIANDO...' : 'ENVIAR AHORA'}
-        </button>
+      {/* TARJETAS DE ESTADÍSTICAS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '30px' }}>
+        <StatCard label="Total en Fecha" value={asistencias.length} color="#A8D500" />
+        <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" />
+        <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" />
+        <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" />
       </div>
 
-      <div style={{ marginBottom: '25px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-        <input 
-          type="text" 
-          placeholder="Buscar fiel..." 
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #000', minWidth: '250px', backgroundColor: '#fff', color: '#000' }}
-        />
-        <select 
-          value={filtroHorario} 
-          onChange={(e) => setFiltroHorario(e.target.value)}
-          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', cursor: 'pointer' }}
-        >
-          <option value="Todas">Todas las reuniones</option>
-          <option value="09:00">09:00 HS</option>
-          <option value="11:00">11:00 HS</option>
-          <option value="20:00">20:00 HS</option>
-          <option value="Extraoficial">Fuera de Horario</option>
+      {/* PANEL DE NOTIFICACIONES MEJORADO */}
+      <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
+        <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+          <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} />
+        </div>
+        <textarea placeholder="Escribe el mensaje aquí..." value={mensajePush} onChange={(e) => setMensajePush(e.target.value)} style={{ width: '100%', padding: '12px', height: '70px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px' }} />
+        <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN'}</button>
+        {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}
+      </div>
+
+      {/* BUSCADOR Y TABLA */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        <input placeholder="🔍 Buscar miembro..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} style={{ flex: 3, padding: '15px', borderRadius: '12px', background: '#1E1E1E', color: '#fff', border: '1px solid #333' }} />
+        <select value={filtroHorario} onChange={(e) => setFiltroHorario(e.target.value)} style={{ flex: 1, padding: '15px', borderRadius: '12px', background: '#A8D500', color: '#000', fontWeight: 'bold', border: 'none' }}>
+          <option value="Todas">Todos</option>
+          <option value="09:00">09:00</option>
+          <option value="11:00">11:00</option>
+          <option value="20:00">20:00</option>
         </select>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #000', marginBottom: '50px' }}>
+      <div style={{ background: '#1E1E1E', borderRadius: '20px', overflow: 'hidden', border: '1px solid #333' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#000' }}>
-            <tr>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Nombre Completo</th>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Horario Reunion</th>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Hora Ingreso</th>
+          <thead>
+            <tr style={{ background: '#252525', textAlign: 'left' }}>
+              <th style={{ padding: '15px' }}>Miembro</th>
+              <th style={{ padding: '15px' }}>Reunión</th>
+              <th style={{ padding: '15px' }}>Hora</th>
+              <th style={{ padding: '15px' }}>Info</th>
             </tr>
           </thead>
           <tbody>
-            {datosFiltrados.map((asistencia) => (
-              <tr key={asistencia.id} style={{ borderTop: '1px solid #000' }}>
-                <td style={{ padding: '15px', color: '#000', fontWeight: '500' }}>
-                  {asistencia.miembros?.nombre} {asistencia.miembros?.apellido}
-                </td>
-                <td style={{ padding: '15px' }}>
-                  <span style={{ padding: '4px 10px', background: '#eee', borderRadius: '20px', fontSize: '0.85rem', color: '#000', border: '1px solid #ccc' }}>
-                    {asistencia.horario_reunion}
-                  </span>
-                </td>
-                <td style={{ padding: '15px', color: '#000' }}>{asistencia.hora_entrada}</td>
-              </tr>
-            ))}
+            {datosFiltrados.map((a) => {
+              const esNuevo = new Date(a.miembros?.created_at).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }) === hoyArg;
+              return (
+                <tr key={a.id} style={{ borderBottom: '1px solid #252525' }}>
+                  <td style={{ padding: '15px' }}>
+                    <div style={{ fontWeight: 'bold' }}>{a.miembros?.nombre} {a.miembros?.apellido}</div>
+                    {esNuevo && <span style={{ fontSize: '10px', background: '#A8D500', color: '#000', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold' }}>NUEVO</span>}
+                  </td>
+                  <td style={{ padding: '15px' }}><span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '6px', background: '#333' }}>{a.horario_reunion}</span></td>
+                  <td style={{ padding: '15px' }}>{a.hora_entrada}</td>
+                  <td style={{ padding: '15px' }}>
+                     {/* Aquí podrías sumar el contador de racha si lo deseas */}
+                     <span style={{ color: '#666', fontSize: '12px' }}>Fiel</span>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
-    </main>
+    </div>
+  )
+}
+
+function StatCard({ label, value, color }: any) {
+  return (
+    <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center' }}>
+      <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ fontSize: '28px', fontWeight: 'bold', color: color }}>{value}</div>
+    </div>
   )
 }
