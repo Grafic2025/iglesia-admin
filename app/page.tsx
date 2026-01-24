@@ -16,7 +16,7 @@ export default function AdminDashboard() {
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
-  // 1. PERSISTENCIA DE SESIÓN
+  // Persistencia de sesión
   useEffect(() => {
     const isAuth = localStorage.getItem('admin_auth')
     if (isAuth === 'true') setAuthorized(true)
@@ -32,13 +32,13 @@ export default function AdminDashboard() {
     }
   }
 
+  // FUNCIÓN SALIR
   const handleLogout = () => {
     localStorage.removeItem('admin_auth')
     setAuthorized(false)
     setPassword('')
   }
 
-  // 2. CARGA DE DATOS CON RACHA DE FIDELIDAD
   useEffect(() => {
     if (authorized) {
       fetchAsistencias();
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif', color: '#fff', background: '#121212', minHeight: '100vh' }}>
       
-      {/* HEADER CON BOTÓN SALIR */}
+      {/* HEADER CON EL BOTÓN SALIR SOLICITADO */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
           <h1 style={{ color: '#A8D500', marginBottom: '5px' }}>Iglesia del Salvador</h1>
@@ -123,11 +123,18 @@ export default function AdminDashboard() {
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input type="date" value={fechaSeleccionada} onChange={(e) => setFechaSeleccionada(e.target.value)} style={{ padding: '10px', borderRadius: '10px', background: '#333', color: '#fff', border: 'none' }} />
           <button onClick={exportarCSV} style={{ padding: '10px 20px', borderRadius: '10px', background: '#fff', color: '#000', fontWeight: 'bold', cursor: 'pointer' }}>📥 Excel</button>
-          <button onClick={handleLogout} style={{ padding: '10px 15px', borderRadius: '10px', background: '#ff4444', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>SALIR</button>
+          
+          {/* BOTÓN SALIR */}
+          <button 
+            onClick={handleLogout} 
+            style={{ padding: '10px 15px', borderRadius: '10px', background: '#ff4444', color: '#fff', border: 'none', fontWeight: 'bold', cursor: 'pointer' }}
+          >
+            SALIR
+          </button>
         </div>
       </div>
 
-      {/* TARJETAS INTELIGENTES */}
+      {/* TARJETAS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '30px' }}>
         <StatCard label="Total en Fecha" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} />
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
