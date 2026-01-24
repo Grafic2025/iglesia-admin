@@ -131,9 +131,10 @@ export default function AdminDashboard() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead style={{ background: '#000' }}>
             <tr>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Nombre</th>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Horario Bloque</th>
-              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Hora Real</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Nombre Completo</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Horario Reunion</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Hora Ingreso</th>
+              <th style={{ textAlign: 'left', padding: '15px' }}>Asistió</th>
             </tr>
           </thead>
           <tbody>
