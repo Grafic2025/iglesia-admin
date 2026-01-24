@@ -16,7 +16,6 @@ export default function AdminDashboard() {
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
-  // Persistencia de sesión (LocalStorage)
   useEffect(() => {
     const isAuth = localStorage.getItem('admin_auth')
     if (isAuth === 'true') setAuthorized(true)
@@ -47,14 +46,12 @@ export default function AdminDashboard() {
   }, [authorized, fechaSeleccionada])
 
   const fetchAsistencias = async () => {
-    // 1. Traer asistencias del día
     const { data, error } = await supabase
       .from('asistencias')
       .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at)`)
       .eq('fecha', fechaSeleccionada)
       .order('hora_entrada', { ascending: false });
 
-    // 2. Traer historial de 30 días para calcular la Racha
     const hace30Dias = new Date();
     hace30Dias.setDate(hace30Dias.getDate() - 30);
     const fechaLimite = hace30Dias.toISOString().split('T')[0];
@@ -103,7 +100,8 @@ export default function AdminDashboard() {
 
   const datosFiltrados = asistencias.filter(a => {
     const nombre = `${a.miembros?.nombre} ${a.miembros?.apellido}`.toLowerCase();
-    return nombre.includes(busqueda.toLowerCase()) && (filtroHorario === 'Todas' || a.horario_reunion === filtroHorario);
+    const cumpleHorario = filtroHorario === 'Todas' || a.horario_reunion === filtroHorario;
+    return nombre.includes(busqueda.toLowerCase()) && cumpleHorario;
   });
 
   if (!authorized) return (
@@ -133,8 +131,10 @@ export default function AdminDashboard() {
       </div>
 
       {/* TARJETAS ESTADÍSTICAS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '30px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '30px' }}>
         <StatCard label="Total Hoy" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} />
+        {/* NUEVA CARD EXTRAOFICIAL */}
+        <StatCard label="Extra" value={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length} color="#FFB400" isActive={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length > 0} />
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
         <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
@@ -162,6 +162,7 @@ export default function AdminDashboard() {
           <option value="09:00">09:00</option>
           <option value="11:00">11:00</option>
           <option value="20:00">20:00</option>
+          <option value="Extraoficial">Extraoficiales</option>
         </select>
       </div>
 
@@ -179,6 +180,7 @@ export default function AdminDashboard() {
           <tbody>
             {datosFiltrados.map((a) => {
               const esNuevo = a.miembros?.created_at && new Date(a.miembros.created_at).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }) === hoyArg;
+              const esExtra = a.horario_reunion === 'Extraoficial';
               return (
                 <tr key={a.id} style={{ borderBottom: '1px solid #252525' }}>
                   <td style={{ padding: '15px' }}>
@@ -186,7 +188,16 @@ export default function AdminDashboard() {
                     {esNuevo && <span style={{ fontSize: '10px', background: '#A8D500', color: '#000', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold', display: 'inline-block', marginTop: '4px' }}>NUEVO</span>}
                   </td>
                   <td style={{ padding: '15px' }}>
-                    <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '6px', background: '#333' }}>{a.horario_reunion}</span>
+                    <span style={{ 
+                      fontSize: '12px', 
+                      padding: '4px 8px', 
+                      borderRadius: '6px', 
+                      background: esExtra ? '#FFB400' : '#333',
+                      color: esExtra ? '#000' : '#fff',
+                      fontWeight: esExtra ? 'bold' : 'normal'
+                    }}>
+                      {a.horario_reunion}
+                    </span>
                   </td>
                   <td style={{ padding: '15px', color: '#888' }}>{a.hora_entrada}</td>
                   <td style={{ padding: '15px' }}>
@@ -207,8 +218,8 @@ export default function AdminDashboard() {
 function StatCard({ label, value, color, isActive }: any) {
   return (
     <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' }}>
-      <div style={{ fontSize: '12px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
-      <div style={{ fontSize: '28px', fontWeight: 'bold', color: isActive ? color : '#555' }}>{value}</div>
+      <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
+      <div style={{ fontSize: '24px', fontWeight: 'bold', color: isActive ? color : '#555' }}>{value}</div>
     </div>
   )
 }
