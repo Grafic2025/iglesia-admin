@@ -10,7 +10,7 @@ export default function AdminDashboard() {
   const [busqueda, setBusqueda] = useState('')
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
-  const [enviando, setEnviando] = useState(false) // Estado para el botón
+  const [enviando, setEnviando] = useState(false)
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,47 +44,34 @@ export default function AdminDashboard() {
     return cumpleHorario && cumpleBusqueda
   })
 
-  // --- FUNCIÓN MAESTRA DE ENVÍO ---
+  // --- FUNCIÓN DE ENVÍO CORREGIDA (LLAMA A TU API) ---
   const enviarNotificaciones = async () => {
-    if (!mensajePush.trim()) return alert("Escribe un mensaje antes de enviar.");
-
-    // 1. Extraer tokens únicos de la lista que estamos viendo en pantalla
-    const tokens = [...new Set(datosFiltrados
-      .map(item => item.miembros?.token_notificacion)
-      .filter(token => token && token.startsWith('ExponentPushToken')))];
-
-    if (tokens.length === 0) {
-      return alert("No hay dispositivos registrados en este filtro para recibir mensajes.");
-    }
-
-    if (!confirm(`¿Enviar este mensaje a ${tokens.length} personas?`)) return;
+    if (!mensajePush.trim()) return alert("Por favor, escribe un mensaje");
 
     setEnviando(true);
 
     try {
-      const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      const response = await fetch('/api/notify', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: tokens,
-          title: tituloPush,
-          body: mensajePush,
-          sound: 'default',
+          title: tituloPush,        // Usa el estado del input
+          message: mensajePush,     // Usa el estado del textarea
+          horario: filtroHorario    // Usa el estado del select ("Todas", "09:00", etc)
         }),
       });
 
+      const resData = await response.json();
+
       if (response.ok) {
-        alert("✅ ¡Notificaciones enviadas con éxito!");
-        setMensajePush(''); // Limpia el mensaje
+        alert(`✅ ¡Enviado con éxito!`);
+        setMensajePush(""); // Limpia el texto después de enviar
       } else {
-        alert("❌ Error al enviar a través de Expo.");
+        alert("❌ Error: " + (resData.error || "Fallo en el envío"));
       }
-    } catch (error) {
-      console.error(error);
-      alert("❌ Error de conexión.");
+    } catch (err) {
+      console.error(err);
+      alert("❌ Fallo crítico de conexión con el servidor.");
     } finally {
       setEnviando(false);
     }
@@ -135,12 +122,13 @@ export default function AdminDashboard() {
         </p>
         <input 
           type="text" 
+          placeholder="Título de la notificación"
           value={tituloPush} 
           onChange={(e) => setTituloPush(e.target.value)}
           style={{ width: '100%', padding: '12px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000' }}
         />
         <textarea 
-          placeholder="Escribe el mensaje..."
+          placeholder="Escribe el mensaje aquí..."
           value={mensajePush}
           onChange={(e) => setMensajePush(e.target.value)}
           style={{ width: '100%', padding: '12px', height: '100px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', marginBottom: '15px' }}
@@ -184,7 +172,7 @@ export default function AdminDashboard() {
         </select>
       </div>
 
-      <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #000' }}>
+      <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #000', marginBottom: '50px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead style={{ background: '#000' }}>
             <tr>
