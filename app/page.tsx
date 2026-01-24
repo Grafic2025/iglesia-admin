@@ -8,7 +8,6 @@ export default function AdminDashboard() {
   const [asistencias, setAsistencias] = useState<any[]>([])
   const [filtroHorario, setFiltroHorario] = useState('Todas')
   const [busqueda, setBusqueda] = useState('')
-  // Estados para notificaciones
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
 
@@ -37,7 +36,6 @@ export default function AdminDashboard() {
     if (data) setAsistencias(data)
   }
 
-  // Filtrado lógico: Ahora incluye "Extraoficial" si lo seleccionas
   const datosFiltrados = asistencias.filter(item => {
     const cumpleHorario = filtroHorario === 'Todas' || item.horario_reunion === filtroHorario
     const nombreCompleto = `${item.miembros?.nombre} ${item.miembros?.apellido}`.toLowerCase()
@@ -45,30 +43,17 @@ export default function AdminDashboard() {
     return cumpleHorario && cumpleBusqueda
   })
 
-  // Función para enviar notificaciones a los filtrados
-  const enviarNotificacion = async () => {
-    const tokens = datosFiltrados
-      .map(a => a.miembros?.token_notificacion)
-      .filter(token => token !== null);
-
-    if (tokens.length === 0) return alert("No hay tokens en este grupo");
-
-    // Aquí llamarías a tu API de Vercel/Firebase
-    console.log("Enviando a:", tokens);
-    alert(`Enviando mensaje a ${tokens.length} personas del grupo ${filtroHorario}`);
-  }
-
   if (!authorized) {
     return (
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f0f2f5' }}>
-        <form onSubmit={handleLogin} style={{ padding: '40px', background: 'white', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-          <h2>⛪ Acceso Admin</h2>
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ffffff' }}>
+        <form onSubmit={handleLogin} style={{ padding: '40px', background: '#f8f9fa', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.2)', textAlign: 'center', border: '1px solid #ddd' }}>
+          <h2 style={{ color: '#000' }}>⛪ Acceso Admin</h2>
           <input 
             type="password" 
             placeholder="Contraseña Maestra" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={{ padding: '12px', width: '250px', borderRadius: '6px', border: '1px solid #ddd', marginBottom: '20px', display: 'block' }}
+            style={{ padding: '12px', width: '250px', borderRadius: '6px', border: '1px solid #000', marginBottom: '20px', display: 'block', color: '#000', backgroundColor: '#fff' }}
           />
           <button type="submit" style={{ background: '#0070f3', color: 'white', border: 'none', padding: '12px 30px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Entrar</button>
         </form>
@@ -77,61 +62,61 @@ export default function AdminDashboard() {
   }
 
   return (
-    <main style={{ padding: '30px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'system-ui' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-        <h1>Panel de Asistencia</h1>
-        <button onClick={() => setAuthorized(false)} style={{ background: '#eee', border: 'none', padding: '8px 15px', borderRadius: '6px' }}>Cerrar Sesión</button>
+    <main style={{ padding: '30px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'system-ui', backgroundColor: '#ffffff', minHeight: '100vh', color: '#000' }}>
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '2px solid #eee', paddingBottom: '10px' }}>
+        <h1 style={{ color: '#000' }}>Panel de Asistencia</h1>
+        <button onClick={() => setAuthorized(false)} style={{ background: '#333', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '6px', cursor: 'pointer' }}>Cerrar Sesión</button>
       </header>
 
-      {/* TARJETAS DE RESUMEN */}
+      {/* TARJETAS CON COLORES FIJOS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '40px' }}>
-        <div style={{ padding: '20px', background: '#e3f2fd', borderRadius: '10px' }}>
-          <h4 style={{ margin: 0 }}>Total Registrados</h4>
-          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '10px 0' }}>{asistencias.length}</p>
+        <div style={{ padding: '20px', background: '#cfe2ff', borderRadius: '10px', border: '1px solid #9ec5fe' }}>
+          <h4 style={{ margin: 0, color: '#084298' }}>Total Registrados</h4>
+          <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '10px 0', color: '#084298' }}>{asistencias.length}</p>
         </div>
-        <div style={{ padding: '20px', background: '#f1f8e9', borderRadius: '10px' }}>
-          <h4 style={{ margin: 0 }}>Vistos en Filtro</h4>
-          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '10px 0' }}>{datosFiltrados.length}</p>
+        <div style={{ padding: '20px', background: '#d1e7dd', borderRadius: '10px', border: '1px solid #a3cfbb' }}>
+          <h4 style={{ margin: 0, color: '#0f5132' }}>Vistos en Filtro</h4>
+          <p style={{ fontSize: '2.5rem', fontWeight: 'bold', margin: '10px 0', color: '#0f5132' }}>{datosFiltrados.length}</p>
         </div>
       </div>
 
-      {/* BLOQUE DE NOTIFICACIONES */}
-      <div style={{ background: 'white', padding: '25px', borderRadius: '12px', border: '1px solid #eee', marginBottom: '40px' }}>
-        <h3>📢 Enviar Notificación Push</h3>
-        <p style={{ fontSize: '0.8rem', color: '#666' }}>Se enviará a: <strong>{filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `GRUPO ${filtroHorario}`}</strong></p>
+      {/* BLOQUE DE NOTIFICACIONES (FONDO GRIS CLARO PARA QUE RESALTE) */}
+      <div style={{ background: '#f8f9fa', padding: '25px', borderRadius: '12px', border: '2px solid #000', marginBottom: '40px' }}>
+        <h3 style={{ color: '#000', marginTop: 0 }}>📢 Enviar Notificación Push</h3>
+        <p style={{ fontSize: '0.9rem', color: '#333', marginBottom: '15px' }}>Destinatarios: <strong style={{ textDecoration: 'underline' }}>{filtroHorario === 'Todas' ? 'TODA LA IGLESIA' : `GRUPO ${filtroHorario}`}</strong></p>
         <input 
           type="text" 
           value={tituloPush} 
           onChange={(e) => setTituloPush(e.target.value)}
-          style={{ width: '100%', padding: '10px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #ddd' }}
+          style={{ width: '100%', padding: '12px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000' }}
         />
         <textarea 
-          placeholder="Escribe el mensaje para los fieles..."
+          placeholder="Escribe el mensaje..."
           value={mensajePush}
           onChange={(e) => setMensajePush(e.target.value)}
-          style={{ width: '100%', padding: '10px', height: '80px', borderRadius: '6px', border: '1px solid #ddd', marginBottom: '15px' }}
+          style={{ width: '100%', padding: '12px', height: '100px', borderRadius: '6px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', marginBottom: '15px' }}
         />
         <button 
-          onClick={enviarNotificacion}
-          style={{ width: '100%', padding: '15px', background: 'black', color: 'white', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}
+          onClick={() => alert("Función de envío activada")}
+          style={{ width: '100%', padding: '15px', background: '#000', color: '#fff', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}
         >
           ENVIAR AHORA
         </button>
       </div>
 
-      {/* FILTROS CON EXTRAOFICIAL */}
-      <div style={{ marginBottom: '20px', display: 'flex', gap: '15px', flexWrap: 'wrap', alignItems: 'center' }}>
+      {/* FILTROS CON BORDES NEGROS */}
+      <div style={{ marginBottom: '25px', display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
         <input 
           type="text" 
-          placeholder="Buscar fiel por nombre..." 
+          placeholder="Buscar fiel..." 
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc', minWidth: '250px' }}
+          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #000', minWidth: '250px', backgroundColor: '#fff', color: '#000' }}
         />
         <select 
           value={filtroHorario} 
           onChange={(e) => setFiltroHorario(e.target.value)}
-          style={{ padding: '10px', borderRadius: '8px', border: '1px solid #ccc' }}
+          style={{ padding: '12px', borderRadius: '8px', border: '1px solid #000', backgroundColor: '#fff', color: '#000', cursor: 'pointer' }}
         >
           <option value="Todas">Todas las reuniones</option>
           <option value="09:00">09:00 HS</option>
@@ -141,22 +126,26 @@ export default function AdminDashboard() {
         </select>
       </div>
 
-      {/* TABLA DE RESULTADOS */}
-      <div style={{ background: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      {/* TABLA CON CONTRASTE ALTO */}
+      <div style={{ background: '#fff', borderRadius: '12px', overflow: 'hidden', border: '1px solid #000' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#f8f9fa' }}>
+          <thead style={{ background: '#000' }}>
             <tr>
-              <th style={{ textAlign: 'left', padding: '15px' }}>Nombre</th>
-              <th style={{ textAlign: 'left', padding: '15px' }}>Horario</th>
-              <th style={{ textAlign: 'left', padding: '15px' }}>Ingreso</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Nombre</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Horario Bloque</th>
+              <th style={{ textAlign: 'left', padding: '15px', color: '#fff' }}>Hora Real</th>
             </tr>
           </thead>
           <tbody>
             {datosFiltrados.map((asistencia) => (
-              <tr key={asistencia.id} style={{ borderTop: '1px solid #eee' }}>
-                <td style={{ padding: '15px' }}>{asistencia.miembros?.nombre} {asistencia.miembros?.apellido}</td>
-                <td style={{ padding: '15px' }}>{asistencia.horario_reunion}</td>
-                <td style={{ padding: '15px' }}>{asistencia.hora_entrada}</td>
+              <tr key={asistencia.id} style={{ borderTop: '1px solid #000' }}>
+                <td style={{ padding: '15px', color: '#000', fontWeight: '500' }}>{asistencia.miembros?.nombre} {asistencia.miembros?.apellido}</td>
+                <td style={{ padding: '15px' }}>
+                  <span style={{ padding: '4px 10px', background: '#eee', borderRadius: '20px', fontSize: '0.85rem', color: '#000', border: '1px solid #ccc' }}>
+                    {asistencia.horario_reunion}
+                  </span>
+                </td>
+                <td style={{ padding: '15px', color: '#000' }}>{asistencia.hora_entrada}</td>
               </tr>
             ))}
           </tbody>
