@@ -326,8 +326,9 @@ export default function AdminDashboard() {
         </table>
       </div>
     </div>
-  )
-
+ );
+}
+      
 function StatCard({ label, value, color, isActive }: any) {
   return (
     <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' }}>
