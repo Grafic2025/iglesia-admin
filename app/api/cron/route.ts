@@ -67,7 +67,8 @@ export async function GET() {
             mensajeAEnviar = `📖 ${textoEspanol} (${referencia})`;
           } catch (e) {
             mensajeAEnviar = "¡Que tengas un bendecido día!";
-          } //
+          }
+        } // <--- ESTA ES LA LLAVE QUE FALTABA
 
         // 4. ENVÍO REAL (Asegúrate que la variable de entorno esté bien en Vercel)
         await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
