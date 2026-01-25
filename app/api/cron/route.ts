@@ -82,6 +82,16 @@ export async function GET() {
         });
       }
     }
+    
+    // --- ESTO ES LO NUEVO: Guardar el resultado en Supabase ---
+        await supabase
+          .from('programaciones')
+          .update({ 
+            ultimo_estado: respuesta.ok ? 'Exitoso' : 'Error', 
+            ultima_ejecucion: new Date().toISOString() 
+          })
+          .eq('id', tarea.id);
+        // ---------------------------------------------------------
 
     return NextResponse.json({ 
       ok: true, 
