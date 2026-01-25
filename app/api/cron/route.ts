@@ -5,30 +5,25 @@ export async function GET() {
   try {
     const ahora = new Date();
     
-    // 1. Obtenemos hora y minuto (ej: 18, 05)
-    const opciones: Intl.DateTimeFormatOptions = { 
-      hour: '2-digit', minute: '2-digit', 
-      hour12: false, timeZone: 'America/Argentina/Buenos_Aires' 
-    };
-    const horaActual = ahora.toLocaleTimeString('en-GB', opciones);
+    // 1. Obtenemos la hora actual exactamente como la guardas: "HH:mm" (ej: "18:19")
+    const horaActual = ahora.toLocaleTimeString('en-GB', { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      timeZone: 'America/Argentina/Buenos_Aires' 
+    });
     
-    // 2. Definimos el rango de ese minuto (desde :00 hasta :59 segundos)
-    const horaInicio = `${horaActual}:00`;
-    const horaFin = `${horaActual}:59`;
-
+    // 2. Preparamos el nombre del día para que coincida con "Domingo"
     const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diaHoy = dias[ahora.getDay()];
 
-    console.log(`Cron ejecutando: ${diaHoy} entre ${horaInicio} y ${horaFin}`);
+    console.log(`Buscando: ${diaHoy} a las ${horaActual}`);
 
-    // 3. BUSQUEDA POR RANGO (Esto es lo más seguro para columnas tipo TIME)
+    // 3. BUSQUEDA EXACTA: Buscamos el texto tal cual aparece en tu captura
     const { data: tareas, error } = await supabase
       .from('programaciones')
       .select('*')
-      .eq('activo', true)
-      .or(`dia_semana.eq.Todos los días,dia_semana.eq.${diaHoy}`)
-      .gte('hora', horaInicio) // Mayor o igual a 17:59:00
-      .lte('hora', horaFin);   // Menor o igual a 17:59:59
+      .eq('hora', horaActual) // Buscará "18:19"
+      .or(`dia_semana.eq.Todos los días,dia_semana.eq.${diaHoy}`);
 
     if (error) throw error;
 
@@ -42,12 +37,11 @@ export async function GET() {
             const data = await res.json();
             mensajeAEnviar = `📖 ${data.text} (${data.reference})`;
           } catch (e) {
-            mensajeAEnviar = "¡Bendecido día!";
+            mensajeAEnviar = "¡Que tengas un bendecido día!";
           }
         }
 
-        // 4. ENVÍO REAL
-        // IMPORTANTE: Verifica que NEXT_PUBLIC_BASE_URL sea https://tu-sitio.vercel.app
+        // 4. ENVÍO REAL (Asegúrate que la variable de entorno esté bien en Vercel)
         await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -62,7 +56,8 @@ export async function GET() {
 
     return NextResponse.json({ 
       ok: true, 
-      rangoBuscado: `${horaInicio} a ${horaFin}`, 
+      diaEncontrado: diaHoy,
+      horaBuscada: horaActual, 
       encontrados: tareas?.length || 0 
     });
 
