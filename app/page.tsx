@@ -26,8 +26,21 @@ export default function AdminDashboard() {
     if (authorized) {
       fetchAsistencias();
       fetchProgramaciones();
-      const channel = supabase.channel('cambios').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe();
-      return () => { supabase.removeChannel(channel) };
+
+      // Realtime para Asistencias
+      const channelAsis = supabase.channel('cambios-asistencias')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias())
+        .subscribe();
+
+      // Realtime para Programaciones (actualiza estados Exitoso/Error)
+      const channelProg = supabase.channel('cambios-programas')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'programaciones' }, () => fetchProgramaciones())
+        .subscribe();
+
+      return () => { 
+        supabase.removeChannel(channelAsis);
+        supabase.removeChannel(channelProg);
+      };
     }
   }, [authorized, fechaSeleccionada])
 
@@ -149,7 +162,7 @@ export default function AdminDashboard() {
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
       </div>
 
-      {/* PANEL DE PROGRAMACIÓN (Avisos y Versículos) */}
+      {/* PANEL DE PROGRAMACIÓN */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#FFB400', marginBottom: '8px' }}>⏰ Programar Avisos y Versículo</h3>
         <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px', lineHeight: '1.5' }}>
@@ -178,7 +191,7 @@ export default function AdminDashboard() {
               const dia = (document.getElementById('prog-dia') as HTMLSelectElement).value;
               const hora = (document.getElementById('prog-hora') as HTMLInputElement).value;
               if(!mensaje || !hora) return alert('Completa mensaje y hora');
-              const { error } = await supabase.from('programaciones').insert([{ mensaje, dia_semana: dia, hora, activo: true }]);
+              const { error } = await supabase.from('programaciones').insert([{ mensaje, dia_semana: dia, hora, activo: true, ultimo_estado: 'Pendiente' }]);
               if (error) alert('Error al programar');
               else {
                 alert('¡Programado con éxito!');
@@ -193,68 +206,53 @@ export default function AdminDashboard() {
         </div>
 
         {/* LISTA DE PROGRAMACIONES */}
-<div style={{ display: 'grid', gap: '10px' }}>
-  {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
-  {programaciones.map((p) => (
-    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-        {/* INDICADOR DE ESTADO VISUAL */}
-        <div 
-          title={p.ultimo_estado ? `Estado: ${p.ultimo_estado}` : 'Esperando ejecución'}
-          style={{ 
-            width: '10px', 
-            height: '10px', 
-            borderRadius: '50%', 
-            background: p.ultimo_estado === 'Exitoso' ? '#A8D500' : p.ultimo_estado?.includes('Error') ? '#ff4444' : '#555',
-            boxShadow: p.ultimo_estado === 'Exitoso' ? '0 0 8px #A8D500' : 'none'
-          }} 
-        />
-        
-        <div>
-          <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
-            {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
-          </div>
-          <div style={{ fontSize: '12px', color: '#888' }}>
-            {p.dia_semana} a las {p.hora.substring(0,5)} hs 
-            {p.ultima_ejecucion && (
-              <span style={{ marginLeft: '8px', fontStyle: 'italic', color: '#555' }}>
-                • Envío: {new Date(p.ultima_ejecucion).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs
-              </span>
-            )}
-          </div>
+        <div style={{ display: 'grid', gap: '10px' }}>
+          {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
+          {programaciones.map((p) => (
+            <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <div 
+                  title={p.ultimo_estado ? `Estado: ${p.ultimo_estado}` : 'Esperando ejecución'}
+                  style={{ 
+                    width: '10px', height: '10px', borderRadius: '50%', 
+                    background: p.ultimo_estado === 'Exitoso' ? '#A8D500' : p.ultimo_estado?.includes('Error') ? '#ff4444' : '#555',
+                    boxShadow: p.ultimo_estado === 'Exitoso' ? '0 0 8px #A8D500' : 'none'
+                  }} 
+                />
+                <div>
+                  <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
+                    {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#888' }}>
+                    {p.dia_semana} a las {p.hora.substring(0,5)} hs 
+                    {p.ultima_ejecucion && (
+                      <span style={{ marginLeft: '8px', fontStyle: 'italic', color: '#555' }}>
+                        • Envío: {new Date(p.ultima_ejecucion).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                {p.ultimo_estado && (
+                  <span style={{ fontSize: '10px', fontWeight: 'bold', color: p.ultimo_estado === 'Exitoso' ? '#A8D500' : '#ff4444', background: 'rgba(0,0,0,0.2)', padding: '2px 6px', borderRadius: '4px' }}>
+                    {p.ultimo_estado.toUpperCase()}
+                  </span>
+                )}
+                <button 
+                  onClick={async () => {
+                    if(confirm('¿Eliminar esta programación?')) {
+                      await supabase.from('programaciones').delete().eq('id', p.id);
+                      fetchProgramaciones();
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '18px', padding: '5px' }}
+                >🗑️</button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        {/* TEXTO DE ESTADO (Opcional, para más claridad) */}
-        {p.ultimo_estado && (
-          <span style={{ 
-            fontSize: '10px', 
-            fontWeight: 'bold', 
-            color: p.ultimo_estado === 'Exitoso' ? '#A8D500' : '#ff4444',
-            background: 'rgba(0,0,0,0.2)',
-            padding: '2px 6px',
-            borderRadius: '4px'
-          }}>
-            {p.ultimo_estado.toUpperCase()}
-          </span>
-        )}
-
-        <button 
-          onClick={async () => {
-            if(confirm('¿Eliminar esta programación?')) {
-              await supabase.from('programaciones').delete().eq('id', p.id);
-              fetchProgramaciones();
-            }
-          }}
-          style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '18px', padding: '5px' }}
-        >
-          🗑️
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
 
       {/* PANEL DE NOTIFICACIONES MANUALES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
@@ -296,7 +294,6 @@ export default function AdminDashboard() {
           <tbody>
             {datosFiltrados.map((a) => {
               const esNuevo = a.miembros?.created_at && new Date(a.miembros.created_at).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }) === hoyArg;
-              const esExtra = a.horario_reunion === 'Extraoficial';
               return (
                 <tr key={a.id} style={{ borderBottom: '1px solid #252525' }}>
                   <td style={{ padding: '15px' }}>
@@ -304,12 +301,7 @@ export default function AdminDashboard() {
                     {esNuevo && <span style={{ fontSize: '10px', background: '#A8D500', color: '#000', padding: '2px 6px', borderRadius: '10px', fontWeight: 'bold', display: 'inline-block', marginTop: '4px' }}>NUEVO</span>}
                   </td>
                   <td style={{ padding: '15px' }}>
-                    <span style={{ 
-                      fontSize: '12px', padding: '4px 8px', borderRadius: '6px', 
-                      background: esExtra ? '#FFB400' : '#333',
-                      color: esExtra ? '#000' : '#fff',
-                      fontWeight: esExtra ? 'bold' : 'normal'
-                    }}>
+                    <span style={{ fontSize: '12px', padding: '4px 8px', borderRadius: '6px', background: a.horario_reunion === 'Extraoficial' ? '#FFB400' : '#333', color: a.horario_reunion === 'Extraoficial' ? '#000' : '#fff' }}>
                       {a.horario_reunion}
                     </span>
                   </td>
@@ -326,9 +318,9 @@ export default function AdminDashboard() {
         </table>
       </div>
     </div>
- );
+  );
 }
-      
+
 function StatCard({ label, value, color, isActive }: any) {
   return (
     <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' }}>
