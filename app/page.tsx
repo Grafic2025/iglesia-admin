@@ -6,6 +6,7 @@ export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
   const [password, setPassword] = useState('')
   const [asistencias, setAsistencias] = useState<any[]>([])
+  const [programaciones, setProgramaciones] = useState<any[]>([])
   const [filtroHorario, setFiltroHorario] = useState('Todas')
   const [busqueda, setBusqueda] = useState('')
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
@@ -21,32 +22,17 @@ export default function AdminDashboard() {
     if (isAuth === 'true') setAuthorized(true)
   }, [])
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (password === 'Iglesia2026') {
-      setAuthorized(true)
-      localStorage.setItem('admin_auth', 'true')
-    } else {
-      alert('Contraseña incorrecta')
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('admin_auth')
-    setAuthorized(false)
-    setPassword('')
-  }
-
   useEffect(() => {
     if (authorized) {
       fetchAsistencias();
+      fetchProgramaciones();
       const channel = supabase.channel('cambios').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe();
       return () => { supabase.removeChannel(channel) };
     }
   }, [authorized, fechaSeleccionada])
 
   const fetchAsistencias = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('asistencias')
       .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at)`)
       .eq('fecha', fechaSeleccionada)
@@ -68,6 +54,30 @@ export default function AdminDashboard() {
       });
       setAsistencias(listaFinal);
     }
+  }
+
+  const fetchProgramaciones = async () => {
+    const { data } = await supabase
+      .from('programaciones')
+      .select('*')
+      .order('hora', { ascending: true });
+    if (data) setProgramaciones(data);
+  }
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (password === 'Iglesia2026') {
+      setAuthorized(true)
+      localStorage.setItem('admin_auth', 'true')
+    } else {
+      alert('Contraseña incorrecta')
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin_auth')
+    setAuthorized(false)
+    setPassword('')
   }
 
   const exportarCSV = () => {
@@ -133,67 +143,86 @@ export default function AdminDashboard() {
       {/* TARJETAS ESTADÍSTICAS */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '30px' }}>
         <StatCard label="Total Hoy" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} />
-        {/* NUEVA CARD EXTRAOFICIAL */}
         <StatCard label="Extra" value={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length} color="#FFB400" isActive={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length > 0} />
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
         <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
       </div>
-	  
-	  {/* NUEVO: PANEL DE PROGRAMACIÓN (Avisos y Versículos) */}
+
+      {/* PANEL DE PROGRAMACIÓN (Avisos y Versículos) */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
-        <h3 style={{ marginTop: 0, color: '#FFB400' }}>⏰ Programar Avisos y Versículo</h3>
-        <p style={{ fontSize: '13px', color: '#888', marginTop: '-10px' }}>
-          Escribe <b>VERSICULO</b> para enviar uno automático de la Biblia.
+        <h3 style={{ marginTop: 0, color: '#FFB400', marginBottom: '8px' }}>⏰ Programar Avisos y Versículo</h3>
+        <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px', lineHeight: '1.5' }}>
+          Escribe <b style={{ color: '#fff' }}>VERSICULO</b> para enviar uno automático de la Biblia.
         </p>
         
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '25px' }}>
           <input 
             placeholder="Mensaje o 'VERSICULO'" 
             id="prog-msj"
-            style={{ flex: 2, minWidth: '200px', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} 
+            style={{ flex: 2, minWidth: '200px', padding: '14px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '16px' }} 
           />
-          <select id="prog-dia" style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444' }}>
+          <select id="prog-dia" style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#222', color: '#fff', border: '1px solid #444', fontSize: '16px' }}>
             <option>Todos los días</option>
-            <option>Lunes</option>
-            <option>Martes</option>
-            <option>Miércoles</option>
-            <option>Jueves</option>
-            <option>Viernes</option>
-            <option>Sábado</option>
-            <option>Domingo</option>
+            <option>Lunes</option><option>Martes</option><option>Miércoles</option>
+            <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
           </select>
           <input 
             type="time" 
             id="prog-hora"
-            style={{ flex: 1, padding: '12px', borderRadius: '8px', background: '#222', color: '#fff', border: '1px solid #444' }} 
+            style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#222', color: '#fff', border: '1px solid #444', fontSize: '16px' }} 
           />
           <button 
             onClick={async () => {
               const mensaje = (document.getElementById('prog-msj') as HTMLInputElement).value;
               const dia = (document.getElementById('prog-dia') as HTMLSelectElement).value;
               const hora = (document.getElementById('prog-hora') as HTMLInputElement).value;
-              
               if(!mensaje || !hora) return alert('Completa mensaje y hora');
-
-              const { error } = await supabase.from('programaciones').insert([
-                { mensaje, dia_semana: dia, hora, activo: true }
-              ]);
-
+              const { error } = await supabase.from('programaciones').insert([{ mensaje, dia_semana: dia, hora, activo: true }]);
               if (error) alert('Error al programar');
               else {
                 alert('¡Programado con éxito!');
                 (document.getElementById('prog-msj') as HTMLInputElement).value = '';
+                fetchProgramaciones();
               }
             }}
-            style={{ padding: '12px 25px', background: '#FFB400', color: '#000', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', border: 'none' }}
+            style={{ padding: '14px 25px', background: '#FFB400', color: '#000', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer', border: 'none', fontSize: '16px' }}
           >
             PROGRAMAR
           </button>
         </div>
+
+        {/* LISTA DE PROGRAMACIONES */}
+        <div style={{ borderTop: '1px solid #333', paddingTop: '20px' }}>
+          <h4 style={{ margin: '0 0 15px 0', color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Envíos Automáticos Activos</h4>
+          <div style={{ display: 'grid', gap: '10px' }}>
+            {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
+            {programaciones.map((p) => (
+              <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
+                <div>
+                  <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
+                    {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#888' }}>{p.dia_semana} a las {p.hora.substring(0,5)} hs</div>
+                </div>
+                <button 
+                  onClick={async () => {
+                    if(confirm('¿Eliminar esta programación?')) {
+                      await supabase.from('programaciones').delete().eq('id', p.id);
+                      fetchProgramaciones();
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '18px' }}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* PANEL DE NOTIFICACIONES */}
+      {/* PANEL DE NOTIFICACIONES MANUALES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
         <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
@@ -201,9 +230,9 @@ export default function AdminDashboard() {
           placeholder="Escribe el mensaje aquí..." 
           value={mensajePush} 
           onChange={(e) => setMensajePush(e.target.value)} 
-          style={{ width: '100%', padding: '15px', height: '150px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px', fontSize: '16px', resize: 'vertical' }} 
+          style={{ width: '100%', padding: '15px', height: '100px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px', fontSize: '16px', resize: 'vertical' }} 
         />
-        <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN'}</button>
+        <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN AHORA'}</button>
         {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}
       </div>
 
@@ -242,9 +271,7 @@ export default function AdminDashboard() {
                   </td>
                   <td style={{ padding: '15px' }}>
                     <span style={{ 
-                      fontSize: '12px', 
-                      padding: '4px 8px', 
-                      borderRadius: '6px', 
+                      fontSize: '12px', padding: '4px 8px', borderRadius: '6px', 
                       background: esExtra ? '#FFB400' : '#333',
                       color: esExtra ? '#000' : '#fff',
                       fontWeight: esExtra ? 'bold' : 'normal'
