@@ -193,34 +193,68 @@ export default function AdminDashboard() {
         </div>
 
         {/* LISTA DE PROGRAMACIONES */}
-        <div style={{ borderTop: '1px solid #333', paddingTop: '20px' }}>
-          <h4 style={{ margin: '0 0 15px 0', color: '#888', fontSize: '12px', textTransform: 'uppercase', letterSpacing: '1px' }}>Envíos Automáticos Activos</h4>
-          <div style={{ display: 'grid', gap: '10px' }}>
-            {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
-            {programaciones.map((p) => (
-              <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
-                <div>
-                  <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
-                    {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#888' }}>{p.dia_semana} a las {p.hora.substring(0,5)} hs</div>
-                </div>
-                <button 
-                  onClick={async () => {
-                    if(confirm('¿Eliminar esta programación?')) {
-                      await supabase.from('programaciones').delete().eq('id', p.id);
-                      fetchProgramaciones();
-                    }
-                  }}
-                  style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '18px' }}
-                >
-                  🗑️
-                </button>
-              </div>
-            ))}
+<div style={{ display: 'grid', gap: '10px' }}>
+  {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
+  {programaciones.map((p) => (
+    <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        {/* INDICADOR DE ESTADO VISUAL */}
+        <div 
+          title={p.ultimo_estado ? `Estado: ${p.ultimo_estado}` : 'Esperando ejecución'}
+          style={{ 
+            width: '10px', 
+            height: '10px', 
+            borderRadius: '50%', 
+            background: p.ultimo_estado === 'Exitoso' ? '#A8D500' : p.ultimo_estado?.includes('Error') ? '#ff4444' : '#555',
+            boxShadow: p.ultimo_estado === 'Exitoso' ? '0 0 8px #A8D500' : 'none'
+          }} 
+        />
+        
+        <div>
+          <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
+            {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
+          </div>
+          <div style={{ fontSize: '12px', color: '#888' }}>
+            {p.dia_semana} a las {p.hora.substring(0,5)} hs 
+            {p.ultima_ejecucion && (
+              <span style={{ marginLeft: '8px', fontStyle: 'italic', color: '#555' }}>
+                • Envío: {new Date(p.ultima_ejecucion).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs
+              </span>
+            )}
           </div>
         </div>
       </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* TEXTO DE ESTADO (Opcional, para más claridad) */}
+        {p.ultimo_estado && (
+          <span style={{ 
+            fontSize: '10px', 
+            fontWeight: 'bold', 
+            color: p.ultimo_estado === 'Exitoso' ? '#A8D500' : '#ff4444',
+            background: 'rgba(0,0,0,0.2)',
+            padding: '2px 6px',
+            borderRadius: '4px'
+          }}>
+            {p.ultimo_estado.toUpperCase()}
+          </span>
+        )}
+
+        <button 
+          onClick={async () => {
+            if(confirm('¿Eliminar esta programación?')) {
+              await supabase.from('programaciones').delete().eq('id', p.id);
+              fetchProgramaciones();
+            }
+          }}
+          style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '18px', padding: '5px' }}
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
 
       {/* PANEL DE NOTIFICACIONES MANUALES */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
