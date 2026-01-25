@@ -327,7 +327,6 @@ export default function AdminDashboard() {
       </div>
     </div>
   )
-}
 
 function StatCard({ label, value, color, isActive }: any) {
   return (
