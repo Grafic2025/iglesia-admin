@@ -5,27 +5,30 @@ export async function GET() {
   try {
     const ahora = new Date();
     
-    // 1. Generamos la hora en formato HH:mm (ej: "18:05")
-    // Usamos 'en-GB' para asegurar formato 24hs sin AM/PM
-    const horaActualCorta = ahora.toLocaleTimeString('en-GB', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      timeZone: 'America/Argentina/Buenos_Aires' 
-    });
+    // 1. Obtenemos hora y minuto (ej: 18, 05)
+    const opciones: Intl.DateTimeFormatOptions = { 
+      hour: '2-digit', minute: '2-digit', 
+      hour12: false, timeZone: 'America/Argentina/Buenos_Aires' 
+    };
+    const horaActual = ahora.toLocaleTimeString('en-GB', opciones);
     
+    // 2. Definimos el rango de ese minuto (desde :00 hasta :59 segundos)
+    const horaInicio = `${horaActual}:00`;
+    const horaFin = `${horaActual}:59`;
+
     const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diaHoy = dias[ahora.getDay()];
 
-    console.log(`Buscando programaciones para: ${diaHoy} ${horaActualCorta}`);
+    console.log(`Cron ejecutando: ${diaHoy} entre ${horaInicio} y ${horaFin}`);
 
-    // 2. BUSQUEDA FLEXIBLE: Usamos 'ilike' con '%' para ignorar los segundos
-    // Esto encontrará "18:05:00" aunque el cron llegue a las "18:05:35"
+    // 3. BUSQUEDA POR RANGO (Esto es lo más seguro para columnas tipo TIME)
     const { data: tareas, error } = await supabase
       .from('programaciones')
       .select('*')
       .eq('activo', true)
       .or(`dia_semana.eq.Todos los días,dia_semana.eq.${diaHoy}`)
-      .filter('hora', 'ilike', `${horaActualCorta}%`); 
+      .gte('hora', horaInicio) // Mayor o igual a 17:59:00
+      .lte('hora', horaFin);   // Menor o igual a 17:59:59
 
     if (error) throw error;
 
@@ -33,19 +36,18 @@ export async function GET() {
       for (const tarea of tareas) {
         let mensajeAEnviar = tarea.mensaje;
 
-        // Lógica de Versículo Automático
         if (tarea.mensaje.toUpperCase() === 'VERSICULO') {
           try {
             const res = await fetch('https://bible-api.com/?random=verse&translation=bbe');
             const data = await res.json();
             mensajeAEnviar = `📖 ${data.text} (${data.reference})`;
           } catch (e) {
-            mensajeAEnviar = "¡Que tengas un bendecido día en el Señor!";
+            mensajeAEnviar = "¡Bendecido día!";
           }
         }
 
-        // 3. ENVIAR NOTIFICACIÓN
-        // Asegúrate que NEXT_PUBLIC_BASE_URL en Vercel sea: https://iglesia-admin.vercel.app
+        // 4. ENVÍO REAL
+        // IMPORTANTE: Verifica que NEXT_PUBLIC_BASE_URL sea https://tu-sitio.vercel.app
         await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -60,8 +62,8 @@ export async function GET() {
 
     return NextResponse.json({ 
       ok: true, 
-      horaServidor: horaActualCorta, 
-      tareasEncontradas: tareas?.length || 0 
+      rangoBuscado: `${horaInicio} a ${horaFin}`, 
+      encontrados: tareas?.length || 0 
     });
 
   } catch (error: any) {
