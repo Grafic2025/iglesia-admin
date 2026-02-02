@@ -3,17 +3,14 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    // 1. Extraemos 'specificToken' del cuerpo de la petición
     const { title, message, horario, specificToken } = await req.json();
 
     let tokens: string[] = [];
 
-    // 2. LÓGICA DE SELECCIÓN DE TOKENS
+    // 1. LÓGICA DE SELECCIÓN DE TOKENS
     if (specificToken) {
-      // CASO A: Es una notificación para un usuario específico (ej. Bienvenida QR)
       tokens = [specificToken];
     } else {
-      // CASO B: Es una notificación masiva (por horario o a todos)
       const hoy = new Date().toLocaleDateString("en-CA", {
         timeZone: "America/Argentina/Buenos_Aires"
       });
@@ -42,19 +39,23 @@ export async function POST(req: Request) {
       const { data: miembros, error: errMieb } = await query;
       if (errMieb) throw new Error("Error buscando miembros");
 
-      // Filtrar y limpiar tokens duplicados
-      tokens = [...new Set(
-        miembros?.map(m => m.token_notificacion)
-          .filter(t => t && t.startsWith('ExponentPushToken'))
-      )] as string[];
+      // Obtenemos tokens de la tabla miembros
+      const tokensMiembros = miembros?.map(m => m.token_notificacion) || [];
+      
+      // Obtenemos también tokens de la tabla push_tokens para asegurar alcance total
+      const { data: otrosTokens } = await supabase.from('push_tokens').select('token');
+      const tokensGenerales = otrosTokens?.map(t => t.token) || [];
+
+      // Unificamos y filtramos duplicados/inválidos
+      tokens = [...new Set([...tokensMiembros, ...tokensGenerales])]
+        .filter(t => t && t.startsWith('ExponentPushToken')) as string[];
     }
 
-    // 3. VALIDACIÓN FINAL DE TOKENS
     if (tokens.length === 0) {
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 4. PREPARAR NOTIFICACIONES PARA EXPO
+    // 2. PREPARAR NOTIFICACIONES
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
@@ -62,7 +63,7 @@ export async function POST(req: Request) {
       body: message,
     }));
 
-    // 5. ENVÍO A EXPO
+    // 3. ENVÍO A EXPO
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: { 
@@ -73,6 +74,33 @@ export async function POST(req: Request) {
     });
 
     const expoData = await response.json();
+
+    // --- 4. LÓGICA DE LIMPIEZA DOBLE (Miembros y Push_Tokens) ---
+    if (expoData.data) {
+      const tokensABorrar: string[] = [];
+      
+      expoData.data.forEach((ticket: any, index: number) => {
+        if (ticket.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
+          tokensABorrar.push(tokens[index]);
+        }
+      });
+
+      if (tokensABorrar.length > 0) {
+        // Limpiamos en la tabla 'miembros'
+        await supabase
+          .from('miembros')
+          .update({ token_notificacion: null })
+          .in('token_notificacion', tokensABorrar);
+        
+        // Limpiamos en la tabla 'push_tokens'
+        await supabase
+          .from('push_tokens')
+          .delete()
+          .in('token', tokensABorrar);
+        
+        console.log(`🧹 Limpieza: se eliminaron ${tokensABorrar.length} tokens obsoletos.`);
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 
