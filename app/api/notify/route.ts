@@ -3,11 +3,12 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    const { title, message, horario, specificToken } = await req.json();
+    // 1. Agregamos 'image' a la desestructuración del JSON
+    const { title, message, horario, specificToken, image } = await req.json();
 
     let tokens: string[] = [];
 
-    // 1. LÓGICA DE SELECCIÓN DE TOKENS
+    // --- LÓGICA DE SELECCIÓN DE TOKENS (Se mantiene igual) ---
     if (specificToken) {
       tokens = [specificToken];
     } else {
@@ -39,14 +40,10 @@ export async function POST(req: Request) {
       const { data: miembros, error: errMieb } = await query;
       if (errMieb) throw new Error("Error buscando miembros");
 
-      // Obtenemos tokens de la tabla miembros
       const tokensMiembros = miembros?.map(m => m.token_notificacion) || [];
-      
-      // Obtenemos también tokens de la tabla push_tokens para asegurar alcance total
       const { data: otrosTokens } = await supabase.from('push_tokens').select('token');
       const tokensGenerales = otrosTokens?.map(t => t.token) || [];
 
-      // Unificamos y filtramos duplicados/inválidos
       tokens = [...new Set([...tokensMiembros, ...tokensGenerales])]
         .filter(t => t && t.startsWith('ExponentPushToken')) as string[];
     }
@@ -55,12 +52,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 2. PREPARAR NOTIFICACIONES
+    // 2. PREPARAR NOTIFICACIONES CON IMAGEN
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: title || "Iglesia del Salvador",
       body: message,
+      // PROPIEDAD CLAVE: Aquí es donde Expo toma la imagen para la vista previa
+      image: image ? image : null, 
+      // Opcional: enviamos la url también en data por si la app necesita abrirla
+      data: { 
+        url: image || null,
+        message: message 
+      },
+      // Habilita la prioridad alta para que la imagen cargue rápido
+      priority: 'high' 
     }));
 
     // 3. ENVÍO A EXPO
@@ -75,10 +81,9 @@ export async function POST(req: Request) {
 
     const expoData = await response.json();
 
-    // --- 4. LÓGICA DE LIMPIEZA DOBLE (Miembros y Push_Tokens) ---
+    // --- 4. LÓGICA DE LIMPIEZA DOBLE (Se mantiene igual) ---
     if (expoData.data) {
       const tokensABorrar: string[] = [];
-      
       expoData.data.forEach((ticket: any, index: number) => {
         if (ticket.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
           tokensABorrar.push(tokens[index]);
@@ -86,19 +91,8 @@ export async function POST(req: Request) {
       });
 
       if (tokensABorrar.length > 0) {
-        // Limpiamos en la tabla 'miembros'
-        await supabase
-          .from('miembros')
-          .update({ token_notificacion: null })
-          .in('token_notificacion', tokensABorrar);
-        
-        // Limpiamos en la tabla 'push_tokens'
-        await supabase
-          .from('push_tokens')
-          .delete()
-          .in('token', tokensABorrar);
-        
-        console.log(`🧹 Limpieza: se eliminaron ${tokensABorrar.length} tokens obsoletos.`);
+        await supabase.from('miembros').update({ token_notificacion: null }).in('token_notificacion', tokensABorrar);
+        await supabase.from('push_tokens').delete().in('token', tokensABorrar);
       }
     }
 
