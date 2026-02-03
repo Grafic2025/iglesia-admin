@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
+  const [urlImagen, setUrlImagen] = useState('') // NUEVO: Estado para la imagen
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
 
@@ -27,12 +28,10 @@ export default function AdminDashboard() {
       fetchAsistencias();
       fetchProgramaciones();
 
-      // Realtime para Asistencias
       const channelAsis = supabase.channel('cambios-asistencias')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias())
         .subscribe();
 
-      // Realtime para Programaciones (actualiza estados Exitoso/Error)
       const channelProg = supabase.channel('cambios-programas')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'programaciones' }, () => fetchProgramaciones())
         .subscribe();
@@ -103,17 +102,36 @@ export default function AdminDashboard() {
     link.click();
   }
 
+  // NUEVA LÓGICA: Extraer miniatura de Youtube
+  const getYoutubeThumb = (url: string) => {
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      const videoId = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
+      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+    return url;
+  }
+
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
+    
+    // Convertimos a miniatura si es link de Youtube
+    const finalImage = getYoutubeThumb(urlImagen);
+
     try {
       const res = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: tituloPush, message: mensajePush, horario: filtroHorario }),
+        body: JSON.stringify({ 
+          title: tituloPush, 
+          message: mensajePush, 
+          horario: filtroHorario,
+          image: finalImage // Enviamos la imagen a la API
+        }),
       });
       const result = await res.json();
       setNotificacionStatus({ show: true, message: res.ok ? `✅ Enviado a ${result.total} personas` : `❌ Error`, error: !res.ok });
+      if(res.ok) setUrlImagen('');
     } catch (e) {
       setNotificacionStatus({ show: true, message: `❌ Error de red`, error: true });
     }
@@ -254,10 +272,33 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* PANEL DE NOTIFICACIONES MANUALES */}
+      {/* PANEL DE NOTIFICACIONES MANUALES (MODIFICADO) */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
+        
         <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
+        
+        {/* NUEVO: Campo de imagen / Youtube */}
+        <div style={{ marginBottom: '15px' }}>
+          <input 
+            placeholder="Link de YouTube o Imagen (.jpg, .png)" 
+            value={urlImagen} 
+            onChange={(e) => setUrlImagen(e.target.value)} 
+            style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} 
+          />
+          {urlImagen && (
+            <div style={{ marginTop: '10px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #333', width: '250px', background: '#111' }}>
+              <p style={{ fontSize: '10px', color: '#888', padding: '5px 10px', margin: 0 }}>Vista previa:</p>
+              <img 
+                src={getYoutubeThumb(urlImagen)} 
+                style={{ width: '100%', height: 'auto', display: 'block' }} 
+                alt="Preview"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
+            </div>
+          )}
+        </div>
+
         <textarea 
           placeholder="Escribe el mensaje aquí..." 
           value={mensajePush} 
