@@ -52,20 +52,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 2. PREPARAR NOTIFICACIONES CON IMAGEN
+    // 2. PREPARAR NOTIFICACIONES CON IMAGEN (CORREGIDO PARA VISUALIZACIÓN EN CELULAR)
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: title || "Iglesia del Salvador",
       body: message,
-      // PROPIEDAD CLAVE: Aquí es donde Expo toma la imagen para la vista previa
-      image: image ? image : null, 
-      // Opcional: enviamos la url también en data por si la app necesita abrirla
+      
+      // PROPIEDADES CLAVE PARA QUE SE VEA LA IMAGEN:
+      mutableContent: true, // Permite que iOS descargue la imagen antes de mostrarla
+      attachments: image ? [{ url: image }] : [], // Requerido para iOS
+      image: image || null, // Requerido para Android
+      
       data: { 
         url: image || null,
         message: message 
       },
-      // Habilita la prioridad alta para que la imagen cargue rápido
       priority: 'high' 
     }));
 

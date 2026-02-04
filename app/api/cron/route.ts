@@ -25,7 +25,9 @@ export async function GET() {
     if (tareas && tareas.length > 0) {
       for (const tarea of tareas) {
         let mensajeAEnviar = tarea.mensaje;
+        let imagenAEnviar = tarea.url_imagen || null; // <--- NUEVO: Soporte para imagen programada
 
+        // --- LÓGICA DE VERSÍCULO ---
         if (tarea.mensaje.toUpperCase() === 'VERSICULO') {
           try {
             const res = await fetch('https://bible-api.com/?random=verse&translation=bbe');
@@ -35,35 +37,37 @@ export async function GET() {
             const dataT = await resT.json();
             const textoEspanol = dataT.responseData.translatedText;
 
-          let referencia = data.reference;
-const libros: { [key: string]: string } = {
-  'Genesis': 'Génesis', 'Exodus': 'Éxodo', 'Leviticus': 'Levítico', 'Numbers': 'Números', 'Deuteronomy': 'Deuteronomio',
-  'Joshua': 'Josué', 'Judges': 'Jueces', 'Ruth': 'Rut', '1 Samuel': '1 Samuel', '2 Samuel': '2 Samuel',
-  '1 Kings': '1 Reyes', '2 Kings': '2 Reyes', '1 Chronicles': '1 Crónicas', '2 Chronicles': '2 Crónicas',
-  'Ezra': 'Esdras', 'Nehemiah': 'Nehemías', 'Esther': 'Ester', 'Job': 'Job', 'Psalms': 'Salmos', 'Psalm': 'Salmo',
-  'Proverbs': 'Proverbios', 'Ecclesiastes': 'Eclesiastés', 'Song of Solomon': 'Cantares', 'Song of Songs': 'Cantares', 
-  'Isaiah': 'Isaías', 'Jeremiah': 'Jeremías', 'Lamentations': 'Lamentaciones', 'Ezekiel': 'Ezequiel', 'Daniel': 'Daniel', 
-  'Hosea': 'Oseas', 'Joel': 'Joel', 'Amos': 'Amós', 'Obadiah': 'Abdías', 'Jonah': 'Jonás', 'Micah': 'Miqueas', 'Nahum': 'Nahúm',
-  'Habakkuk': 'Habacuc', 'Zephaniah': 'Sofonías', 'Haggai': 'Hageo', 'Zechariah': 'Zacarías', 'Malachi': 'Malaquías',
-  'Matthew': 'Mateo', 'Mark': 'Marcos', 'Luke': 'Lucas', 'John': 'Juan', 'Acts': 'Hechos', 'Romans': 'Romanos',
-  '1 Corinthians': '1 Corintios', '2 Corinthians': '2 Corintios', 'Galatians': 'Gálatas', 'Ephesians': 'Efesios',
-  'Philippians': 'Filipenses', 'Colossians': 'Colosenses', '1 Thessalonians': '1 Tesalonicenses', '2 Thessalonians': '2 Tesalonicenses',
-  '1 Timothy': '1 Timoteo', '2 Timothy': '2 Timoteo', 'Titus': 'Tito', 'Philemon': 'Filemón', 'Hebrews': 'Hebreos',
-  'James': 'Santiago', '1 Peter': '1 Pedro', '2 Peter': '2 Pedro', '1 John': '1 Juan', '2 John': '2 Juan',
-  '3 John': '3 Juan', 'Jude': 'Judas', 'Revelation': 'Apocalipsis'
-};
+            let referencia = data.reference;
+            const libros: { [key: string]: string } = {
+              'Genesis': 'Génesis', 'Exodus': 'Éxodo', 'Leviticus': 'Levítico', 'Numbers': 'Números', 'Deuteronomy': 'Deuteronomio',
+              'Joshua': 'Josué', 'Judges': 'Jueces', 'Ruth': 'Rut', '1 Samuel': '1 Samuel', '2 Samuel': '2 Samuel',
+              '1 Kings': '1 Reyes', '2 Kings': '2 Reyes', '1 Chronicles': '1 Crónicas', '2 Chronicles': '2 Crónicas',
+              'Ezra': 'Esdras', 'Nehemiah': 'Nehemías', 'Esther': 'Ester', 'Job': 'Job', 'Psalms': 'Salmos', 'Psalm': 'Salmo',
+              'Proverbs': 'Proverbios', 'Ecclesiastes': 'Eclesiastés', 'Song of Solomon': 'Cantares', 'Song of Songs': 'Cantares', 
+              'Isaiah': 'Isaías', 'Jeremiah': 'Jeremías', 'Lamentations': 'Lamentaciones', 'Ezekiel': 'Ezequiel', 'Daniel': 'Daniel', 
+              'Hosea': 'Oseas', 'Joel': 'Joel', 'Amos': 'Amós', 'Obadiah': 'Abdías', 'Jonah': 'Jonás', 'Micah': 'Miqueas', 'Nahum': 'Nahúm',
+              'Habakkuk': 'Habacuc', 'Zephaniah': 'Sofonías', 'Haggai': 'Hageo', 'Zechariah': 'Zacarías', 'Malachi': 'Malaquías',
+              'Matthew': 'Mateo', 'Mark': 'Marcos', 'Luke': 'Lucas', 'John': 'Juan', 'Acts': 'Hechos', 'Romans': 'Romanos',
+              '1 Corinthians': '1 Corintios', '2 Corinthians': '2 Corintios', 'Galatians': 'Gálatas', 'Ephesians': 'Efesios',
+              'Philippians': 'Filipenses', 'Colossians': 'Colosenses', '1 Thessalonians': '1 Tesalonicenses', '2 Thessalonians': '2 Tesalonicenses',
+              '1 Timothy': '1 Timoteo', '2 Timothy': '2 Timoteo', 'Titus': 'Tito', 'Philemon': 'Filemón', 'Hebrews': 'Hebreos',
+              'James': 'Santiago', '1 Peter': '1 Pedro', '2 Peter': '2 Pedro', '1 John': '1 Juan', '2 John': '2 Juan',
+              '3 John': '3 Juan', 'Jude': 'Judas', 'Revelation': 'Apocalipsis'
+            };
 
-Object.keys(libros).forEach(eng => { 
-  referencia = referencia.replace(eng, libros[eng]); 
-});
+            Object.keys(libros).forEach(eng => { 
+              referencia = referencia.replace(eng, libros[eng]); 
+            });
 
             mensajeAEnviar = `📖 ${textoEspanol} (${referencia})`;
+            // Podés poner una imagen fija para los versículos si querés:
+            // imagenAEnviar = "https://tu-link-a-imagen-biblia.jpg"; 
           } catch (e) {
             mensajeAEnviar = "¡Que tengas un bendecido día!";
           }
         }
 
-        // --- ENVÍO REAL Y CAPTURA DE ESTADO ---
+        // --- ENVÍO REAL A LA API DE NOTIFICACIONES ---
         try {
           const respuestaEnvio = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
             method: 'POST',
@@ -71,11 +75,11 @@ Object.keys(libros).forEach(eng => {
             body: JSON.stringify({ 
               title: tarea.mensaje.toUpperCase() === 'VERSICULO' ? 'Versículo del Día' : 'Aviso Iglesia',
               message: mensajeAEnviar,
-              horario: 'Todas'
+              horario: 'Todas',
+              image: imagenAEnviar // <--- AGREGADO: Ahora la cron también manda la imagen
             }),
           });
 
-          // Actualizamos la fila en Supabase con el resultado
           await supabase
             .from('programaciones')
             .update({ 
@@ -85,7 +89,6 @@ Object.keys(libros).forEach(eng => {
             .eq('id', tarea.id);
 
         } catch (errorEnvio) {
-          // Si ni siquiera pudo conectar con la API de notificación
           await supabase
             .from('programaciones')
             .update({ 
