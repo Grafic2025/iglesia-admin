@@ -3,8 +3,13 @@ import { supabase } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
-    // 1. Agregamos 'image' a la desestructuración del JSON
-    const { title, message, horario, specificToken, image } = await req.json();
+    const body = await req.json();
+    const { title, message, horario, specificToken, image } = body;
+
+    // --- LOGS DE ENTRADA ---
+    console.log("=== NUEVA NOTIFICACIÓN ===");
+    console.log("Título:", title);
+    console.log("URL Imagen:", image || "No se recibió imagen");
 
     let tokens: string[] = [];
 
@@ -30,6 +35,7 @@ export async function POST(req: Request) {
         const ids = asistenciasHoy?.map(a => a.miembro_id) || [];
         
         if (ids.length === 0) {
+          console.log("Aviso: No hay asistentes para el horario seleccionado");
           return NextResponse.json({ 
             error: `Nadie asistió a la reunión de las ${horario} el día ${hoy}` 
           }, { status: 400 });
@@ -49,27 +55,28 @@ export async function POST(req: Request) {
     }
 
     if (tokens.length === 0) {
+      console.log("Error: Lista de tokens vacía");
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 2. PREPARAR NOTIFICACIONES (Mantenemos tu lógica, agregamos soporte multimedia real)
+    // 2. PREPARAR NOTIFICACIONES
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: title || "Iglesia del Salvador",
       body: message,
-      
-      // AJUSTES TÉCNICOS PARA IMÁGENES
-      mutableContent: true, // Permite que el celular procese el archivo adjunto
-      attachments: image ? [{ url: image }] : [], // Formato para iOS
-      image: image || null, // Formato para Android
-      
+      mutableContent: true, 
+      attachments: image ? [{ url: image }] : [], 
+      image: image || null, 
       data: { 
         url: image || null,
         message: message 
       },
       priority: 'high' 
     }));
+
+    // --- LOG DEL PAYLOAD QUE VA A EXPO ---
+    console.log("Payload enviado a Expo (Muestra 1):", JSON.stringify(notifications[0], null, 2));
 
     // 3. ENVÍO A EXPO
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
@@ -82,6 +89,9 @@ export async function POST(req: Request) {
     });
 
     const expoData = await response.json();
+
+    // --- LOG DE RESPUESTA DE EXPO ---
+    console.log("Respuesta de Expo Server:", JSON.stringify(expoData, null, 2));
 
     // --- 4. LÓGICA DE LIMPIEZA DOBLE (Se mantiene igual) ---
     if (expoData.data) {
@@ -105,6 +115,7 @@ export async function POST(req: Request) {
     });
 
   } catch (error: any) {
+    console.error("Error crítico en la API:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
