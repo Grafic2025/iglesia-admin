@@ -52,17 +52,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 2. PREPARAR NOTIFICACIONES CON IMAGEN (CORREGIDO PARA VISUALIZACIÓN EN CELULAR)
+    // 2. PREPARAR NOTIFICACIONES (Mantenemos tu lógica, agregamos soporte multimedia real)
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: title || "Iglesia del Salvador",
       body: message,
       
-      // PROPIEDADES CLAVE PARA QUE SE VEA LA IMAGEN:
-      mutableContent: true, // Permite que iOS descargue la imagen antes de mostrarla
-      attachments: image ? [{ url: image }] : [], // Requerido para iOS
-      image: image || null, // Requerido para Android
+      // AJUSTES TÉCNICOS PARA IMÁGENES
+      mutableContent: true, // Permite que el celular procese el archivo adjunto
+      attachments: image ? [{ url: image }] : [], // Formato para iOS
+      image: image || null, // Formato para Android
       
       data: { 
         url: image || null,

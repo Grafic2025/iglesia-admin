@@ -25,7 +25,7 @@ export async function GET() {
     if (tareas && tareas.length > 0) {
       for (const tarea of tareas) {
         let mensajeAEnviar = tarea.mensaje;
-        let imagenAEnviar = tarea.url_imagen || null; // <--- NUEVO: Soporte para imagen programada
+        let imagenAEnviar = tarea.url_imagen || null; // Soporte para imagen programada en la tabla
 
         // --- LÓGICA DE VERSÍCULO ---
         if (tarea.mensaje.toUpperCase() === 'VERSICULO') {
@@ -60,8 +60,10 @@ export async function GET() {
             });
 
             mensajeAEnviar = `📖 ${textoEspanol} (${referencia})`;
-            // Podés poner una imagen fija para los versículos si querés:
-            // imagenAEnviar = "https://tu-link-a-imagen-biblia.jpg"; 
+            
+            // Opcional: Si quieres una imagen por defecto para los versículos, descomenta la línea de abajo
+            // if (!imagenAEnviar) imagenAEnviar = "URL_DE_UNA_IMAGEN_DE_BIBLIA";
+
           } catch (e) {
             mensajeAEnviar = "¡Que tengas un bendecido día!";
           }
@@ -76,7 +78,7 @@ export async function GET() {
               title: tarea.mensaje.toUpperCase() === 'VERSICULO' ? 'Versículo del Día' : 'Aviso Iglesia',
               message: mensajeAEnviar,
               horario: 'Todas',
-              image: imagenAEnviar // <--- AGREGADO: Ahora la cron también manda la imagen
+              image: imagenAEnviar // Enviamos la imagen para que aparezca en la miniatura
             }),
           });
 

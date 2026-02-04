@@ -13,6 +13,7 @@
     "expo": "^54.0.32",
     "expo-device": "~8.0.10",
     "expo-notifications": "~0.32.16",
+    "expo-updates": "~29.0.16",
     "next": "16.1.4",
     "react": "19.2.3",
     "react-dom": "19.2.3"
