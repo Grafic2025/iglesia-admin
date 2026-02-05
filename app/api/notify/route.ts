@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
       // IMÁGENES (Duplicamos para asegurar que Android e iOS la encuentren)
       image: image || null,          // Campo estándar de Expo para Android
-      icon: image || null,           // Algunas capas de Android lo usan como miniatura
+      icon: "https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Logo.png", // Icono "avatar" (Grande en Android)
       attachments: image ? [{
         url: image,
         identifier: 'image-1',
