@@ -13,6 +13,9 @@ export default function AdminDashboard() {
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
   const [premiosPendientes, setPremiosPendientes] = useState<any>({ nivel5: [], nivel10: [], nivel20: [], nivel30: [] })
+  const [oracionesActivas, setOracionesActivas] = useState(0)
+  const [nuevosMes, setNuevosMes] = useState(0)
+  const [premiosEntregados, setPremiosEntregados] = useState<any[]>([])
 
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
@@ -29,6 +32,9 @@ export default function AdminDashboard() {
       fetchAsistencias();
       fetchProgramaciones();
       calcularPremios();
+      calcularOracionesActivas();
+      calcularNuevosMes();
+      cargarPremiosEntregados();
 
       const channelAsis = supabase.channel('cambios-asistencias')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias())
@@ -116,6 +122,78 @@ export default function AdminDashboard() {
       setPremiosPendientes({ nivel5, nivel10, nivel20, nivel30 });
     } catch (e) {
       console.error('Error calculando premios:', e);
+    }
+  }
+
+  const calcularOracionesActivas = async () => {
+    try {
+      const { data: pedidos } = await supabase
+        .from('pedidos_oracion')
+        .select('contador_oraciones');
+
+      const total = pedidos?.reduce((acc, p) =>
+        acc + (p.contador_oraciones || 0), 0
+      ) || 0;
+
+      setOracionesActivas(total);
+    } catch (e) {
+      console.error('Error calculando oraciones:', e);
+    }
+  }
+
+  const calcularNuevosMes = async () => {
+    try {
+      const primerDiaMes = new Date();
+      primerDiaMes.setDate(1);
+      primerDiaMes.setHours(0, 0, 0, 0);
+
+      const { data: nuevos } = await supabase
+        .from('miembros')
+        .select('id')
+        .gte('created_at', primerDiaMes.toISOString());
+
+      setNuevosMes(nuevos?.length || 0);
+    } catch (e) {
+      console.error('Error calculando nuevos del mes:', e);
+    }
+  }
+
+  const cargarPremiosEntregados = async () => {
+    try {
+      const { data } = await supabase
+        .from('premios_entregados')
+        .select('*');
+
+      setPremiosEntregados(data || []);
+    } catch (e) {
+      console.error('Error cargando premios entregados:', e);
+    }
+  }
+
+  const marcarComoEntregado = async (miembroId: string, nivel: number, nombreCompleto: string) => {
+    if (!confirm(`¿Marcar como entregado el premio de nivel ${nivel} para ${nombreCompleto}?`)) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('premios_entregados')
+        .insert({
+          miembro_id: miembroId,
+          nivel: nivel,
+          entregado_por: 'Admin',
+          notas: ''
+        });
+
+      if (error) {
+        alert('Error al marcar como entregado: ' + error.message);
+      } else {
+        alert('✅ Premio marcado como entregado');
+        cargarPremiosEntregados();
+        calcularPremios();
+      }
+    } catch (e) {
+      console.error('Error marcando premio:', e);
     }
   }
 
@@ -214,6 +292,8 @@ export default function AdminDashboard() {
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
         <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
+        <StatCard label="Oraciones Activas" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
+        <StatCard label="Nuevos del Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="👥" />
       </div>
 
       {/* PANEL DE PREMIOS */}
@@ -234,12 +314,27 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {premiosPendientes.nivel30.map((m: any) => (
-                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #9333EA' }}>
-                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
-                  <span style={{ color: '#9333EA', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
-                </div>
-              ))}
+              {premiosPendientes.nivel30.map((m: any) => {
+                const yaEntregado = premiosEntregados.some(p => p.miembro_id === m.id && p.nivel === 30);
+                return (
+                  <div key={m.id} style={{ background: yaEntregado ? '#1a1a1a' : '#252525', padding: '8px 12px', borderRadius: '8px', border: `1px solid ${yaEntregado ? '#555' : '#9333EA'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: yaEntregado ? '#888' : '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                      <span style={{ color: '#9333EA', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                    </div>
+                    {yaEntregado ? (
+                      <span style={{ fontSize: '16px' }}>✅</span>
+                    ) : (
+                      <button
+                        onClick={() => marcarComoEntregado(m.id, 30, `${m.nombre} ${m.apellido}`)}
+                        style={{ background: '#9333EA', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        Entregar
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -255,12 +350,27 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {premiosPendientes.nivel20.map((m: any) => (
-                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #3B82F6' }}>
-                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
-                  <span style={{ color: '#3B82F6', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
-                </div>
-              ))}
+              {premiosPendientes.nivel20.map((m: any) => {
+                const yaEntregado = premiosEntregados.some(p => p.miembro_id === m.id && p.nivel === 20);
+                return (
+                  <div key={m.id} style={{ background: yaEntregado ? '#1a1a1a' : '#252525', padding: '8px 12px', borderRadius: '8px', border: `1px solid ${yaEntregado ? '#555' : '#3B82F6'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: yaEntregado ? '#888' : '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                      <span style={{ color: '#3B82F6', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                    </div>
+                    {yaEntregado ? (
+                      <span style={{ fontSize: '16px' }}>✅</span>
+                    ) : (
+                      <button
+                        onClick={() => marcarComoEntregado(m.id, 20, `${m.nombre} ${m.apellido}`)}
+                        style={{ background: '#3B82F6', color: '#fff', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        Entregar
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -276,12 +386,27 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {premiosPendientes.nivel10.map((m: any) => (
-                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #FFB400' }}>
-                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
-                  <span style={{ color: '#FFB400', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
-                </div>
-              ))}
+              {premiosPendientes.nivel10.map((m: any) => {
+                const yaEntregado = premiosEntregados.some(p => p.miembro_id === m.id && p.nivel === 10);
+                return (
+                  <div key={m.id} style={{ background: yaEntregado ? '#1a1a1a' : '#252525', padding: '8px 12px', borderRadius: '8px', border: `1px solid ${yaEntregado ? '#555' : '#FFB400'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: yaEntregado ? '#888' : '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                      <span style={{ color: '#FFB400', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                    </div>
+                    {yaEntregado ? (
+                      <span style={{ fontSize: '16px' }}>✅</span>
+                    ) : (
+                      <button
+                        onClick={() => marcarComoEntregado(m.id, 10, `${m.nombre} ${m.apellido}`)}
+                        style={{ background: '#FFB400', color: '#000', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        Entregar
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -297,12 +422,27 @@ export default function AdminDashboard() {
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-              {premiosPendientes.nivel5.map((m: any) => (
-                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #A8D500' }}>
-                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
-                  <span style={{ color: '#A8D500', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
-                </div>
-              ))}
+              {premiosPendientes.nivel5.map((m: any) => {
+                const yaEntregado = premiosEntregados.some(p => p.miembro_id === m.id && p.nivel === 5);
+                return (
+                  <div key={m.id} style={{ background: yaEntregado ? '#1a1a1a' : '#252525', padding: '8px 12px', borderRadius: '8px', border: `1px solid ${yaEntregado ? '#555' : '#A8D500'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div>
+                      <span style={{ color: yaEntregado ? '#888' : '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                      <span style={{ color: '#A8D500', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                    </div>
+                    {yaEntregado ? (
+                      <span style={{ fontSize: '16px' }}>✅</span>
+                    ) : (
+                      <button
+                        onClick={() => marcarComoEntregado(m.id, 5, `${m.nombre} ${m.apellido}`)}
+                        style={{ background: '#A8D500', color: '#000', border: 'none', padding: '4px 8px', borderRadius: '6px', fontSize: '11px', cursor: 'pointer', fontWeight: 'bold' }}
+                      >
+                        Entregar
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -478,11 +618,13 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ label, value, color, isActive }: any) {
+function StatCard({ label, value, color, isActive, icon }: any) {
   return (
     <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333', textAlign: 'center', opacity: isActive ? 1 : 0.3, transition: '0.3s' }}>
+      {icon && <div style={{ fontSize: '20px', marginBottom: '5px' }}>{icon}</div>}
       <div style={{ fontSize: '10px', color: '#888', marginBottom: '5px', textTransform: 'uppercase' }}>{label}</div>
       <div style={{ fontSize: '24px', fontWeight: 'bold', color: isActive ? color : '#555' }}>{value}</div>
     </div>
   )
 }
+
