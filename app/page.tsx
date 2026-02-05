@@ -12,6 +12,7 @@ export default function AdminDashboard() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
+  const [premiosPendientes, setPremiosPendientes] = useState<any>({ nivel5: [], nivel10: [], nivel20: [], nivel30: [] })
 
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
@@ -27,6 +28,7 @@ export default function AdminDashboard() {
     if (authorized) {
       fetchAsistencias();
       fetchProgramaciones();
+      calcularPremios();
 
       const channelAsis = supabase.channel('cambios-asistencias')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias())
@@ -74,6 +76,47 @@ export default function AdminDashboard() {
       .select('*')
       .order('hora', { ascending: true });
     if (data) setProgramaciones(data);
+  }
+
+  const calcularPremios = async () => {
+    try {
+      const hace30Dias = new Date();
+      hace30Dias.setDate(hace30Dias.getDate() - 30);
+      const fechaLimite = hace30Dias.toISOString().split('T')[0];
+
+      // Obtener todos los miembros
+      const { data: miembros } = await supabase
+        .from('miembros')
+        .select('id, nombre, apellido');
+
+      if (!miembros) return;
+
+      // Calcular racha de cada miembro
+      const miembrosConRacha = await Promise.all(
+        miembros.map(async (m) => {
+          const { data: asistencias } = await supabase
+            .from('asistencias')
+            .select('id')
+            .eq('miembro_id', m.id)
+            .gte('fecha', fechaLimite);
+
+          return {
+            ...m,
+            racha: asistencias?.length || 0
+          };
+        })
+      );
+
+      // Agrupar por niveles de premio
+      const nivel5 = miembrosConRacha.filter(m => m.racha >= 5 && m.racha < 10);
+      const nivel10 = miembrosConRacha.filter(m => m.racha >= 10 && m.racha < 20);
+      const nivel20 = miembrosConRacha.filter(m => m.racha >= 20 && m.racha < 30);
+      const nivel30 = miembrosConRacha.filter(m => m.racha >= 30);
+
+      setPremiosPendientes({ nivel5, nivel10, nivel20, nivel30 });
+    } catch (e) {
+      console.error('Error calculando premios:', e);
+    }
   }
 
   const handleLogin = (e: React.FormEvent) => {
@@ -171,6 +214,105 @@ export default function AdminDashboard() {
         <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
         <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
         <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
+      </div>
+
+      {/* PANEL DE PREMIOS */}
+      <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
+        <h3 style={{ marginTop: 0, color: '#9333EA', marginBottom: '8px' }}>🎁 Premios Pendientes de Entrega</h3>
+        <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px' }}>
+          Miembros que alcanzaron metas de asistencia (últimos 30 días)
+        </p>
+
+        {/* Nivel 30 - Entrada a Retiro */}
+        {premiosPendientes.nivel30.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>🎟️</span>
+              <h4 style={{ margin: 0, color: '#fff' }}>Entrada a Retiro (30+ asistencias)</h4>
+              <span style={{ background: '#9333EA', color: '#fff', padding: '2px 8px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold' }}>
+                {premiosPendientes.nivel30.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {premiosPendientes.nivel30.map((m: any) => (
+                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #9333EA' }}>
+                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                  <span style={{ color: '#9333EA', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Nivel 20 - Libro */}
+        {premiosPendientes.nivel20.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>📚</span>
+              <h4 style={{ margin: 0, color: '#fff' }}>Libro Cristiano (20-29 asistencias)</h4>
+              <span style={{ background: '#3B82F6', color: '#fff', padding: '2px 8px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold' }}>
+                {premiosPendientes.nivel20.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {premiosPendientes.nivel20.map((m: any) => (
+                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #3B82F6' }}>
+                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                  <span style={{ color: '#3B82F6', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Nivel 10 - Café */}
+        {premiosPendientes.nivel10.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>☕</span>
+              <h4 style={{ margin: 0, color: '#fff' }}>Café Gratis (10-19 asistencias)</h4>
+              <span style={{ background: '#FFB400', color: '#000', padding: '2px 8px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold' }}>
+                {premiosPendientes.nivel10.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {premiosPendientes.nivel10.map((m: any) => (
+                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #FFB400' }}>
+                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                  <span style={{ color: '#FFB400', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Nivel 5 - Sticker */}
+        {premiosPendientes.nivel5.length > 0 && (
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+              <span style={{ fontSize: '24px' }}>⭐</span>
+              <h4 style={{ margin: 0, color: '#fff' }}>Sticker IDS (5-9 asistencias)</h4>
+              <span style={{ background: '#A8D500', color: '#000', padding: '2px 8px', borderRadius: '10px', fontSize: '12px', fontWeight: 'bold' }}>
+                {premiosPendientes.nivel5.length}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {premiosPendientes.nivel5.map((m: any) => (
+                <div key={m.id} style={{ background: '#252525', padding: '8px 12px', borderRadius: '8px', border: '1px solid #A8D500' }}>
+                  <span style={{ color: '#fff', fontSize: '14px' }}>{m.nombre} {m.apellido}</span>
+                  <span style={{ color: '#A8D500', fontSize: '12px', marginLeft: '8px', fontWeight: 'bold' }}>🔥 {m.racha}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {premiosPendientes.nivel5.length === 0 && premiosPendientes.nivel10.length === 0 &&
+          premiosPendientes.nivel20.length === 0 && premiosPendientes.nivel30.length === 0 && (
+            <p style={{ color: '#555', fontSize: '14px', textAlign: 'center', padding: '20px' }}>
+              No hay premios pendientes en este momento.
+            </p>
+          )}
       </div>
 
       {/* PANEL DE PROGRAMACIÓN */}
