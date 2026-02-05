@@ -58,7 +58,8 @@ export async function POST(req: Request) {
       attachments: image ? [{
         url: image,
         identifier: 'image-1',
-        type: 'image/jpg'            // Forzamos el tipo para que iOS no dude
+        typeHint: 'image', // Usamos typeHint 'image' que es lo estándar de Expo
+        hideThumbnail: false
       }] : [],
 
       data: {
