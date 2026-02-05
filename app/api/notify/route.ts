@@ -4,11 +4,11 @@ import { supabase } from '@/lib/supabase';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, message, horario, specificToken, image } = body;
+    const { title, message, horario, specificToken } = body;
 
     console.log("=== NUEVA NOTIFICACIÓN ===");
     console.log("Título:", title);
-    console.log("URL Imagen:", image || "No se recibió imagen");
+
 
     let tokens: string[] = [];
 
@@ -53,19 +53,15 @@ export async function POST(req: Request) {
       mutableContent: true,
 
       // IMÁGENES (Duplicamos para asegurar que Android e iOS la encuentren)
-      image: image || null,          // Campo estándar de Expo para Android
+      // IMÁGENES
+      image: null,
       icon: "https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Logo.png", // Icono "avatar" (Grande en Android)
-      attachments: image ? [{
-        url: image,
-        identifier: 'image-1',
-        typeHint: 'image', // Usamos typeHint 'image' que es lo estándar de Expo
-        hideThumbnail: false
-      }] : [],
+      attachments: [],
 
       data: {
-        url: image || null,
+        url: null,
         message: message,
-        picture: image || null       // Campo extra para procesado interno
+        picture: null
       }
     }));
 

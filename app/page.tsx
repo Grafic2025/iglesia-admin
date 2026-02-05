@@ -12,7 +12,7 @@ export default function AdminDashboard() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
-  const [urlImagen, setUrlImagen] = useState('') // NUEVO: Estado para la imagen
+
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
 
@@ -102,21 +102,13 @@ export default function AdminDashboard() {
     link.click();
   }
 
-  // NUEVA LÓGICA: Extraer miniatura de Youtube
-  const getYoutubeThumb = (url: string) => {
-    if (url.includes('youtube.com') || url.includes('youtu.be')) {
-      const videoId = url.split('v=')[1]?.split('&')[0] || url.split('/').pop();
-      return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-    }
-    return url;
-  }
+
 
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
 
-    // Convertimos a miniatura si es link de Youtube
-    const finalImage = getYoutubeThumb(urlImagen);
+
 
     try {
       const res = await fetch('/api/notify', {
@@ -126,12 +118,13 @@ export default function AdminDashboard() {
           title: tituloPush,
           message: mensajePush,
           horario: filtroHorario,
-          image: finalImage // Enviamos la imagen a la API
         }),
       });
       const result = await res.json();
       setNotificacionStatus({ show: true, message: res.ok ? `✅ Enviado a ${result.total} personas` : `❌ Error`, error: !res.ok });
-      if (res.ok) setUrlImagen('');
+      if (res.ok) {
+        // Nada que limpiar de imágenes
+      }
     } catch (e) {
       setNotificacionStatus({ show: true, message: `❌ Error de red`, error: true });
     }
@@ -278,26 +271,7 @@ export default function AdminDashboard() {
 
         <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
 
-        {/* NUEVO: Campo de imagen / Youtube */}
-        <div style={{ marginBottom: '15px' }}>
-          <input
-            placeholder="Link de YouTube o Imagen (.jpg, .png)"
-            value={urlImagen}
-            onChange={(e) => setUrlImagen(e.target.value)}
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }}
-          />
-          {urlImagen && (
-            <div style={{ marginTop: '10px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #333', width: '250px', background: '#111' }}>
-              <p style={{ fontSize: '10px', color: '#888', padding: '5px 10px', margin: 0 }}>Vista previa:</p>
-              <img
-                src={getYoutubeThumb(urlImagen)}
-                style={{ width: '100%', height: 'auto', display: 'block' }}
-                alt="Preview"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
-              />
-            </div>
-          )}
-        </div>
+
 
         <textarea
           placeholder="Escribe el mensaje aquí..."
