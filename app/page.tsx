@@ -36,7 +36,7 @@ export default function AdminDashboard() {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'programaciones' }, () => fetchProgramaciones())
         .subscribe();
 
-      return () => { 
+      return () => {
         supabase.removeChannel(channelAsis);
         supabase.removeChannel(channelProg);
       };
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (password === 'Iglesia2026') {
+    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       setAuthorized(true)
       localStorage.setItem('admin_auth', 'true')
     } else {
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
-    
+
     // Convertimos a miniatura si es link de Youtube
     const finalImage = getYoutubeThumb(urlImagen);
 
@@ -122,16 +122,16 @@ export default function AdminDashboard() {
       const res = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          title: tituloPush, 
-          message: mensajePush, 
+        body: JSON.stringify({
+          title: tituloPush,
+          message: mensajePush,
           horario: filtroHorario,
           image: finalImage // Enviamos la imagen a la API
         }),
       });
       const result = await res.json();
       setNotificacionStatus({ show: true, message: res.ok ? `✅ Enviado a ${result.total} personas` : `❌ Error`, error: !res.ok });
-      if(res.ok) setUrlImagen('');
+      if (res.ok) setUrlImagen('');
     } catch (e) {
       setNotificacionStatus({ show: true, message: `❌ Error de red`, error: true });
     }
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'sans-serif', color: '#fff', background: '#121212', minHeight: '100vh' }}>
-      
+
       {/* HEADER */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '20px' }}>
         <div>
@@ -186,29 +186,29 @@ export default function AdminDashboard() {
         <p style={{ fontSize: '13px', color: '#888', marginBottom: '20px', lineHeight: '1.5' }}>
           Escribe <b style={{ color: '#fff' }}>VERSICULO</b> para enviar uno automático de la Biblia.
         </p>
-        
+
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '25px' }}>
-          <input 
-            placeholder="Mensaje o 'VERSICULO'" 
+          <input
+            placeholder="Mensaje o 'VERSICULO'"
             id="prog-msj"
-            style={{ flex: 2, minWidth: '200px', padding: '14px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '16px' }} 
+            style={{ flex: 2, minWidth: '200px', padding: '14px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', fontSize: '16px' }}
           />
           <select id="prog-dia" style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#222', color: '#fff', border: '1px solid #444', fontSize: '16px' }}>
             <option>Todos los días</option>
             <option>Lunes</option><option>Martes</option><option>Miércoles</option>
             <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
           </select>
-          <input 
-            type="time" 
+          <input
+            type="time"
             id="prog-hora"
-            style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#222', color: '#fff', border: '1px solid #444', fontSize: '16px' }} 
+            style={{ flex: 1, padding: '14px', borderRadius: '12px', background: '#222', color: '#fff', border: '1px solid #444', fontSize: '16px' }}
           />
-          <button 
+          <button
             onClick={async () => {
               const mensaje = (document.getElementById('prog-msj') as HTMLInputElement).value;
               const dia = (document.getElementById('prog-dia') as HTMLSelectElement).value;
               const hora = (document.getElementById('prog-hora') as HTMLInputElement).value;
-              if(!mensaje || !hora) return alert('Completa mensaje y hora');
+              if (!mensaje || !hora) return alert('Completa mensaje y hora');
               const { error } = await supabase.from('programaciones').insert([{ mensaje, dia_semana: dia, hora, activo: true, ultimo_estado: 'Pendiente' }]);
               if (error) alert('Error al programar');
               else {
@@ -225,24 +225,24 @@ export default function AdminDashboard() {
 
         {/* LISTA DE PROGRAMACIONES */}
         <div style={{ display: 'grid', gap: '10px' }}>
-          {programaciones.length === 0 && <p style={{color: '#555', fontSize: '14px'}}>No hay envíos programados.</p>}
+          {programaciones.length === 0 && <p style={{ color: '#555', fontSize: '14px' }}>No hay envíos programados.</p>}
           {programaciones.map((p) => (
             <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#252525', padding: '12px 18px', borderRadius: '12px', border: '1px solid #333' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                <div 
+                <div
                   title={p.ultimo_estado ? `Estado: ${p.ultimo_estado}` : 'Esperando ejecución'}
-                  style={{ 
-                    width: '10px', height: '10px', borderRadius: '50%', 
+                  style={{
+                    width: '10px', height: '10px', borderRadius: '50%',
                     background: p.ultimo_estado === 'Exitoso' ? '#A8D500' : p.ultimo_estado?.includes('Error') ? '#ff4444' : '#555',
                     boxShadow: p.ultimo_estado === 'Exitoso' ? '0 0 8px #A8D500' : 'none'
-                  }} 
+                  }}
                 />
                 <div>
                   <div style={{ fontWeight: 'bold', color: p.mensaje.toUpperCase() === 'VERSICULO' ? '#FFB400' : '#fff' }}>
                     {p.mensaje.toUpperCase() === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
                   </div>
                   <div style={{ fontSize: '12px', color: '#888' }}>
-                    {p.dia_semana} a las {p.hora.substring(0,5)} hs 
+                    {p.dia_semana} a las {p.hora.substring(0, 5)} hs
                     {p.ultima_ejecucion && (
                       <span style={{ marginLeft: '8px', fontStyle: 'italic', color: '#555' }}>
                         • Envío: {new Date(p.ultima_ejecucion).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })} hs
@@ -257,9 +257,9 @@ export default function AdminDashboard() {
                     {p.ultimo_estado.toUpperCase()}
                   </span>
                 )}
-                <button 
+                <button
                   onClick={async () => {
-                    if(confirm('¿Eliminar esta programación?')) {
+                    if (confirm('¿Eliminar esta programación?')) {
                       await supabase.from('programaciones').delete().eq('id', p.id);
                       fetchProgramaciones();
                     }
@@ -275,23 +275,23 @@ export default function AdminDashboard() {
       {/* PANEL DE NOTIFICACIONES MANUALES (MODIFICADO) */}
       <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', marginBottom: '30px', border: '1px solid #333' }}>
         <h3 style={{ marginTop: 0, color: '#A8D500' }}>📢 Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}</h3>
-        
+
         <input placeholder="Título" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
-        
+
         {/* NUEVO: Campo de imagen / Youtube */}
         <div style={{ marginBottom: '15px' }}>
-          <input 
-            placeholder="Link de YouTube o Imagen (.jpg, .png)" 
-            value={urlImagen} 
-            onChange={(e) => setUrlImagen(e.target.value)} 
-            style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }} 
+          <input
+            placeholder="Link de YouTube o Imagen (.jpg, .png)"
+            value={urlImagen}
+            onChange={(e) => setUrlImagen(e.target.value)}
+            style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff' }}
           />
           {urlImagen && (
             <div style={{ marginTop: '10px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #333', width: '250px', background: '#111' }}>
               <p style={{ fontSize: '10px', color: '#888', padding: '5px 10px', margin: 0 }}>Vista previa:</p>
-              <img 
-                src={getYoutubeThumb(urlImagen)} 
-                style={{ width: '100%', height: 'auto', display: 'block' }} 
+              <img
+                src={getYoutubeThumb(urlImagen)}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
                 alt="Preview"
                 onError={(e) => (e.currentTarget.style.display = 'none')}
               />
@@ -299,11 +299,11 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <textarea 
-          placeholder="Escribe el mensaje aquí..." 
-          value={mensajePush} 
-          onChange={(e) => setMensajePush(e.target.value)} 
-          style={{ width: '100%', padding: '15px', height: '100px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px', fontSize: '16px', resize: 'vertical' }} 
+        <textarea
+          placeholder="Escribe el mensaje aquí..."
+          value={mensajePush}
+          onChange={(e) => setMensajePush(e.target.value)}
+          style={{ width: '100%', padding: '15px', height: '100px', borderRadius: '12px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '15px', fontSize: '16px', resize: 'vertical' }}
         />
         <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN AHORA'}</button>
         {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}

@@ -52,23 +52,32 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No hay dispositivos con token válido' }, { status: 400 });
     }
 
-    // 2. PREPARAR NOTIFICACIONES (Mantenemos tu lógica, agregamos soporte multimedia real)
+   // 2. PREPARAR NOTIFICACIONES (Versión de Máxima Compatibilidad)
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: title || "Iglesia del Salvador",
       body: message,
       
-      // AJUSTES TÉCNICOS PARA IMÁGENES
-      mutableContent: true, // Permite que el celular procese el archivo adjunto
-      attachments: image ? [{ url: image }] : [], // Formato para iOS
-      image: image || null, // Formato para Android
+      // PROPIEDADES DE PRIORIDAD
+      channelId: "default", 
+      priority: 'high',
+      mutableContent: true, 
+      
+      // IMÁGENES (Duplicamos para asegurar que Android e iOS la encuentren)
+      image: image || null,          // Campo estándar de Expo para Android
+      icon: image || null,           // Algunas capas de Android lo usan como miniatura
+      attachments: image ? [{ 
+        url: image,
+        identifier: 'image-1',
+        type: 'image/jpg'            // Forzamos el tipo para que iOS no dude
+      }] : [], 
       
       data: { 
         url: image || null,
-        message: message 
-      },
-      priority: 'high' 
+        message: message,
+        picture: image || null       // Campo extra para procesado interno
+      }
     }));
 
     // 3. ENVÍO A EXPO
