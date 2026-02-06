@@ -31,11 +31,12 @@ export async function POST(req: Request) {
         query = query.in('id', ids);
       }
       const { data: miembros } = await query;
-      const tokensMiembros = miembros?.map(m => m.token_notificacion) || [];
-      const { data: otrosTokens } = await supabase.from('push_tokens').select('token');
-      const tokensGenerales = otrosTokens?.map(t => t.token) || [];
-      tokens = [...new Set([...tokensMiembros, ...tokensGenerales])]
-        .filter(t => t && t.startsWith('ExponentPushToken')) as string[];
+      tokens = miembros
+        ?.map(m => m.token_notificacion)
+        .filter(t => t && t.startsWith('ExponentPushToken')) as string[] || [];
+
+      // Asegurar tokens únicos
+      tokens = [...new Set(tokens)];
     }
 
     if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens' }, { status: 400 });

@@ -16,6 +16,8 @@ export default function AdminDashboard() {
   const [oracionesActivas, setOracionesActivas] = useState(0)
   const [nuevosMes, setNuevosMes] = useState(0)
   const [premiosEntregados, setPremiosEntregados] = useState<any[]>([])
+  const [bautismos, setBautismos] = useState<any[]>([])
+  const [ayuda, setAyuda] = useState<any[]>([])
 
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
@@ -35,6 +37,8 @@ export default function AdminDashboard() {
       calcularOracionesActivas();
       calcularNuevosMes();
       cargarPremiosEntregados();
+      fetchBautismos();
+      fetchAyuda();
 
       const channelAsis = supabase.channel('cambios-asistencias')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias())
@@ -139,6 +143,22 @@ export default function AdminDashboard() {
     } catch (e) {
       console.error('Error calculando oraciones:', e);
     }
+  }
+
+  const fetchBautismos = async () => {
+    const { data } = await supabase
+      .from('solicitudes_bautismo')
+      .select('*, miembros(nombre, apellido)')
+      .order('created_at', { ascending: false });
+    if (data) setBautismos(data);
+  }
+
+  const fetchAyuda = async () => {
+    const { data } = await supabase
+      .from('consultas_ayuda')
+      .select('*, miembros(nombre, apellido)')
+      .order('created_at', { ascending: false });
+    if (data) setAyuda(data);
   }
 
   const calcularNuevosMes = async () => {
@@ -563,6 +583,37 @@ export default function AdminDashboard() {
         />
         <button onClick={enviarNotificacion} disabled={enviando} style={{ width: '100%', padding: '15px', background: '#A8D500', color: '#000', borderRadius: '30px', fontWeight: 'bold', cursor: 'pointer' }}>{enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN AHORA'}</button>
         {notificacionStatus.show && <div style={{ marginTop: '15px', textAlign: 'center', color: notificacionStatus.error ? '#ff4444' : '#A8D500', fontWeight: 'bold' }}>{notificacionStatus.message}</div>}
+      </div>
+
+      {/* PANEL DE BAUTISMOS Y AYUDA */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+        <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', border: '1px solid #333' }}>
+          <h3 style={{ marginTop: 0, color: '#00D9FF', marginBottom: '15px' }}>💧 Solicitudes de Bautismo</h3>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {bautismos.length === 0 && <p style={{ color: '#555', fontSize: '14px' }}>No hay solicitudes.</p>}
+            {bautismos.map((b) => (
+              <div key={b.id} style={{ background: '#252525', padding: '12px', borderRadius: '12px', marginBottom: '10px', border: '1px solid #333' }}>
+                <div style={{ fontWeight: 'bold' }}>{b.miembros?.nombre} {b.miembros?.apellido}</div>
+                <div style={{ fontSize: '12px', color: '#aaa' }}>Edad: {b.edad} | Cel: {b.celular}</div>
+                <div style={{ fontSize: '12px', color: '#aaa' }}>Grupo: {b.pertenece_grupo}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', border: '1px solid #333' }}>
+          <h3 style={{ marginTop: 0, color: '#ff4444', marginBottom: '15px' }}>🆘 Consultas de Ayuda</h3>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {ayuda.length === 0 && <p style={{ color: '#555', fontSize: '14px' }}>No hay consultas.</p>}
+            {ayuda.map((a) => (
+              <div key={a.id} style={{ background: '#252525', padding: '12px', borderRadius: '12px', marginBottom: '10px', border: '1px solid #333' }}>
+                <div style={{ fontWeight: 'bold' }}>{a.miembros?.nombre} {a.miembros?.apellido}</div>
+                <div style={{ fontSize: '12px', color: '#aaa' }}>Cel: {a.celular}</div>
+                <div style={{ fontSize: '12px', color: '#fff', marginTop: '5px', fontStyle: 'italic' }}>"{a.mensaje}"</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* BUSCADOR Y FILTROS */}
