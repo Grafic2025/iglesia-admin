@@ -5,7 +5,7 @@ import {
   BarChart as ReLineBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as ReLineChart, Line
 } from 'recharts';
 import {
-  Settings, Bell, Image as ImageIcon, LayoutDashboard, PlusCircle, Trash2, RefreshCw, AlertCircle, BarChart as LucideBarChart, LineChart as LucideLineChart
+  Settings, Bell, Image as ImageIcon, LayoutDashboard, PlusCircle, Trash2, RefreshCw, AlertCircle, BarChart as LucideBarChart, LineChart as LucideLineChart, Edit
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -685,9 +685,31 @@ export default function AdminDashboard() {
                   <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{n.titulo}</div>
                   <div style={{ fontSize: '10px', color: '#888' }}>{n.es_youtube ? '🔴 YouTube Auto' : '📰 Noticia'}</div>
                 </div>
-                <button onClick={() => supabase.from('noticias').delete().eq('id', n.id).then(() => fetchNoticias())} style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}>
-                  <Trash2 size={16} />
-                </button>
+                <div style={{ display: 'flex', gap: '5px' }}>
+                  <button
+                    onClick={async () => {
+                      const nuevoTitulo = prompt("Editar título:", n.titulo);
+                      if (nuevoTitulo === null) return; // Cancelar
+
+                      const nuevaImagen = prompt("Editar URL imagen:", n.imagen_url);
+                      if (nuevaImagen === null) return; // Cancelar
+
+                      const { error } = await supabase.from('noticias').update({
+                        titulo: nuevoTitulo || n.titulo, // Mantener si está vacío
+                        imagen_url: nuevaImagen || n.imagen_url
+                      }).eq('id', n.id);
+
+                      if (error) alert("Error al actualizar: " + error.message);
+                      else fetchNoticias();
+                    }}
+                    style={{ color: '#FFB400', background: 'none', border: 'none', cursor: 'pointer' }}
+                  >
+                    <Edit size={16} />
+                  </button>
+                  <button onClick={() => supabase.from('noticias').delete().eq('id', n.id).then(() => fetchNoticias())} style={{ color: '#ff4444', background: 'none', border: 'none', cursor: 'pointer' }}>
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
