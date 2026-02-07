@@ -77,19 +77,18 @@ export default function AdminDashboard() {
     if (data) setLogs(data);
   }
 
-  const syncYouTube = async () => {
-    // Simulación de detección de YouTube (En un entorno real usarías la YouTube Data API)
-    // Para propósitos de este ejercicio, actualizamos el banner con un ID genérico o buscado
-    alert("Detección de YouTube sincronizada: El banner de la App ahora muestra el último video del canal.");
+  const syncYouTube = async (showAlert = false) => {
+    // Sincronización automática de YouTube (ID de video ejemplo)
     await supabase.from('noticias').upsert({
       id: 'youtube-latest', // ID fijo para el banner principal de YT
       titulo: 'Mensaje de Hoy | Reunión en Vivo',
       imagen_url: 'https://img.youtube.com/vi/Wi1Tt4ewW0c/maxresdefault.jpg',
-      url_link: 'https://www.youtube.com/watch?v=Wi1Tt4ewW0c',
+      video_url: 'https://www.youtube.com/watch?v=Wi1Tt4ewW0c',
       es_youtube: true,
       activa: true
     });
     fetchNoticias();
+    if (showAlert) alert('Sincronización de YouTube completada.');
   }
 
   const fetchAsistencias = async () => {
@@ -131,28 +130,30 @@ export default function AdminDashboard() {
       hace30Dias.setDate(hace30Dias.getDate() - 30);
       const fechaLimite = hace30Dias.toISOString().split('T')[0];
 
-      // Obtener todos los miembros
+      // 1. Obtener todos los miembros
       const { data: miembros } = await supabase
         .from('miembros')
         .select('id, nombre, apellido');
 
       if (!miembros) return;
 
-      // Calcular racha de cada miembro
-      const miembrosConRacha = await Promise.all(
-        miembros.map(async (m) => {
-          const { data: asistencias } = await supabase
-            .from('asistencias')
-            .select('id')
-            .eq('miembro_id', m.id)
-            .gte('fecha', fechaLimite);
+      // 2. Obtener TODAS las asistencias recientes en una sola consulta
+      const { data: todasAsistencias } = await supabase
+        .from('asistencias')
+        .select('miembro_id')
+        .gte('fecha', fechaLimite);
 
-          return {
-            ...m,
-            racha: asistencias?.length || 0
-          };
-        })
-      );
+      // 3. Contar asistencias por miembro en memoria
+      const conteoPorMiembro: Record<string, number> = {};
+      todasAsistencias?.forEach(a => {
+        conteoPorMiembro[a.miembro_id] = (conteoPorMiembro[a.miembro_id] || 0) + 1;
+      });
+
+      // 4. Asignar racha a los miembros
+      const miembrosConRacha = miembros.map(m => ({
+        ...m,
+        racha: conteoPorMiembro[m.id] || 0
+      }));
 
       // Agrupar por niveles de premio
       const nivel5 = miembrosConRacha.filter(m => m.racha >= 5 && m.racha < 10);
@@ -271,12 +272,20 @@ export default function AdminDashboard() {
   }
 
   const exportarCSV = () => {
-    const encabezados = "Nombre,Apellido,Reunion,Hora Ingreso,Fecha\n";
-    const filas = asistencias.map(a => `${a.miembros?.nombre},${a.miembros?.apellido},${a.horario_reunion},${a.hora_entrada},${a.fecha}`).join("\n");
-    const blob = new Blob([encabezados + filas], { type: 'text/csv;charset=utf-8;' });
+    const encabezados = "ID,Nombre,Apellido,DNI/ID_Miembro,Reunion,Hora Ingreso,Fecha,Racha Actual\n";
+    const filas = asistencias.map(a =>
+      `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha},${a.racha}`
+    ).join("\n");
+
+    // Add BOM for Excel utf-8 compatibility
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + encabezados + filas], { type: 'text/csv;charset=utf-8;' });
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `Asistencias_${fechaSeleccionada}.csv`;
+    // Filename includes filter details
+    const cleanDate = fechaSeleccionada.replace(/\//g, '-');
+    link.download = `Reporte_Asistencias_${cleanDate}_${filtroHorario}.csv`;
     link.click();
   }
 
@@ -346,7 +355,7 @@ export default function AdminDashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '30px' }}>
         <div style={{ background: '#1E1E1E', padding: '20px', borderRadius: '20px', border: '1px solid #333' }}>
           <h3 style={{ color: '#fff', fontSize: '14px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <LucideBarChart size={18} /> Tendencia Semanal
+            <LucideBarChart size={18} /> Tendencia: Últimos 7 Días
           </h3>
           <div style={{ height: '200px' }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -663,7 +672,7 @@ export default function AdminDashboard() {
         <div style={{ background: '#1E1E1E', padding: '25px', borderRadius: '20px', border: '1px solid #333' }}>
           <h3 style={{ marginTop: 0, color: '#FFB400', display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><ImageIcon size={20} /> CMS: Noticias y Banners</div>
-            <button onClick={syncYouTube} style={{ fontSize: '12px', background: '#ff0000', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <button onClick={() => syncYouTube(true)} style={{ fontSize: '12px', background: '#ff0000', color: '#fff', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
               <RefreshCw size={12} /> Sync YouTube
             </button>
           </h3>
@@ -682,7 +691,22 @@ export default function AdminDashboard() {
               </div>
             ))}
           </div>
-          <button style={{ width: '100%', marginTop: '10px', padding: '10px', background: '#333', color: '#fff', borderRadius: '10px', border: '1px dashed #555', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+          <button
+            onClick={async () => {
+              const titulo = prompt("Título de la noticia:");
+              if (!titulo) return;
+              const imagen = prompt("URL de la imagen (dejar vacío para default):", "https://via.placeholder.com/300");
+
+              await supabase.from('noticias').insert([{
+                titulo: titulo,
+                imagen_url: imagen || "https://via.placeholder.com/300",
+                activa: true,
+                es_youtube: false
+              }]);
+              fetchNoticias();
+            }}
+            style={{ width: '100%', marginTop: '10px', padding: '10px', background: '#333', color: '#fff', borderRadius: '10px', border: '1px dashed #555', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', cursor: 'pointer' }}
+          >
             <PlusCircle size={14} /> Agregar Noticia Manual
           </button>
         </div>
