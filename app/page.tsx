@@ -689,14 +689,33 @@ export default function AdminDashboard() {
                   <button
                     onClick={async () => {
                       const nuevoTitulo = prompt("Editar título:", n.titulo);
-                      if (nuevoTitulo === null) return; // Cancelar
+                      if (nuevoTitulo === null) return;
 
                       const nuevaImagen = prompt("Editar URL imagen:", n.imagen_url);
-                      if (nuevaImagen === null) return; // Cancelar
+                      if (nuevaImagen === null) return;
+
+                      // Preguntar por destino
+                      let nuevaUrl = n.url;
+                      let nuevaScreen = n.screen;
+
+                      const tipoDestino = prompt("¿A dónde lleva esta noticia?\n1. Link Externo (YouTube, Web)\n2. Pantalla Interna de la App\n3. Ninguno\n\nEscribe 1, 2 o 3:", n.url ? "1" : n.screen ? "2" : "3");
+
+                      if (tipoDestino === "1") {
+                        nuevaUrl = prompt("Ingresa el Link (URL):", n.url || "https://");
+                        nuevaScreen = null;
+                      } else if (tipoDestino === "2") {
+                        nuevaScreen = prompt("Ingresa nombre EXACTO de pantalla (ej: Agenda, Quiero Ayudar, Quiero Bautizarme, Soy Nuevo, Necesito Oración):", n.screen || "");
+                        nuevaUrl = null;
+                      } else {
+                        nuevaUrl = null;
+                        nuevaScreen = null;
+                      }
 
                       const { error } = await supabase.from('noticias').update({
-                        titulo: nuevoTitulo || n.titulo, // Mantener si está vacío
-                        imagen_url: nuevaImagen || n.imagen_url
+                        titulo: nuevoTitulo || n.titulo,
+                        imagen_url: nuevaImagen || n.imagen_url,
+                        url: nuevaUrl,
+                        screen: nuevaScreen
                       }).eq('id', n.id);
 
                       if (error) alert("Error al actualizar: " + error.message);
@@ -719,11 +738,25 @@ export default function AdminDashboard() {
               if (!titulo) return;
               const imagen = prompt("URL de la imagen (dejar vacío para default):", "https://via.placeholder.com/300");
 
+              // Preguntar por destino
+              let urlDestino = null;
+              let screenDestino = null;
+
+              const tipoDestino = prompt("¿A dónde lleva esta noticia?\n1. Link Externo (YouTube, Web)\n2. Pantalla Interna de la App\n3. Ninguno\n\nEscribe 1, 2 o 3:", "3");
+
+              if (tipoDestino === "1") {
+                urlDestino = prompt("Ingresa el Link (URL):", "https://");
+              } else if (tipoDestino === "2") {
+                screenDestino = prompt("Ingresa nombre EXACTO de pantalla:\n- Agenda\n- Quiero Ayudar\n- Necesito Ayuda\n- Quiero Bautizarme\n- Quiero Capacitarme\n- Soy Nuevo\n- Necesito Oración\n- Sumarme a un Grupo", "Agenda");
+              }
+
               await supabase.from('noticias').insert([{
                 titulo: titulo,
                 imagen_url: imagen || "https://via.placeholder.com/300",
                 activa: true,
-                es_youtube: false
+                es_youtube: false,
+                url: urlDestino,
+                screen: screenDestino
               }]);
               fetchNoticias();
             }}
