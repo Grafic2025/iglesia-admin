@@ -78,17 +78,19 @@ export default function AdminDashboard() {
   }
 
   const syncYouTube = async (showAlert = false) => {
-    // Sincronización automática de YouTube (ID de video ejemplo)
-    await supabase.from('noticias').upsert({
-      id: 'youtube-latest', // ID fijo para el banner principal de YT
-      titulo: 'Mensaje de Hoy | Reunión en Vivo',
-      imagen_url: 'https://img.youtube.com/vi/Wi1Tt4ewW0c/maxresdefault.jpg',
-      video_url: 'https://www.youtube.com/watch?v=Wi1Tt4ewW0c',
-      es_youtube: true,
-      activa: true
-    });
-    fetchNoticias();
-    if (showAlert) alert('Sincronización de YouTube completada.');
+    try {
+      const res = await fetch('/api/youtube-sync');
+      const data = await res.json();
+
+      if (data.success) {
+        fetchNoticias();
+        if (showAlert) alert('✅ YouTube sincronizado: ' + data.title);
+      } else {
+        if (showAlert) alert('❌ Error sincronizando YouTube: ' + data.error);
+      }
+    } catch (e) {
+      if (showAlert) alert('❌ Error de conexión al sincronizar YouTube');
+    }
   }
 
   const fetchAsistencias = async () => {
