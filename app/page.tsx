@@ -873,6 +873,7 @@ export default function AdminDashboard() {
               <th style={{ padding: '15px' }}>Reunión</th>
               <th style={{ padding: '15px' }}>Entrada</th>
               <th style={{ padding: '15px' }}>Info</th>
+              <th style={{ padding: '15px', textAlign: 'center' }}>Enviar Mensaje Personal</th>
             </tr>
           </thead>
           <tbody>
@@ -891,20 +892,20 @@ export default function AdminDashboard() {
                   </td>
                   <td style={{ padding: '15px', color: '#888' }}>{a.hora_entrada}</td>
                   <td style={{ padding: '15px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
-                        {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
-                      </span>
-                      {a.miembros?.token_notificacion && (
-                        <button
-                          onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
-                          style={{ background: '#333', border: '1px solid #555', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#A8D500' }}
-                          title="Enviar mensaje personal"
-                        >
-                          <Send size={12} />
-                        </button>
-                      )}
-                    </div>
+                    <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
+                      {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
+                    </span>
+                  </td>
+                  <td style={{ padding: '15px', textAlign: 'center' }}>
+                    {a.miembros?.token_notificacion && (
+                      <button
+                        onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
+                        style={{ background: '#333', border: '1px solid #555', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#A8D500', margin: '0 auto' }}
+                        title="Enviar mensaje personal"
+                      >
+                        <Send size={16} />
+                      </button>
+                    )}
                   </td>
                 </tr>
               )
