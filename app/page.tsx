@@ -5,7 +5,7 @@ import {
   BarChart as ReLineBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as ReLineChart, Line
 } from 'recharts';
 import {
-  Settings, Bell, Image as ImageIcon, LayoutDashboard, PlusCircle, Trash2, RefreshCw, AlertCircle, BarChart as LucideBarChart, LineChart as LucideLineChart, Edit
+  Settings, Bell, Send, Image as ImageIcon, LayoutDashboard, PlusCircle, Trash2, RefreshCw, AlertCircle, BarChart as LucideBarChart, LineChart as LucideLineChart, Edit
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
   const fetchAsistencias = async () => {
     const { data } = await supabase
       .from('asistencias')
-      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at)`)
+      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at, token_notificacion)`)
       .eq('fecha', fechaSeleccionada)
       .order('hora_entrada', { ascending: false });
 
@@ -319,6 +319,28 @@ export default function AdminDashboard() {
     }
     setEnviando(false);
     setTimeout(() => setNotificacionStatus({ show: false, message: '', error: false }), 4000);
+  }
+
+  const enviarNotificacionIndividual = async (token: string, nombre: string) => {
+    const mensaje = prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
+    if (!mensaje) return;
+
+    try {
+      const res = await fetch('/api/notify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'Iglesia del Salvador',
+          message: mensaje,
+          specificToken: token,
+        }),
+      });
+      const result = await res.json();
+      if (res.ok) alert(`✅ Notificación enviada a ${nombre}`);
+      else alert(`❌ Error: ${result.error || 'Desconocido'}`);
+    } catch (e) {
+      alert(`❌ Error de red`);
+    }
   }
 
   const datosFiltrados = asistencias.filter(a => {
@@ -869,9 +891,20 @@ export default function AdminDashboard() {
                   </td>
                   <td style={{ padding: '15px', color: '#888' }}>{a.hora_entrada}</td>
                   <td style={{ padding: '15px' }}>
-                    <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
-                      {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ color: a.racha >= 4 ? '#A8D500' : '#888', fontWeight: 'bold' }}>
+                        {a.racha >= 4 ? '🔥' : '📍'} Racha: {a.racha}
+                      </span>
+                      {a.miembros?.token_notificacion && (
+                        <button
+                          onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
+                          style={{ background: '#333', border: '1px solid #555', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#A8D500' }}
+                          title="Enviar mensaje personal"
+                        >
+                          <Send size={12} />
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               )
