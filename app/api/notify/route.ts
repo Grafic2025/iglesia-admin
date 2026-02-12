@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
-      title: title || "Iglesia del Salvador",
+      title: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
       body: message,
 
       // PROPIEDADES DE PRIORIDAD

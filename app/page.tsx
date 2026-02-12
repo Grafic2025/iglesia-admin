@@ -680,7 +680,7 @@ export default function AdminDashboard() {
           <h3 style={{ marginTop: 0, color: '#A8D500', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Bell size={20} /> Notificar a: {filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Reunión ${filtroHorario}`}
           </h3>
-          <input placeholder="Título del aviso..." value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
+          <input placeholder="Iglesia del Salvador" value={tituloPush} onChange={(e) => setTituloPush(e.target.value)} style={{ width: '100%', padding: '12px', borderRadius: '8px', background: '#222', border: '1px solid #444', color: '#fff', marginBottom: '10px' }} />
           <textarea
             placeholder="Escribe el mensaje aquí..."
             value={mensajePush}

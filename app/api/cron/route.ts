@@ -4,13 +4,13 @@ import { supabase } from '@/lib/supabase';
 export async function GET() {
   try {
     const ahora = new Date();
-    
-    const horaActual = ahora.toLocaleTimeString('en-GB', { 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      timeZone: 'America/Argentina/Buenos_Aires' 
+
+    const horaActual = ahora.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'America/Argentina/Buenos_Aires'
     });
-    
+
     const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
     const diaHoy = dias[ahora.getDay()];
 
@@ -32,7 +32,7 @@ export async function GET() {
           try {
             const res = await fetch('https://bible-api.com/?random=verse&translation=bbe');
             const data = await res.json();
-            
+
             const resT = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(data.text)}&langpair=en|es`);
             const dataT = await resT.json();
             const textoEspanol = dataT.responseData.translatedText;
@@ -43,8 +43,8 @@ export async function GET() {
               'Joshua': 'Josué', 'Judges': 'Jueces', 'Ruth': 'Rut', '1 Samuel': '1 Samuel', '2 Samuel': '2 Samuel',
               '1 Kings': '1 Reyes', '2 Kings': '2 Reyes', '1 Chronicles': '1 Crónicas', '2 Chronicles': '2 Crónicas',
               'Ezra': 'Esdras', 'Nehemiah': 'Nehemías', 'Esther': 'Ester', 'Job': 'Job', 'Psalms': 'Salmos', 'Psalm': 'Salmo',
-              'Proverbs': 'Proverbios', 'Ecclesiastes': 'Eclesiastés', 'Song of Solomon': 'Cantares', 'Song of Songs': 'Cantares', 
-              'Isaiah': 'Isaías', 'Jeremiah': 'Jeremías', 'Lamentations': 'Lamentaciones', 'Ezekiel': 'Ezequiel', 'Daniel': 'Daniel', 
+              'Proverbs': 'Proverbios', 'Ecclesiastes': 'Eclesiastés', 'Song of Solomon': 'Cantares', 'Song of Songs': 'Cantares',
+              'Isaiah': 'Isaías', 'Jeremiah': 'Jeremías', 'Lamentations': 'Lamentaciones', 'Ezekiel': 'Ezequiel', 'Daniel': 'Daniel',
               'Hosea': 'Oseas', 'Joel': 'Joel', 'Amos': 'Amós', 'Obadiah': 'Abdías', 'Jonah': 'Jonás', 'Micah': 'Miqueas', 'Nahum': 'Nahúm',
               'Habakkuk': 'Habacuc', 'Zephaniah': 'Sofonías', 'Haggai': 'Hageo', 'Zechariah': 'Zacarías', 'Malachi': 'Malaquías',
               'Matthew': 'Mateo', 'Mark': 'Marcos', 'Luke': 'Lucas', 'John': 'Juan', 'Acts': 'Hechos', 'Romans': 'Romanos',
@@ -55,12 +55,12 @@ export async function GET() {
               '3 John': '3 Juan', 'Jude': 'Judas', 'Revelation': 'Apocalipsis'
             };
 
-            Object.keys(libros).forEach(eng => { 
-              referencia = referencia.replace(eng, libros[eng]); 
+            Object.keys(libros).forEach(eng => {
+              referencia = referencia.replace(eng, libros[eng]);
             });
 
             mensajeAEnviar = `📖 ${textoEspanol} (${referencia})`;
-            
+
             // Opcional: Si quieres una imagen por defecto para los versículos, descomenta la línea de abajo
             // if (!imagenAEnviar) imagenAEnviar = "URL_DE_UNA_IMAGEN_DE_BIBLIA";
 
@@ -74,8 +74,8 @@ export async function GET() {
           const respuestaEnvio = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              title: tarea.mensaje.toUpperCase() === 'VERSICULO' ? 'Versículo del Día' : 'Aviso Iglesia',
+            body: JSON.stringify({
+              title: tarea.mensaje.toUpperCase() === 'VERSICULO' ? 'Versículo del Día' : 'Iglesia del Salvador',
               message: mensajeAEnviar,
               horario: 'Todas',
               image: imagenAEnviar // Enviamos la imagen para que aparezca en la miniatura
@@ -84,18 +84,18 @@ export async function GET() {
 
           await supabase
             .from('programaciones')
-            .update({ 
-              ultimo_estado: respuestaEnvio.ok ? 'Exitoso' : 'Error', 
-              ultima_ejecucion: new Date().toISOString() 
+            .update({
+              ultimo_estado: respuestaEnvio.ok ? 'Exitoso' : 'Error',
+              ultima_ejecucion: new Date().toISOString()
             })
             .eq('id', tarea.id);
 
         } catch (errorEnvio) {
           await supabase
             .from('programaciones')
-            .update({ 
-              ultimo_estado: 'Error de conexión', 
-              ultima_ejecucion: new Date().toISOString() 
+            .update({
+              ultimo_estado: 'Error de conexión',
+              ultima_ejecucion: new Date().toISOString()
             })
             .eq('id', tarea.id);
         }
