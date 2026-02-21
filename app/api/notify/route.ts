@@ -79,6 +79,19 @@ export async function POST(req: Request) {
     const expoData = await response.json();
     console.log("Respuesta Expo:", JSON.stringify(expoData, null, 2));
 
+    // --- GUARDAR EN LOGS PARA EL ADMIN ---
+    try {
+      await supabase.from('notificacion_logs').insert([{
+        fecha: new Date().toISOString(),
+        titulo: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
+        mensaje: message,
+        destinatarios_count: tokens.length,
+        estado: response.ok ? 'Exitoso' : 'Error'
+      }]);
+    } catch (dbError) {
+      console.error("Error guardando log:", dbError);
+    }
+
     return NextResponse.json({ success: true, total: tokens.length, expoResponse: expoData });
 
   } catch (error: any) {

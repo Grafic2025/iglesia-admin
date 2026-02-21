@@ -30,6 +30,7 @@ export default function AdminDashboard() {
   const [noticias, setNoticias] = useState<any[]>([])
   const [recursos, setRecursos] = useState<any[]>([])
   const [logs, setLogs] = useState<any[]>([])
+  const [logsError, setLogsError] = useState<string | null>(null)
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
@@ -60,9 +61,14 @@ export default function AdminDashboard() {
         .on('postgres_changes', { event: '*', schema: 'public', table: 'programaciones' }, () => fetchProgramaciones())
         .subscribe();
 
+      const channelLog = supabase.channel('cambios-logs')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'notificacion_logs' }, () => fetchLogs())
+        .subscribe();
+
       return () => {
         supabase.removeChannel(channelAsis);
         supabase.removeChannel(channelProg);
+        supabase.removeChannel(channelLog);
       };
     }
   }, [authorized, fechaSeleccionada])
@@ -73,8 +79,18 @@ export default function AdminDashboard() {
   }
 
   const fetchLogs = async () => {
-    const { data } = await supabase.from('notificacion_logs').select('*').order('fecha', { ascending: false }).limit(10);
-    if (data) setLogs(data);
+    try {
+      const { data, error } = await supabase.from('notificacion_logs').select('*').order('fecha', { ascending: false }).limit(10);
+      if (error) {
+        console.error('Error fetching logs:', error);
+        setLogsError(error.message);
+      } else {
+        setLogs(data || []);
+        setLogsError(null);
+      }
+    } catch (e: any) {
+      setLogsError(e.message);
+    }
   }
 
   const syncYouTube = async (showAlert = false) => {
@@ -312,7 +328,7 @@ export default function AdminDashboard() {
       const result = await res.json();
       setNotificacionStatus({ show: true, message: res.ok ? `✅ Enviado a ${result.total} personas` : `❌ Error`, error: !res.ok });
       if (res.ok) {
-        // Nada que limpiar de imágenes
+        fetchLogs(); // Forzar actualización inmediata de la tabla de historial
       }
     } catch (e) {
       setNotificacionStatus({ show: true, message: `❌ Error de red`, error: true });
@@ -336,7 +352,10 @@ export default function AdminDashboard() {
         }),
       });
       const result = await res.json();
-      if (res.ok) alert(`✅ Notificación enviada a ${nombre}`);
+      if (res.ok) {
+        alert(`✅ Notificación enviada a ${nombre}`);
+        fetchLogs(); // Actualizar historial
+      }
       else alert(`❌ Error: ${result.error || 'Desconocido'}`);
     } catch (e) {
       alert(`❌ Error de red`);
@@ -807,7 +826,8 @@ export default function AdminDashboard() {
               </tr>
             </thead>
             <tbody>
-              {logs.length === 0 && <tr><td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#555' }}>Sin logs recientes</td></tr>}
+              {logsError && <tr><td colSpan={4} style={{ padding: '10px', textAlign: 'center', color: '#ff4444' }}>⚠️ Error: {logsError}</td></tr>}
+              {logs.length === 0 && !logsError && <tr><td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#555' }}>Sin logs recientes</td></tr>}
               {logs.map(l => (
                 <tr key={l.id} style={{ borderBottom: '1px solid #252525' }}>
                   <td style={{ padding: '8px', color: '#aaa' }}>{new Date(l.fecha).toLocaleDateString()}</td>
