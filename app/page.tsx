@@ -821,19 +821,23 @@ export default function AdminDashboard() {
               <tr style={{ color: '#888', textAlign: 'left', borderBottom: '1px solid #333' }}>
                 <th style={{ padding: '8px' }}>Fecha</th>
                 <th style={{ padding: '8px' }}>Título</th>
+                <th style={{ padding: '8px' }}>Mensaje</th>
                 <th style={{ padding: '8px' }}>Destinatarios</th>
                 <th style={{ padding: '8px' }}>Estado</th>
               </tr>
             </thead>
             <tbody>
-              {logsError && <tr><td colSpan={4} style={{ padding: '10px', textAlign: 'center', color: '#ff4444' }}>⚠️ Error: {logsError}</td></tr>}
-              {logs.length === 0 && !logsError && <tr><td colSpan={4} style={{ padding: '20px', textAlign: 'center', color: '#555' }}>Sin logs recientes</td></tr>}
+              {logsError && <tr><td colSpan={5} style={{ padding: '10px', textAlign: 'center', color: '#ff4444' }}>⚠️ Error: {logsError}</td></tr>}
+              {logs.length === 0 && !logsError && <tr><td colSpan={5} style={{ padding: '20px', textAlign: 'center', color: '#555' }}>Sin logs recientes</td></tr>}
               {logs.map(l => (
                 <tr key={l.id} style={{ borderBottom: '1px solid #252525' }}>
-                  <td style={{ padding: '8px', color: '#aaa' }}>{new Date(l.fecha).toLocaleDateString()}</td>
-                  <td style={{ padding: '8px' }}>{l.titulo}</td>
+                  <td style={{ padding: '8px', color: '#aaa', whiteSpace: 'nowrap' }}>{new Date(l.fecha).toLocaleDateString()}</td>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>{l.titulo}</td>
+                  <td style={{ padding: '8px', color: '#ddd', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={l.mensaje}>
+                    {l.mensaje}
+                  </td>
                   <td style={{ padding: '8px' }}>{l.destinatarios_count} personas</td>
-                  <td style={{ padding: '8px', color: l.estado === 'Exitoso' ? '#A8D500' : '#ff4444' }}>{l.estado}</td>
+                  <td style={{ padding: '8px', color: l.estado === 'Exitoso' ? '#A8D500' : '#ff4444', fontWeight: 'bold' }}>{l.estado}</td>
                 </tr>
               ))}
             </tbody>
