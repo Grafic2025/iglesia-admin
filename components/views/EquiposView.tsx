@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users2, Calendar, Plus, UserPlus, CheckCircle2, Clock, ShieldAlert, X, User, Search, Trash2 } from 'lucide-react';
 
-const EquiposView = ({ supabase, setActiveTab }: { supabase: any, setActiveTab?: (t: string) => void }) => {
+const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: { supabase: any, setActiveTab?: (t: string) => void, enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void> }) => {
     const [loading, setLoading] = useState(true);
     const [teams, setTeams] = useState<any[]>([]);
     const [members, setMembers] = useState<any[]>([]);
@@ -134,6 +134,17 @@ const EquiposView = ({ supabase, setActiveTab }: { supabase: any, setActiveTab?:
             if (error.code === '23505') alert("Este miembro ya está en el equipo.");
             else alert("Error: " + error.message);
         } else {
+            // Notificar al miembro
+            if (enviarNotificacionIndividual) {
+                const miembro = members.find(m => m.id === memberId);
+                if (miembro?.token_notificacion) {
+                    await enviarNotificacionIndividual(
+                        miembro.token_notificacion,
+                        miembro.nombre,
+                        `🙌 ¡Hola ${miembro.nombre}! Has sido asignado al equipo '${selectedTeam.nombre}' como ${assignRole || 'General'}. ¡Gracias por tu servicio! ❤️`
+                    );
+                }
+            }
             setShowAssignModal(false);
             setAssignRole('');
             handleSelectTeam(selectedTeam);

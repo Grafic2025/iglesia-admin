@@ -7,9 +7,10 @@ interface GenteViewProps {
     miembros: any[];
     hoyArg: string;
     fetchMiembros: () => Promise<void>;
+    enviarNotificacionIndividual: (token: string, nombre: string, mensaje: string) => Promise<void>;
 }
 
-const GenteView = ({ miembros, hoyArg, fetchMiembros }: GenteViewProps) => {
+const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividual }: GenteViewProps) => {
     const [search, setSearch] = useState('');
 
     // Filter members based on search
@@ -17,15 +18,24 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros }: GenteViewProps) => {
         `${m.nombre} ${m.apellido}`.toLowerCase().includes(search.toLowerCase())
     );
 
-    const toggleServerStatus = async (id: string, currentStatus: boolean) => {
+    const toggleServerStatus = async (miembro: any) => {
+        const nuevoEstado = !miembro.es_servidor;
         const { error } = await supabase
             .from('miembros')
-            .update({ es_servidor: !currentStatus })
-            .eq('id', id);
+            .update({ es_servidor: nuevoEstado })
+            .eq('id', miembro.id);
 
         if (error) {
             alert("Error al actualizar: " + error.message);
         } else {
+            // Si lo acabamos de hacer servidor, mandamos la notificación
+            if (nuevoEstado && miembro.token_notificacion) {
+                await enviarNotificacionIndividual(
+                    miembro.token_notificacion,
+                    miembro.nombre,
+                    `¡Hola ${miembro.nombre}! 🎉 Has sido habilitado como SERVIDOR en Iglesia del Salvador. ¡Gracias por sumarte al equipo! 🙌`
+                );
+            }
             await fetchMiembros();
         }
     };
@@ -102,7 +112,7 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros }: GenteViewProps) => {
                                     </button>
                                 )}
                                 <button
-                                    onClick={() => toggleServerStatus(m.id, m.es_servidor)}
+                                    onClick={() => toggleServerStatus(m)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${m.es_servidor
                                         ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
                                         : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'

@@ -9,7 +9,7 @@ interface DetailedRow {
     responsable: string;
 }
 
-const ServiciosView = ({ supabase }: { supabase: any }) => {
+const ServiciosView = ({ supabase, enviarNotificacionIndividual }: { supabase: any, enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void> }) => {
     const [loading, setLoading] = useState(true);
     const [schedules, setSchedules] = useState<any[]>([]);
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
@@ -106,6 +106,22 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
 
         if (res.error) alert("Error: " + res.error.message);
         else {
+            // Notificar al equipo asignado
+            if (enviarNotificacionIndividual && assignedStaff.length > 0) {
+                const fechaFormat = new Date(fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                for (const staff of assignedStaff) {
+                    // Buscamos el token del miembro
+                    const miembro = allMembers.find(m => m.id === staff.miembro_id);
+                    if (miembro?.token_notificacion) {
+                        await enviarNotificacionIndividual(
+                            miembro.token_notificacion,
+                            miembro.nombre,
+                            `📅 Has sido asignado para el servicio del ${fechaFormat} (${horario}) como: ${staff.rol}. ¡Nos vemos allá! 🙌`
+                        );
+                    }
+                }
+            }
             setShowModal(false);
             fetchData();
         }

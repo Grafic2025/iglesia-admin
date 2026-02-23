@@ -210,8 +210,8 @@ export default function AdminDashboard() {
     setTimeout(() => setNotificacionStatus({ show: false, message: '', error: false }), 4000);
   }
 
-  const enviarNotificacionIndividual = async (token: string, nombre: string) => {
-    const mensaje = prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
+  const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string) => {
+    const mensaje = mensajeCustom || prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
     if (!mensaje) return;
     try {
       const res = await fetch('/api/notify', {
@@ -219,9 +219,14 @@ export default function AdminDashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: 'Iglesia del Salvador', message: mensaje, specificToken: token }),
       });
-      if (res.ok) { alert(`✅ Enviado a ${nombre}`); fetchLogs(); }
-      else alert(`❌ Error`);
-    } catch (e) { alert(`❌ Error de red`); }
+      if (res.ok) {
+        if (!mensajeCustom) alert(`✅ Enviado a ${nombre}`);
+        fetchLogs();
+      }
+      else if (!mensajeCustom) alert(`❌ Error`);
+    } catch (e) {
+      if (!mensajeCustom) alert(`❌ Error de red`);
+    }
   }
 
   const eliminarNoticia = async (id: string) => {
@@ -305,13 +310,22 @@ export default function AdminDashboard() {
 
           {(activeTab === 'dashboard' || activeTab === 'miembros') && (
             <div className="flex items-center gap-4 bg-[#1E1E1E] p-2 rounded-2xl border border-[#333]">
-              <div className="flex flex-col px-3">
+              <div className="flex flex-col px-3 cursor-pointer" onClick={(e) => {
+                const input = e.currentTarget.querySelector('input');
+                if (input) {
+                  try {
+                    (input as any).showPicker();
+                  } catch (err) {
+                    input.focus();
+                  }
+                }
+              }}>
                 <label className="text-[9px] text-[#A8D500] font-black uppercase tracking-widest">Consultar Asistencia</label>
                 <input
                   type="date"
                   value={fechaSeleccionada}
                   onChange={(e) => setFechaSeleccionada(e.target.value)}
-                  className="bg-transparent text-white outline-none text-sm cursor-pointer"
+                  className="bg-transparent text-white outline-none text-sm cursor-pointer [color-scheme:dark]"
                 />
               </div>
               <div className="w-px h-8 bg-[#333]"></div>
@@ -351,7 +365,12 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'gente' && (
-            <GenteView miembros={miembros} hoyArg={hoyArg} fetchMiembros={fetchMiembros} />
+            <GenteView
+              miembros={miembros}
+              hoyArg={hoyArg}
+              fetchMiembros={fetchMiembros}
+              enviarNotificacionIndividual={enviarNotificacionIndividual}
+            />
           )}
 
           {activeTab === 'notificaciones' && (
@@ -387,11 +406,11 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'servicios' && (
-            <ServiciosView supabase={supabase} />
+            <ServiciosView supabase={supabase} enviarNotificacionIndividual={enviarNotificacionIndividual} />
           )}
 
           {activeTab === 'equipos' && (
-            <EquiposView supabase={supabase} setActiveTab={setActiveTab} />
+            <EquiposView supabase={supabase} setActiveTab={setActiveTab} enviarNotificacionIndividual={enviarNotificacionIndividual} />
           )}
 
           {activeTab === 'cancionero' && (
