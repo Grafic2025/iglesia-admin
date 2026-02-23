@@ -10,11 +10,46 @@ interface Row {
 }
 
 const ServiciosView = ({ supabase }: { supabase: any }) => {
-    const [rows, setRows] = useState<Row[]>([
-        { id: '1', tiempo: '10 min', actividad: 'Alabanza y Adoración', responsable: 'Banda' },
-        { id: '2', tiempo: '5 min', actividad: 'Avisos y Bienvenida', responsable: 'Pastores' },
-        { id: '3', tiempo: '35 min', actividad: 'Predicación', responsable: 'Pastor' },
-    ]);
+    const [rows, setRows] = useState<Row[]>([]);
+    const [notasTecnicas, setNotasTecnicas] = useState('');
+    const [versiculoLema, setVersiculoLema] = useState('');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPlan = async () => {
+            const { data, error } = await supabase
+                .from('servicios_plan')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1);
+
+            if (data && data.length > 0) {
+                const plan = data[0];
+                setRows(plan.items || []);
+                setNotasTecnicas(plan.notas_multimedia || '');
+                setVersiculoLema(plan.versiculo_lema || '');
+            } else {
+                setRows([
+                    { id: '1', tiempo: '10 min', actividad: 'Alabanza y Adoración', responsable: 'Banda' },
+                    { id: '2', tiempo: '5 min', actividad: 'Avisos y Bienvenida', responsable: 'Pastores' },
+                    { id: '3', tiempo: '35 min', actividad: 'Predicación', responsable: 'Pastor' },
+                ]);
+            }
+            setLoading(false);
+        };
+        fetchPlan();
+    }, [supabase]);
+
+    const handleSave = async () => {
+        const { error } = await supabase.from('servicios_plan').insert([{
+            items: rows,
+            notas_multimedia: notasTecnicas,
+            versiculo_lema: versiculoLema,
+            horario: '11:00 HS'
+        }]);
+        if (error) alert("Error al guardar planilla: " + error.message);
+        else alert("✅ Plan de servicio guardado correctamente");
+    };
 
     const addRow = () => {
         const newId = (rows.length + 1).toString();
@@ -29,6 +64,8 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
         setRows(rows.map(r => r.id === id ? { ...r, [field]: value } : r));
     };
 
+    if (loading) return <div className="text-[#A8D500] p-10 text-center animate-pulse font-bold">CARGANDO PLAN...</div>;
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -38,7 +75,10 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
                     </h2>
                     <p className="text-[#888] text-sm italic">Planificación del Culto "Minuto a Minuto"</p>
                 </div>
-                <button className="bg-[#A8D500] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95">
+                <button
+                    onClick={handleSave}
+                    className="bg-[#A8D500] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
+                >
                     <Save size={18} /> GUARDAR PLAN
                 </button>
             </div>
@@ -117,6 +157,8 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
                 <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
                     <h4 className="text-white font-bold mb-4 flex items-center gap-2 italic">Notas Técnicas / Multimedia</h4>
                     <textarea
+                        value={notasTecnicas}
+                        onChange={(e) => setNotasTecnicas(e.target.value)}
                         placeholder="Luces rojas en la adoración, video de bienvenida listo..."
                         className="w-full bg-[#252525] border border-[#333] rounded-xl p-4 text-white text-sm h-32 outline-none focus:border-[#A8D500] resize-none"
                     />
@@ -124,6 +166,8 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
                 <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
                     <h4 className="text-white font-bold mb-4 flex items-center gap-2 italic">Versículo Lema / Idea Central</h4>
                     <textarea
+                        value={versiculoLema}
+                        onChange={(e) => setVersiculoLema(e.target.value)}
                         placeholder="Ej: Salmos 100:4 - Entrad por sus puertas con acción de gracias..."
                         className="w-full bg-[#252525] border border-[#333] rounded-xl p-4 text-white text-sm h-32 outline-none focus:border-[#A8D500] resize-none"
                     />
