@@ -37,6 +37,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [showModal, setShowModal] = useState(false);
     const [showSongPicker, setShowSongPicker] = useState(false);
     const [showStaffPicker, setShowStaffPicker] = useState(false);
+    const [pendingMember, setPendingMember] = useState<any>(null);
+    const [pendingRol, setPendingRol] = useState('Servidor');
 
     const fetchData = async () => {
         setLoading(true);
@@ -158,19 +160,29 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const assignStaff = (m: any) => {
         if (assignedStaff.some(s => s.miembro_id === m.id)) {
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
-        } else {
-            if (m && !assignedStaff.some(s => s.miembro_id === m.id)) {
-                // Verificar bloqueo
-                const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
-                if (bloqueo) {
-                    if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
-                        return;
-                    }
-                }
-                const rol = prompt(`¿Qué rol tendrá ${m.nombre}?`, "Servidor") || "Servidor";
-                setAssignedStaff([...assignedStaff, { miembro_id: m.id, nombre: `${m.nombre} ${m.apellido}`, rol, estado: 'pendiente' }]);
+            return;
+        }
+        const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
+        if (bloqueo) {
+            if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
+                return;
             }
         }
+        // Mostrar modal de rol en lugar de prompt()
+        setPendingMember(m);
+        setPendingRol('Servidor');
+    };
+
+    const confirmAssignRol = () => {
+        if (!pendingMember) return;
+        setAssignedStaff([...assignedStaff, {
+            miembro_id: pendingMember.id,
+            nombre: `${pendingMember.nombre} ${pendingMember.apellido}`,
+            rol: pendingRol || 'Servidor',
+            estado: 'pendiente'
+        }]);
+        setPendingMember(null);
+        setPendingRol('Servidor');
     };
 
     return (
@@ -435,6 +447,44 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                             ))}
                         </div>
                         <button onClick={() => setShowStaffPicker(false)} className="mt-6 w-full py-4 bg-[#3B82F6] text-white font-black rounded-2xl uppercase tracking-widest">Listo</button>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: Asignar Rol */}
+            {pendingMember && (
+                <div className="fixed inset-0 bg-black/95 z-[70] flex items-center justify-center p-4">
+                    <div className="bg-[#1A1A1A] w-full max-w-sm rounded-3xl border border-[#333] p-6 shadow-2xl">
+                        <h3 className="text-white font-bold text-lg mb-2">Asignar Rol</h3>
+                        <p className="text-[#888] text-sm mb-5">¿Qué rol tendrá <span className="text-white font-bold">{pendingMember.nombre}</span>?</p>
+                        <input
+                            type="text"
+                            value={pendingRol}
+                            onChange={e => setPendingRol(e.target.value)}
+                            placeholder="Ej: Guitarra, Batería, Sonido..."
+                            className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] mb-3"
+                            autoFocus
+                        />
+                        <div className="flex flex-wrap gap-2 mb-5">
+                            {['Servidor', 'Guitarra', 'Batería', 'Bajo', 'Teclados', 'Voz', 'Sonido', 'Proyección', 'Bienvenida'].map(r => (
+                                <button
+                                    key={r}
+                                    onClick={() => setPendingRol(r)}
+                                    className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-all ${pendingRol === r ? 'bg-[#A8D500] text-black' : 'bg-[#222] text-[#888] hover:bg-[#333]'
+                                        }`}
+                                >{r}</button>
+                            ))}
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setPendingMember(null)}
+                                className="flex-1 py-3 bg-[#222] text-white font-bold rounded-xl border border-[#333]"
+                            >CANCELAR</button>
+                            <button
+                                onClick={confirmAssignRol}
+                                className="flex-1 py-3 bg-[#A8D500] text-black font-black rounded-xl"
+                            >CONFIRMAR</button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -44,6 +44,9 @@ export default function AdminDashboard() {
   const [auditLogs, setAuditLogs] = useState<any[]>([])
   const [retencionData, setRetencionData] = useState({ total: 0, activos: 0, porcentaje: 0 })
   const [heatmapData, setHeatmapData] = useState<any[]>([])
+  const [exportStart, setExportStart] = useState('')
+  const [exportEnd, setExportEnd] = useState('')
+  const [showExportModal, setShowExportModal] = useState(false)
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
@@ -310,25 +313,15 @@ export default function AdminDashboard() {
   }
 
   const editarNoticia = async (n: any) => {
-    const nuevoTitulo = prompt("Editar título:", n.titulo);
-    if (nuevoTitulo === null) return;
-    const nuevaImagen = prompt("Editar URL imagen:", n.imagen_url);
-    if (nuevaImagen === null) return;
-    // ... logic simplifies here but we keep the prompt UI for now
-    const { error } = await supabase.from('noticias').update({ titulo: nuevoTitulo, imagen_url: nuevaImagen }).eq('id', n.id);
-    if (error) alert("Error");
-    else fetchNoticias();
+    // Handled by CMSView modal
   }
 
   const agregarNoticia = async () => {
-    const titulo = prompt("Título de la noticia:");
-    if (!titulo) return;
-    const imagen = prompt("URL de la imagen:", "https://via.placeholder.com/300");
-    await supabase.from('noticias').insert([{ titulo, imagen_url: imagen || "https://via.placeholder.com/300", activa: true, es_youtube: false }]);
-    fetchNoticias();
+    // Handled by CMSView modal
   }
 
   const exportarCSV = () => {
+    // Quick export current day (legacy)
     const encabezados = "ID,Nombre,Apellido,DNI/ID_Miembro,Reunion,Hora Ingreso,Fecha,Racha Actual\n";
     const filas = asistencias.map(a => `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha},${a.racha}`).join("\n");
     const bom = "\uFEFF";
@@ -337,6 +330,32 @@ export default function AdminDashboard() {
     link.href = URL.createObjectURL(blob);
     link.download = `Reporte_IDS_${fechaSeleccionada}.csv`;
     link.click();
+  }
+
+  const exportarCSVRango = async () => {
+    const desde = exportStart || fechaSeleccionada;
+    const hasta = exportEnd || fechaSeleccionada;
+
+    const { data, error } = await supabase
+      .from('asistencias')
+      .select('id, miembro_id, horario_reunion, hora_entrada, fecha, miembros(nombre, apellido)')
+      .gte('fecha', desde)
+      .lte('fecha', hasta)
+      .order('fecha', { ascending: true });
+
+    if (error || !data) { alert('Error al obtener datos'); return; }
+
+    const encabezados = "ID,Nombre,Apellido,ID_Miembro,Horario,Hora Entrada,Fecha\n";
+    const filas = data.map((a: any) =>
+      `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha}`
+    ).join("\n");
+    const bom = "\uFEFF";
+    const blob = new Blob([bom + encabezados + filas], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Reporte_IDS_${desde}_al_${hasta}.csv`;
+    link.click();
+    setShowExportModal(false);
   }
 
   const datosFiltrados = asistencias.filter(a => {
@@ -407,7 +426,17 @@ export default function AdminDashboard() {
                 onClick={exportarCSV}
                 className="bg-white text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#eee] transition-all"
               >
-                📥 EXPORTAR EXCEL
+                📥 HOY
+              </button>
+              <button
+                onClick={() => {
+                  setExportStart(fechaSeleccionada);
+                  setExportEnd(fechaSeleccionada);
+                  setShowExportModal(true);
+                }}
+                className="bg-[#A8D500] text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#b0f000] transition-all"
+              >
+                📊 RANGO
               </button>
             </div>
           )}
@@ -514,6 +543,69 @@ export default function AdminDashboard() {
           )}
         </section>
       </main>
+
+      {/* MODAL: Export por rango */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] p-8 shadow-2xl">
+            <h3 className="text-white font-bold text-xl mb-2">📊 Exportar por Rango</h3>
+            <p className="text-[#888] text-sm mb-6">Selecciona el período de asistencias a exportar</p>
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-[#888] text-[10px] font-bold uppercase mb-2 block">Desde</label>
+                <input
+                  type="date"
+                  value={exportStart}
+                  onChange={e => setExportStart(e.target.value)}
+                  className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]"
+                />
+              </div>
+              <div>
+                <label className="text-[#888] text-[10px] font-bold uppercase mb-2 block">Hasta</label>
+                <input
+                  type="date"
+                  value={exportEnd}
+                  onChange={e => setExportEnd(e.target.value)}
+                  className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]"
+                />
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {[
+                { label: 'Esta semana', days: 7 },
+                { label: 'Este mes', days: 30 },
+                { label: '3 meses', days: 90 },
+                { label: 'Este año', days: 365 },
+              ].map(({ label, days }) => {
+                const end = new Date();
+                const start = new Date();
+                start.setDate(start.getDate() - days);
+                return (
+                  <button
+                    key={label}
+                    onClick={() => {
+                      setExportStart(start.toLocaleDateString('en-CA'));
+                      setExportEnd(end.toLocaleDateString('en-CA'));
+                    }}
+                    className="text-xs px-3 py-1.5 rounded-lg bg-[#222] text-[#888] hover:bg-[#333] font-bold transition-all"
+                  >{label}</button>
+                );
+              })}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="flex-1 py-3 bg-[#222] text-white font-bold rounded-xl border border-[#333]"
+              >CANCELAR</button>
+              <button
+                onClick={exportarCSVRango}
+                disabled={!exportStart || !exportEnd}
+                className="flex-1 py-3 bg-[#A8D500] text-black font-black rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+              >📥 DESCARGAR CSV</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
