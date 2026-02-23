@@ -161,7 +161,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         } else {
             if (m && !assignedStaff.some(s => s.miembro_id === m.id)) {
                 // Verificar bloqueo
-                const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && b.fecha === fecha);
+                const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
                 if (bloqueo) {
                     if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
                         return;
@@ -422,7 +422,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                     className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${assignedStaff.some(s => s.miembro_id === m.id) ? 'bg-[#3B82F6] border-transparent text-white font-bold' : 'bg-[#222] border-[#333] text-white hover:border-[#3B82F6]'}`}
                                 >
                                     {(() => {
-                                        const b = allBlockouts.find(b => b.miembro_id === m.id && b.fecha === fecha);
+                                        const b = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
                                         return (
                                             <div className="flex flex-col items-start gap-1">
                                                 <div className="text-left font-bold">{m.nombre} {m.apellido}</div>

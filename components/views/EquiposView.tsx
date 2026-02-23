@@ -66,13 +66,13 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
             const { data: blocksData } = await supabase
                 .from('bloqueos_servidores')
                 .select('*, miembros(nombre, apellido)')
-                .gte('fecha', today)
-                .order('fecha', { ascending: true });
+                .gte('fecha_fin', today)
+                .order('fecha_inicio', { ascending: true });
 
             setBlockouts(blocksData?.map((b: any) => ({
                 id: b.id,
                 name: `${b.miembros.nombre} ${b.miembros.apellido}`,
-                date: new Date(b.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' }),
+                date: `${new Date(b.fecha_inicio + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })} - ${new Date(b.fecha_fin + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })}`,
                 reason: b.motivo
             })) || []);
 
