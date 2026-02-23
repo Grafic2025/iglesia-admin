@@ -12,7 +12,8 @@ import {
     UserCircle,
     Users2,
     Home,
-    Clock
+    Clock,
+    History
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
         { id: 'equipos', label: 'Equipos/Servir', icon: Users2 },
         { id: 'cancionero', label: 'Cancionero', icon: Music },
         { id: 'agenda_config', label: 'Config. Agenda', icon: Clock },
+        { id: 'auditoria', label: 'Auditoría', icon: History },
     ];
 
     return (

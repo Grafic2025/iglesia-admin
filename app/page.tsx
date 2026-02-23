@@ -11,6 +11,7 @@ import GenteView from '../components/views/GenteView'
 import EquiposView from '../components/views/EquiposView'
 import CancioneroView from '../components/views/CancioneroView'
 import AgendaConfigView from '../components/views/AgendaConfigView'
+import AuditoriaView from '../components/views/AuditoriaView'
 import { LogOut } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -40,6 +41,9 @@ export default function AdminDashboard() {
   const [logsError, setLogsError] = useState<string | null>(null)
   const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([])
   const [horariosDisponibles, setHorariosDisponibles] = useState<any[]>([])
+  const [auditLogs, setAuditLogs] = useState<any[]>([])
+  const [retencionData, setRetencionData] = useState({ total: 0, activos: 0, porcentaje: 0 })
+  const [heatmapData, setHeatmapData] = useState<any[]>([])
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
@@ -64,6 +68,8 @@ export default function AdminDashboard() {
       syncYouTube();
       fetchCrecimientoAnual();
       fetchHorarios();
+      fetchAuditLogs();
+      fetchAnalytics();
 
       const channels = [
         supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe(),
@@ -134,6 +140,39 @@ export default function AdminDashboard() {
       data.push({ mes: meses[d.getMonth()], c: count || 0 });
     }
     setCrecimientoAnual(data);
+  }
+
+  const fetchAnalytics = async () => {
+    // Retención (últimos 30 días)
+    const hace30d = new Date();
+    hace30d.setDate(hace30d.getDate() - 30);
+    const { count: total } = await supabase.from('miembros').select('*', { count: 'exact', head: true });
+    const { data: activosData } = await supabase.from('asistencias').select('miembro_id').gte('fecha', hace30d.toISOString().split('T')[0]);
+
+    const uniqueActivos = new Set(activosData?.map(a => a.miembro_id)).size;
+    setRetencionData({
+      total: total || 0,
+      activos: uniqueActivos,
+      porcentaje: total ? Math.round((uniqueActivos / total) * 100) : 0
+    });
+
+    // Heatmap (distribución por horario en el último mes)
+    const { data: hmData } = await supabase.from('asistencias').select('horario_reunion').gte('fecha', hace30d.toISOString().split('T')[0]);
+    const counts: any = {};
+    hmData?.forEach(a => {
+      counts[a.horario_reunion] = (counts[a.horario_reunion] || 0) + 1;
+    });
+    setHeatmapData(Object.keys(counts).map(k => ({ label: k, value: counts[k] })));
+  }
+
+  const fetchAuditLogs = async () => {
+    const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(50);
+    if (data) setAuditLogs(data);
+  }
+
+  const registrarAuditoria = async (accion: string, detalle: string) => {
+    await supabase.from('auditoria').insert([{ accion, detalle, admin_id: 'admin_general' }]);
+    fetchAuditLogs();
   }
 
   const fetchAsistencias = async () => {
@@ -382,6 +421,8 @@ export default function AdminDashboard() {
               nuevosMes={nuevosMes}
               crecimientoAnual={crecimientoAnual}
               horariosDisponibles={horariosDisponibles}
+              retencion={retencionData}
+              heatmap={heatmapData}
             />
           )}
 
@@ -443,11 +484,12 @@ export default function AdminDashboard() {
               ayuda={ayuda}
               supabase={supabase}
               fetchNoticias={fetchNoticias}
+              registrarAuditoria={registrarAuditoria}
             />
           )}
 
           {activeTab === 'servicios' && (
-            <ServiciosView supabase={supabase} enviarNotificacionIndividual={enviarNotificacionIndividual} />
+            <ServiciosView supabase={supabase} enviarNotificacionIndividual={enviarNotificacionIndividual} registrarAuditoria={registrarAuditoria} />
           )}
 
           {activeTab === 'equipos' && (
@@ -463,7 +505,12 @@ export default function AdminDashboard() {
               supabase={supabase}
               horariosDisponibles={horariosDisponibles}
               fetchHorarios={fetchHorarios}
+              registrarAuditoria={registrarAuditoria}
             />
+          )}
+
+          {activeTab === 'auditoria' && (
+            <AuditoriaView logs={auditLogs} />
           )}
         </section>
       </main>

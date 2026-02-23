@@ -6,9 +6,10 @@ interface AgendaConfigViewProps {
     supabase: any;
     horariosDisponibles: any[];
     fetchHorarios: () => Promise<void>;
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
-const AgendaConfigView = ({ supabase, horariosDisponibles, fetchHorarios }: AgendaConfigViewProps) => {
+const AgendaConfigView = ({ supabase, horariosDisponibles, fetchHorarios, registrarAuditoria }: AgendaConfigViewProps) => {
     const [newHorario, setNewHorario] = useState('');
 
     const handleAdd = async () => {
@@ -22,6 +23,7 @@ const AgendaConfigView = ({ supabase, horariosDisponibles, fetchHorarios }: Agen
 
         if (error) alert("Error: " + error.message);
         else {
+            if (registrarAuditoria) registrarAuditoria('AGREGAR HORARIO', `Se añadió ${newHorario}`);
             setNewHorario('');
             fetchHorarios();
         }
@@ -36,7 +38,10 @@ const AgendaConfigView = ({ supabase, horariosDisponibles, fetchHorarios }: Agen
             .upsert({ clave: 'horarios_reunion', valor: updated }, { onConflict: 'clave' });
 
         if (error) alert("Error: " + error.message);
-        else fetchHorarios();
+        else {
+            if (registrarAuditoria) registrarAuditoria('ELIMINAR HORARIO', `Se quitó ${h}`);
+            fetchHorarios();
+        }
     };
 
     return (

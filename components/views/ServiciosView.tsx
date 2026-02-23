@@ -9,7 +9,11 @@ interface DetailedRow {
     responsable: string;
 }
 
-const ServiciosView = ({ supabase, enviarNotificacionIndividual }: { supabase: any, enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void> }) => {
+const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAuditoria }: {
+    supabase: any,
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>,
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>
+}) => {
     const [loading, setLoading] = useState(true);
     const [schedules, setSchedules] = useState<any[]>([]);
     const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
@@ -100,8 +104,10 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual }: { supabase: a
         let res;
         if (selectedSchedule) {
             res = await supabase.from('cronogramas').update(payload).eq('id', selectedSchedule.id);
+            if (registrarAuditoria) await registrarAuditoria('EDITAR CRONOGRAMA', `Se modificó el plan del día ${fecha} (${horario})`);
         } else {
             res = await supabase.from('cronogramas').insert([payload]);
+            if (registrarAuditoria) await registrarAuditoria('CREAR CRONOGRAMA', `Nuevo plan creado para el día ${fecha} (${horario})`);
         }
 
         if (res.error) alert("Error: " + res.error.message);
@@ -147,8 +153,10 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual }: { supabase: a
         if (assignedStaff.some(s => s.miembro_id === m.id)) {
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
         } else {
-            const rol = prompt(`¿Qué rol tendrá ${m.nombre}?`, "Servidor") || "Servidor";
-            setAssignedStaff([...assignedStaff, { miembro_id: m.id, nombre: `${m.nombre} ${m.apellido}`, rol }]);
+            if (m && !assignedStaff.some(s => s.miembro_id === m.id)) {
+                const rol = prompt(`¿Qué rol tendrá ${m.nombre}?`, "Servidor") || "Servidor";
+                setAssignedStaff([...assignedStaff, { miembro_id: m.id, nombre: `${m.nombre} ${m.apellido}`, rol, estado: 'pendiente' }]);
+            }
         }
     };
 
@@ -306,11 +314,21 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual }: { supabase: a
                                     <div className="space-y-2">
                                         {assignedStaff.map(s => (
                                             <div key={s.miembro_id} className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-xl border border-[#333]">
-                                                <div>
-                                                    <p className="text-white font-bold text-sm">{s.nombre}</p>
-                                                    <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.rol}</p>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="text-right mr-3">
+                                                        <p className="text-white font-bold text-sm">{s.nombre}</p>
+                                                        <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.rol}</p>
+                                                    </div>
+                                                    <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :
+                                                            s.estado === 'rechazado' ? 'bg-red-500/20 text-red-500' :
+                                                                'bg-yellow-500/20 text-yellow-500'
+                                                        }`}>
+                                                        {s.estado === 'confirmado' ? <CheckCircle2 size={12} /> :
+                                                            s.estado === 'rechazado' ? <X size={12} /> :
+                                                                <Clock size={12} />}
+                                                    </div>
                                                 </div>
-                                                <button onClick={() => assignStaff({ id: s.miembro_id })} className="text-[#555] hover:text-red-500"><X size={14} /></button>
+                                                <button onClick={() => setAssignedStaff(assignedStaff.filter(item => item.miembro_id !== s.miembro_id))} className="text-[#555] hover:text-red-500 p-1"><X size={14} /></button>
                                             </div>
                                         ))}
                                         <button

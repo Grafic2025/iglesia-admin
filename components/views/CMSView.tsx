@@ -12,11 +12,12 @@ interface CMSViewProps {
     ayuda: any[];
     supabase: any;
     fetchNoticias: () => Promise<void>;
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
 const CMSView = ({
     noticias, syncYouTube, editarNoticia, eliminarNoticia, agregarNoticia,
-    bautismos, ayuda, supabase, fetchNoticias
+    bautismos, ayuda, supabase, fetchNoticias, registrarAuditoria
 }: CMSViewProps) => {
     const [showModal, setShowModal] = React.useState(false);
     const [currentNews, setCurrentNews] = React.useState<any>(null);
