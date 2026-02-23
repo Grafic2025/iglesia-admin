@@ -29,7 +29,6 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
         { id: 'servicios', label: 'Plan de Culto', icon: Calendar },
         { id: 'equipos', label: 'Equipos/Servir', icon: Users2 },
-        { id: 'grupos', label: 'Grupos Nexo', icon: Home },
         { id: 'cancionero', label: 'Cancionero', icon: Music },
     ];
 

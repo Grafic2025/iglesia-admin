@@ -9,7 +9,6 @@ import CMSView from '../components/views/CMSView'
 import ServiciosView from '../components/views/ServiciosView'
 import GenteView from '../components/views/GenteView'
 import EquiposView from '../components/views/EquiposView'
-import GruposView from '../components/views/GruposView'
 import CancioneroView from '../components/views/CancioneroView'
 import { LogOut } from 'lucide-react'
 
@@ -105,7 +104,7 @@ export default function AdminDashboard() {
   const fetchAsistencias = async () => {
     const { data } = await supabase
       .from('asistencias')
-      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at, token_notificacion)`)
+      .select(`id, miembro_id, horario_reunion, hora_entrada, fecha, miembros (nombre, apellido, created_at, token_notificacion, es_servidor)`)
       .eq('fecha', fechaSeleccionada)
       .order('hora_entrada', { ascending: false });
 
@@ -304,21 +303,26 @@ export default function AdminDashboard() {
             <p className="text-[#888] text-sm">Gestión del sistema Iglesia del Salvador</p>
           </div>
 
-          <div className="flex items-center gap-4 bg-[#1E1E1E] p-2 rounded-2xl border border-[#333]">
-            <input
-              type="date"
-              value={fechaSeleccionada}
-              onChange={(e) => setFechaSeleccionada(e.target.value)}
-              className="bg-transparent text-white px-3 py-1 outline-none text-sm cursor-pointer"
-            />
-            <div className="w-px h-8 bg-[#333]"></div>
-            <button
-              onClick={exportarCSV}
-              className="bg-white text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#eee] transition-all"
-            >
-              📥 EXPORTAR EXCEL
-            </button>
-          </div>
+          {(activeTab === 'dashboard' || activeTab === 'miembros') && (
+            <div className="flex items-center gap-4 bg-[#1E1E1E] p-2 rounded-2xl border border-[#333]">
+              <div className="flex flex-col px-3">
+                <label className="text-[9px] text-[#A8D500] font-black uppercase tracking-widest">Consultar Asistencia</label>
+                <input
+                  type="date"
+                  value={fechaSeleccionada}
+                  onChange={(e) => setFechaSeleccionada(e.target.value)}
+                  className="bg-transparent text-white outline-none text-sm cursor-pointer"
+                />
+              </div>
+              <div className="w-px h-8 bg-[#333]"></div>
+              <button
+                onClick={exportarCSV}
+                className="bg-white text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#eee] transition-all"
+              >
+                📥 EXPORTAR EXCEL
+              </button>
+            </div>
+          )}
         </header>
 
         <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -388,10 +392,6 @@ export default function AdminDashboard() {
 
           {activeTab === 'equipos' && (
             <EquiposView supabase={supabase} setActiveTab={setActiveTab} />
-          )}
-
-          {activeTab === 'grupos' && (
-            <GruposView supabase={supabase} />
           )}
 
           {activeTab === 'cancionero' && (
