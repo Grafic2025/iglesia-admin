@@ -119,6 +119,14 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
         `${m.nombre} ${m.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleDeleteTeam = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm("¿Eliminar este equipo y todas sus asignaciones?")) return;
+        const { error } = await supabase.from('equipos').delete().eq('id', id);
+        if (error) alert("Error: " + error.message);
+        else fetchInitialData();
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -141,8 +149,14 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
                     <div
                         key={team.id}
                         onClick={() => handleSelectTeam(team)}
-                        className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all cursor-pointer group"
+                        className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all cursor-pointer group relative"
                     >
+                        <button
+                            onClick={(e) => handleDeleteTeam(team.id, e)}
+                            className="absolute top-4 right-4 p-2 text-[#444] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                        >
+                            <Trash2 size={14} />
+                        </button>
                         <div className="text-4xl mb-4">{team.icono || '👥'}</div>
                         <h4 className="text-white font-bold text-lg">{team.nombre}</h4>
                         <p className="text-[#888] text-sm mb-4">{team.members} Voluntarios</p>
@@ -169,7 +183,12 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
                                     <p className="text-[#888] text-xs">4 posiciones asignadas</p>
                                 </div>
                             </div>
-                            <button className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]">VER DETALLE</button>
+                            <button
+                                onClick={() => alert("Redirigiendo a Plan de Culto para ver detalles...")}
+                                className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]"
+                            >
+                                VER DETALLE
+                            </button>
                         </div>
                     </div>
                 </div>
