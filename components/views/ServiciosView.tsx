@@ -20,6 +20,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [allSongs, setAllSongs] = useState<any[]>([]);
     const [allTeams, setAllTeams] = useState<any[]>([]);
     const [allMembers, setAllMembers] = useState<any[]>([]);
+    const [allBlockouts, setAllBlockouts] = useState<any[]>([]);
 
     // Form states
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
@@ -44,18 +45,21 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { data: scheds },
                 { data: songs },
                 { data: teams },
-                { data: members }
+                { data: members },
+                { data: blocks }
             ] = await Promise.all([
                 supabase.from('cronogramas').select('*').order('fecha', { ascending: false }),
                 supabase.from('canciones').select('*').order('titulo', { ascending: true }),
                 supabase.from('equipos').select('*'),
-                supabase.from('miembros').select('*').eq('es_servidor', true)
+                supabase.from('miembros').select('*').eq('es_servidor', true),
+                supabase.from('bloqueos_servidores').select('*')
             ]);
 
             setSchedules(scheds || []);
             setAllSongs(songs || []);
             setAllTeams(teams || []);
             setAllMembers(members || []);
+            setAllBlockouts(blocks || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -117,14 +121,16 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 const fechaFormat = new Date(fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
 
                 for (const staff of assignedStaff) {
-                    // Buscamos el token del miembro
-                    const miembro = allMembers.find(m => m.id === staff.miembro_id);
-                    if (miembro?.token_notificacion) {
-                        await enviarNotificacionIndividual(
-                            miembro.token_notificacion,
-                            miembro.nombre,
-                            `📅 Has sido asignado para el servicio del ${fechaFormat} (${horario}) como: ${staff.rol}. ¡Nos vemos allá! 🙌`
-                        );
+                    // Solo notificar si está pendiente (nuevo o reiniciado)
+                    if (staff.estado === 'pendiente' || !staff.estado) {
+                        const miembro = allMembers.find(m => m.id === staff.miembro_id);
+                        if (miembro?.token_notificacion) {
+                            await enviarNotificacionIndividual(
+                                miembro.token_notificacion,
+                                miembro.nombre,
+                                `🙌 Has sido seleccionado para ${staff.rol} el día ${fechaFormat} (${horario}). ¿Deseas aceptar?`
+                            );
+                        }
                     }
                 }
             }
@@ -154,6 +160,13 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
         } else {
             if (m && !assignedStaff.some(s => s.miembro_id === m.id)) {
+                // Verificar bloqueo
+                const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && b.fecha === fecha);
+                if (bloqueo) {
+                    if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
+                        return;
+                    }
+                }
                 const rol = prompt(`¿Qué rol tendrá ${m.nombre}?`, "Servidor") || "Servidor";
                 setAssignedStaff([...assignedStaff, { miembro_id: m.id, nombre: `${m.nombre} ${m.apellido}`, rol, estado: 'pendiente' }]);
             }
@@ -313,22 +326,30 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                     </h4>
                                     <div className="space-y-2">
                                         {assignedStaff.map(s => (
-                                            <div key={s.miembro_id} className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-xl border border-[#333]">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="text-right mr-3">
-                                                        <p className="text-white font-bold text-sm">{s.nombre}</p>
-                                                        <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.rol}</p>
-                                                    </div>
-                                                    <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :
+                                            <div key={s.miembro_id} className="flex flex-col p-3 bg-[#1A1A1A] rounded-xl border border-[#333] gap-2">
+                                                <div className="flex items-center justify-between w-full">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="text-right mr-3">
+                                                            <p className="text-white font-bold text-sm">{s.nombre}</p>
+                                                            <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.rol}</p>
+                                                        </div>
+                                                        <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :
                                                             s.estado === 'rechazado' ? 'bg-red-500/20 text-red-500' :
                                                                 'bg-yellow-500/20 text-yellow-500'
-                                                        }`}>
-                                                        {s.estado === 'confirmado' ? <CheckCircle2 size={12} /> :
-                                                            s.estado === 'rechazado' ? <X size={12} /> :
-                                                                <Clock size={12} />}
+                                                            }`}>
+                                                            {s.estado === 'confirmado' ? <CheckCircle2 size={12} /> :
+                                                                s.estado === 'rechazado' ? <X size={12} /> :
+                                                                    <Clock size={12} />}
+                                                        </div>
                                                     </div>
+                                                    <button onClick={() => setAssignedStaff(assignedStaff.filter(item => item.miembro_id !== s.miembro_id))} className="text-[#555] hover:text-red-500 p-1"><X size={14} /></button>
                                                 </div>
-                                                <button onClick={() => setAssignedStaff(assignedStaff.filter(item => item.miembro_id !== s.miembro_id))} className="text-[#555] hover:text-red-500 p-1"><X size={14} /></button>
+                                                {s.estado === 'rechazado' && s.motivo && (
+                                                    <div className="bg-red-500/5 border-l-2 border-red-500 p-2 mt-1">
+                                                        <p className="text-[10px] text-red-500 font-bold uppercase mb-1">Motivo del rechazo:</p>
+                                                        <p className="text-white text-xs italic">"{s.motivo}"</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                         <button
@@ -400,7 +421,15 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                     onClick={() => assignStaff(m)}
                                     className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${assignedStaff.some(s => s.miembro_id === m.id) ? 'bg-[#3B82F6] border-transparent text-white font-bold' : 'bg-[#222] border-[#333] text-white hover:border-[#3B82F6]'}`}
                                 >
-                                    <div className="text-left font-bold">{m.nombre} {m.apellido}</div>
+                                    {(() => {
+                                        const b = allBlockouts.find(b => b.miembro_id === m.id && b.fecha === fecha);
+                                        return (
+                                            <div className="flex flex-col items-start gap-1">
+                                                <div className="text-left font-bold">{m.nombre} {m.apellido}</div>
+                                                {b && <span className="text-[9px] bg-red-500 font-bold text-white px-2 py-0.5 rounded-full uppercase">No disponible: {b.motivo || 'Motivo no especificado'}</span>}
+                                            </div>
+                                        );
+                                    })()}
                                     {assignedStaff.some(s => s.miembro_id === m.id) && <CheckCircle2 size={20} />}
                                 </button>
                             ))}

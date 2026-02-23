@@ -18,10 +18,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     const [searchQuery, setSearchQuery] = useState('');
     const [assignRole, setAssignRole] = useState('');
 
-    const blockouts = [
-        { id: 1, name: 'Juan Perez', date: '27/10', reason: 'Vacaciones' },
-        { id: 2, name: 'Maria Garcia', date: '03/11', reason: 'Viaje de trabajo' },
-    ];
+    const [blockouts, setBlockouts] = useState<any[]>([]);
 
     const [upcomingSchedules, setUpcomingSchedules] = useState<any[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -63,6 +60,21 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
             // Fetch all "servidores" for assignment
             const { data: membersData } = await supabase.from('miembros').select('*').eq('es_servidor', true);
             setMembers(membersData || []);
+
+            // Fetch blockouts (upcoming)
+            const today = new Date().toISOString().split('T')[0];
+            const { data: blocksData } = await supabase
+                .from('bloqueos_servidores')
+                .select('*, miembros(nombre, apellido)')
+                .gte('fecha', today)
+                .order('fecha', { ascending: true });
+
+            setBlockouts(blocksData?.map((b: any) => ({
+                id: b.id,
+                name: `${b.miembros.nombre} ${b.miembros.apellido}`,
+                date: new Date(b.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' }),
+                reason: b.motivo
+            })) || []);
 
         } catch (error) {
             console.error("Error fetching data:", error);
