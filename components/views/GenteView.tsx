@@ -78,7 +78,9 @@ const GenteView = ({ miembros, hoyArg }: GenteViewProps) => {
                                     <div className="flex items-center gap-2">
                                         <div className="text-white font-bold text-lg">{m.nombre} {m.apellido}</div>
                                         {m.es_servidor && (
-                                            <ShieldCheck size={16} className="text-[#A8D500]" title="Servidor Activo" />
+                                            <span title="Servidor Activo">
+                                                <ShieldCheck size={16} className="text-[#A8D500]" />
+                                            </span>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-3 text-xs text-[#888] mt-1">
@@ -101,8 +103,8 @@ const GenteView = ({ miembros, hoyArg }: GenteViewProps) => {
                                 <button
                                     onClick={() => toggleServerStatus(m.id, m.es_servidor)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${m.es_servidor
-                                            ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
-                                            : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'
+                                        ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
+                                        : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'
                                         }`}
                                 >
                                     <UserCircle size={16} />
