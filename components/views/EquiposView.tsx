@@ -23,6 +23,8 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
         { id: 2, name: 'Maria Garcia', date: '03/11', reason: 'Viaje de trabajo' },
     ];
 
+    const [upcomingSchedules, setUpcomingSchedules] = useState<any[]>([]);
+
     const fetchInitialData = async () => {
         setLoading(true);
         try {
@@ -37,6 +39,16 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
             }));
 
             setTeams(teamsWithCounts);
+
+            // Fetch upcoming schedules
+            const { data: scheds } = await supabase
+                .from('cronogramas')
+                .select('*')
+                .gte('fecha', new Date().toISOString().split('T')[0])
+                .order('fecha', { ascending: true })
+                .limit(3);
+
+            setUpcomingSchedules(scheds || []);
 
             // Fetch all "servidores" for assignment
             const { data: membersData } = await supabase.from('miembros').select('*').eq('es_servidor', true);
@@ -54,24 +66,38 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
     }, [supabase]);
 
     const handleSelectTeam = async (team: any) => {
+        console.log("Seleccionando equipo:", team);
         setSelectedTeam(team);
-        const { data, error } = await supabase
-            .from('miembros_equipos')
-            .select(`
-                id,
-                rol,
-                miembro_id,
-                miembros (
-                    nombre,
-                    apellido,
-                    foto_url
-                )
-            `)
-            .eq('equipo_id', team.id);
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('miembros_equipos')
+                .select(`
+                    id,
+                    rol,
+                    miembro_id,
+                    miembros (
+                        nombre,
+                        apellido,
+                        foto_url
+                    )
+                `)
+                .eq('equipo_id', team.id);
 
-        if (!error) {
-            setTeamMembers(data || []);
+            if (error) {
+                console.error("Error al cargar miembros del equipo:", error);
+                alert("Error al cargar miembros: " + error.message);
+                // Mesmo com erro, tentamos mostrar o modal vazio
+                setTeamMembers([]);
+            } else {
+                setTeamMembers(data || []);
+            }
             setShowTeamModal(true);
+        } catch (err: any) {
+            console.error("Exceção ao selecionar equipo:", err);
+            setShowTeamModal(true); // Tentar abrir de qualquer jeito
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -153,7 +179,8 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
                     >
                         <button
                             onClick={(e) => handleDeleteTeam(team.id, e)}
-                            className="absolute top-4 right-4 p-2 text-[#444] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"
+                            className="absolute top-4 right-4 p-2 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                            title="Eliminar equipo"
                         >
                             <Trash2 size={14} />
                         </button>
@@ -170,26 +197,38 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
                 <div className="p-4 border-b border-[#333] flex items-center justify-between bg-[#222]">
                     <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                        <Calendar size={16} className="text-[#A8D500]" /> Próximo Cronograma: Domingo 27/10
+                        <Calendar size={16} className="text-[#A8D500]" /> PRÓXIMAS FECHAS (Domingos y Semanal)
                     </h3>
                 </div>
                 <div className="p-6">
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-[#252525] rounded-xl border border-[#333]">
-                            <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 bg-[#A8D50020] rounded-full flex items-center justify-center text-[#A8D500]">🎸</div>
-                                <div>
-                                    <p className="text-white font-bold text-sm">Banda / Alabanza</p>
-                                    <p className="text-[#888] text-xs">4 posiciones asignadas</p>
+                        {upcomingSchedules.length === 0 ? (
+                            <p className="text-[#555] text-center py-4 italic text-sm">No hay servicios planificados próximamente.</p>
+                        ) : (
+                            upcomingSchedules.map(s => (
+                                <div key={s.id} className="flex items-center justify-between p-4 bg-[#252525] rounded-xl border border-[#333] hover:border-[#A8D50030] transition-all">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-[#A8D50020] rounded-full flex items-center justify-center text-[#A8D500]">
+                                            <Calendar size={18} />
+                                        </div>
+                                        <div>
+                                            <p className="text-white font-bold text-sm uppercase">
+                                                {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                                            </p>
+                                            <p className="text-[#888] text-xs">
+                                                {s.equipo_ids?.length || 0} personas asignadas • {s.horario}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => alert("Para editar este equipo específico, ve a la pestaña 'Plan de Culto'")}
+                                        className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]"
+                                    >
+                                        VER EQUIPO DEL DÍA
+                                    </button>
                                 </div>
-                            </div>
-                            <button
-                                onClick={() => alert("Redirigiendo a Plan de Culto para ver detalles...")}
-                                className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]"
-                            >
-                                VER DETALLE
-                            </button>
-                        </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

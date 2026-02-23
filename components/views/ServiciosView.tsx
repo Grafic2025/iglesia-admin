@@ -195,9 +195,25 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
                                 <h3 className="text-white font-bold text-xl uppercase tracking-widest">
                                     {selectedSchedule ? 'Editando Plan' : 'Nuevo Cronograma'}
                                 </h3>
-                                <div className="flex gap-2">
-                                    <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} className="bg-[#222] border border-[#333] rounded-lg px-3 py-1 text-white text-xs" />
-                                    <input type="text" value={horario} onChange={e => setHorario(e.target.value)} className="bg-[#222] border border-[#333] rounded-lg px-3 py-1 text-white text-xs w-24" />
+                                <div className="flex gap-3 ml-4">
+                                    <div className="flex flex-col">
+                                        <label className="text-[10px] text-[#555] font-black uppercase mb-1">Fecha</label>
+                                        <input
+                                            type="date"
+                                            value={fecha}
+                                            onChange={e => setFecha(e.target.value)}
+                                            className="bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] transition-all cursor-pointer [color-scheme:dark]"
+                                        />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <label className="text-[10px] text-[#555] font-black uppercase mb-1">Horario</label>
+                                        <input
+                                            type="time"
+                                            value={horario}
+                                            onChange={e => setHorario(e.target.value)}
+                                            className="bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] transition-all w-36 cursor-pointer [color-scheme:dark]"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <button onClick={() => setShowModal(false)} className="text-[#888] hover:text-white"><X /></button>
