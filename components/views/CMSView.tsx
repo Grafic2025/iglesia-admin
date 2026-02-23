@@ -11,11 +11,12 @@ interface CMSViewProps {
     bautismos: any[];
     ayuda: any[];
     supabase: any;
+    fetchNoticias: () => Promise<void>;
 }
 
 const CMSView = ({
     noticias, syncYouTube, editarNoticia, eliminarNoticia, agregarNoticia,
-    bautismos, ayuda, supabase
+    bautismos, ayuda, supabase, fetchNoticias
 }: CMSViewProps) => {
     const [showModal, setShowModal] = React.useState(false);
     const [currentNews, setCurrentNews] = React.useState<any>(null);
@@ -62,7 +63,8 @@ const CMSView = ({
         if (error) alert("Error al guardar: " + error.message);
         else {
             setShowModal(false);
-            window.location.reload(); // Simple refresh to fetch news
+            if (fetchNoticias) await fetchNoticias();
+            else window.location.reload();
         }
     };
 

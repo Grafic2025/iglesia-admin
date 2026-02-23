@@ -10,6 +10,7 @@ import ServiciosView from '../components/views/ServiciosView'
 import GenteView from '../components/views/GenteView'
 import EquiposView from '../components/views/EquiposView'
 import CancioneroView from '../components/views/CancioneroView'
+import AgendaConfigView from '../components/views/AgendaConfigView'
 import { LogOut } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -37,6 +38,8 @@ export default function AdminDashboard() {
   const [noticias, setNoticias] = useState<any[]>([])
   const [logs, setLogs] = useState<any[]>([])
   const [logsError, setLogsError] = useState<string | null>(null)
+  const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([])
+  const [horariosDisponibles, setHorariosDisponibles] = useState<any[]>([])
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
@@ -59,6 +62,8 @@ export default function AdminDashboard() {
       fetchNoticias();
       fetchLogs();
       syncYouTube();
+      fetchCrecimientoAnual();
+      fetchHorarios();
 
       const channels = [
         supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe(),
@@ -99,6 +104,36 @@ export default function AdminDashboard() {
   const fetchMiembros = async () => {
     const { data } = await supabase.from('miembros').select('*').order('created_at', { ascending: false });
     if (data) setMiembros(data);
+  }
+
+  const fetchHorarios = async () => {
+    const { data } = await supabase.from('configuracion').select('*').eq('clave', 'horarios_reunion').single();
+    if (data) {
+      setHorariosDisponibles(data.valor || []);
+    } else {
+      // Fallback or init
+      const init = ['09:00', '11:00', '20:00'];
+      setHorariosDisponibles(init);
+    }
+  }
+
+  const fetchCrecimientoAnual = async () => {
+    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    const hoy = new Date();
+    const data = [];
+
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1);
+      const ultimoDia = new Date(d.getFullYear(), d.getMonth() + 1, 0).toISOString().split('T')[0];
+
+      const { count } = await supabase
+        .from('miembros')
+        .select('*', { count: 'exact', head: true })
+        .lte('created_at', ultimoDia);
+
+      data.push({ mes: meses[d.getMonth()], c: count || 0 });
+    }
+    setCrecimientoAnual(data);
   }
 
   const fetchAsistencias = async () => {
@@ -345,6 +380,8 @@ export default function AdminDashboard() {
               asistencias={asistencias}
               oracionesActivas={oracionesActivas}
               nuevosMes={nuevosMes}
+              crecimientoAnual={crecimientoAnual}
+              horariosDisponibles={horariosDisponibles}
             />
           )}
 
@@ -361,6 +398,9 @@ export default function AdminDashboard() {
               enviarNotificacionIndividual={enviarNotificacionIndividual}
               hoyArg={hoyArg}
               supabase={supabase}
+              fetchAsistencias={fetchAsistencias}
+              fetchMiembros={fetchMiembros}
+              horariosDisponibles={horariosDisponibles}
             />
           )}
 
@@ -402,6 +442,7 @@ export default function AdminDashboard() {
               bautismos={bautismos}
               ayuda={ayuda}
               supabase={supabase}
+              fetchNoticias={fetchNoticias}
             />
           )}
 
@@ -415,6 +456,14 @@ export default function AdminDashboard() {
 
           {activeTab === 'cancionero' && (
             <CancioneroView supabase={supabase} />
+          )}
+
+          {activeTab === 'agenda_config' && (
+            <AgendaConfigView
+              supabase={supabase}
+              horariosDisponibles={horariosDisponibles}
+              fetchHorarios={fetchHorarios}
+            />
           )}
         </section>
       </main>

@@ -10,9 +10,11 @@ interface DashboardViewProps {
     asistencias: any[];
     oracionesActivas: number;
     nuevosMes: number;
+    crecimientoAnual: any[];
+    horariosDisponibles: any[];
 }
 
-const DashboardView = ({ asistencias, oracionesActivas, nuevosMes }: DashboardViewProps) => {
+const DashboardView = ({ asistencias, oracionesActivas, nuevosMes, crecimientoAnual, horariosDisponibles }: DashboardViewProps) => {
     return (
         <div className="space-y-6">
             {/* Charts Section */}
@@ -43,11 +45,7 @@ const DashboardView = ({ asistencias, oracionesActivas, nuevosMes }: DashboardVi
                     </h3>
                     <div className="h-[250px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <ReLineChart data={[
-                                { mes: 'Dic', c: 120 },
-                                { mes: 'Ene', c: 145 },
-                                { mes: 'Feb', c: 145 + nuevosMes }
-                            ]}>
+                            <ReLineChart data={crecimientoAnual}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                                 <XAxis dataKey="mes" stroke="#888" fontSize={10} />
                                 <YAxis stroke="#888" fontSize={10} />
@@ -66,10 +64,10 @@ const DashboardView = ({ asistencias, oracionesActivas, nuevosMes }: DashboardVi
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                 <StatCard label="Total Hoy" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} icon={<LayoutDashboard size={18} />} />
+                {horariosDisponibles.map(h => (
+                    <StatCard key={h} label={`${h} HS`} value={asistencias.filter(a => a.horario_reunion === h).length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === h).length > 0} />
+                ))}
                 <StatCard label="Extra" value={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length} color="#FFB400" isActive={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length > 0} />
-                <StatCard label="09:00 HS" value={asistencias.filter(a => a.horario_reunion === '09:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '09:00').length > 0} />
-                <StatCard label="11:00 HS" value={asistencias.filter(a => a.horario_reunion === '11:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '11:00').length > 0} />
-                <StatCard label="20:00 HS" value={asistencias.filter(a => a.horario_reunion === '20:00').length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === '20:00').length > 0} />
                 <StatCard label="Oraciones" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
                 <StatCard label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>

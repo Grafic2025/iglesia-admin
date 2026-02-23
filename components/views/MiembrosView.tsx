@@ -14,12 +14,16 @@ interface MiembrosViewProps {
     enviarNotificacionIndividual: (token: string, nombre: string) => void;
     hoyArg: string;
     supabase: any;
+    fetchAsistencias: () => Promise<void>;
+    fetchMiembros: () => Promise<void>;
+    horariosDisponibles: any[];
 }
 
 const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
-    marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase
+    marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase,
+    fetchAsistencias, fetchMiembros, horariosDisponibles
 }: MiembrosViewProps) => {
 
     const rewardLevels = [
@@ -98,9 +102,9 @@ const MiembrosView = ({
                         className="bg-[#A8D500] text-black font-bold px-4 py-2.5 rounded-xl outline-none cursor-pointer"
                     >
                         <option value="Todas">Todas las Reuniones</option>
-                        <option value="09:00">09:00 HS</option>
-                        <option value="11:00">11:00 HS</option>
-                        <option value="20:00">20:00 HS</option>
+                        {horariosDisponibles.map(h => (
+                            <option key={h} value={h}>{h} HS</option>
+                        ))}
                         <option value="Extraoficial">Extraoficiales</option>
                     </select>
                 </div>
@@ -157,7 +161,12 @@ const MiembrosView = ({
                                                     onClick={async () => {
                                                         const newVal = !a.miembros?.es_servidor;
                                                         const { error } = await supabase.from('miembros').update({ es_servidor: newVal }).eq('id', a.miembro_id);
-                                                        if (!error) window.location.reload();
+                                                        if (!error) {
+                                                            await fetchAsistencias();
+                                                            await fetchMiembros();
+                                                        } else {
+                                                            alert("Error: " + error.message);
+                                                        }
                                                     }}
                                                     className={`p-2 rounded-full transition-all ${a.miembros?.es_servidor ? 'bg-[#A8D500] text-black' : 'bg-[#333] text-[#555] hover:text-[#A8D500]'}`}
                                                     title={a.miembros?.es_servidor ? "Quitar Acceso Servidor" : "Dar Acceso Servidor"}
