@@ -164,7 +164,7 @@ const ServiciosView = ({ supabase }: { supabase: any }) => {
                                 <Trash2 size={16} />
                             </button>
                         </div>
-                        <h3 className="text-white font-black text-lg uppercase">{new Date(s.fecha).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })}</h3>
+                        <h3 className="text-white font-black text-lg uppercase">{new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })}</h3>
                         <p className="text-[#A8D500] font-bold text-xs mb-3">{s.horario}</p>
 
                         <div className="flex gap-4 mt-4 border-t border-[#333] pt-4">
