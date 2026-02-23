@@ -387,7 +387,7 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'equipos' && (
-            <EquiposView supabase={supabase} />
+            <EquiposView supabase={supabase} setActiveTab={setActiveTab} />
           )}
 
           {activeTab === 'grupos' && (

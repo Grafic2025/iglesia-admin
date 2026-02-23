@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users2, Calendar, Plus, UserPlus, CheckCircle2, Clock, ShieldAlert, X, User, Search, Trash2 } from 'lucide-react';
 
-const EquiposView = ({ supabase }: { supabase: any }) => {
+const EquiposView = ({ supabase, setActiveTab }: { supabase: any, setActiveTab?: (t: string) => void }) => {
     const [loading, setLoading] = useState(true);
     const [teams, setTeams] = useState<any[]>([]);
     const [members, setMembers] = useState<any[]>([]);
@@ -179,7 +179,7 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
                     >
                         <button
                             onClick={(e) => handleDeleteTeam(team.id, e)}
-                            className="absolute top-4 right-4 p-2 text-red-500/40 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                            className="absolute top-4 right-4 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
                             title="Eliminar equipo"
                         >
                             <Trash2 size={14} />
@@ -221,7 +221,7 @@ const EquiposView = ({ supabase }: { supabase: any }) => {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={() => alert("Para editar este equipo específico, ve a la pestaña 'Plan de Culto'")}
+                                        onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Para editar este equipo específico, ve a la pestaña 'Plan de Culto'")}
                                         className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]"
                                     >
                                         VER EQUIPO DEL DÍA
