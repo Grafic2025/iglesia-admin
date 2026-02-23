@@ -6,9 +6,10 @@ import { supabase } from '../../lib/supabase';
 interface GenteViewProps {
     miembros: any[];
     hoyArg: string;
+    fetchMiembros: () => Promise<void>;
 }
 
-const GenteView = ({ miembros, hoyArg }: GenteViewProps) => {
+const GenteView = ({ miembros, hoyArg, fetchMiembros }: GenteViewProps) => {
     const [search, setSearch] = useState('');
 
     // Filter members based on search
@@ -25,7 +26,7 @@ const GenteView = ({ miembros, hoyArg }: GenteViewProps) => {
         if (error) {
             alert("Error al actualizar: " + error.message);
         } else {
-            window.location.reload();
+            await fetchMiembros();
         }
     };
 

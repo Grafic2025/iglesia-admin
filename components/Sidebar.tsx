@@ -24,7 +24,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'miembros', label: 'Asistencias', icon: Users },
-        { id: 'gente', label: 'Gente (PC)', icon: UserCircle },
+        { id: 'gente', label: 'Gente', icon: UserCircle },
         { id: 'notificaciones', label: 'Mensajería', icon: Bell },
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
         { id: 'servicios', label: 'Plan de Culto', icon: Calendar },

@@ -351,7 +351,7 @@ export default function AdminDashboard() {
           )}
 
           {activeTab === 'gente' && (
-            <GenteView miembros={miembros} hoyArg={hoyArg} />
+            <GenteView miembros={miembros} hoyArg={hoyArg} fetchMiembros={fetchMiembros} />
           )}
 
           {activeTab === 'notificaciones' && (
