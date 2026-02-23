@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { Send } from 'lucide-react';
+import { Send, UserCircle } from 'lucide-react';
 
 interface MiembrosViewProps {
     busqueda: string;
@@ -13,12 +13,13 @@ interface MiembrosViewProps {
     marcarComoEntregado: (id: string, nivel: number, nombre: string) => void;
     enviarNotificacionIndividual: (token: string, nombre: string) => void;
     hoyArg: string;
+    supabase: any;
 }
 
 const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
-    marcarComoEntregado, enviarNotificacionIndividual, hoyArg
+    marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase
 }: MiembrosViewProps) => {
 
     const rewardLevels = [
@@ -142,15 +143,28 @@ const MiembrosView = ({
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            {a.miembros?.token_notificacion && (
+                                            <div className="flex items-center justify-center gap-2">
+                                                {a.miembros?.token_notificacion && (
+                                                    <button
+                                                        onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
+                                                        className="p-2 rounded-full bg-[#333] text-[#A8D500] hover:bg-[#A8D500] hover:text-black transition-all"
+                                                        title="Enviar mensaje personal"
+                                                    >
+                                                        <Send size={16} />
+                                                    </button>
+                                                )}
                                                 <button
-                                                    onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
-                                                    className="p-2 rounded-full bg-[#333] text-[#A8D500] hover:bg-[#A8D500] hover:text-black transition-all"
-                                                    title="Enviar mensaje personal"
+                                                    onClick={async () => {
+                                                        const newVal = !a.miembros?.es_servidor;
+                                                        const { error } = await supabase.from('miembros').update({ es_servidor: newVal }).eq('id', a.miembro_id);
+                                                        if (!error) window.location.reload();
+                                                    }}
+                                                    className={`p-2 rounded-full transition-all ${a.miembros?.es_servidor ? 'bg-[#A8D500] text-black' : 'bg-[#333] text-[#555] hover:text-[#A8D500]'}`}
+                                                    title={a.miembros?.es_servidor ? "Quitar Acceso Servidor" : "Dar Acceso Servidor"}
                                                 >
-                                                    <Send size={16} />
+                                                    <UserCircle size={16} />
                                                 </button>
-                                            )}
+                                            </div>
                                         </td>
                                     </tr>
                                 )

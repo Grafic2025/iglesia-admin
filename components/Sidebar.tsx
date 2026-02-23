@@ -7,7 +7,11 @@ import {
     Image as ImageIcon,
     Calendar,
     LogOut,
-    ChevronRight
+    ChevronRight,
+    Music,
+    UserCircle,
+    Users2,
+    Home
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -20,10 +24,13 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'miembros', label: 'Asistencias', icon: Users },
-        { id: 'gente', label: 'Gente', icon: Users },
-        { id: 'notificaciones', label: 'Notificaciones', icon: Bell },
+        { id: 'gente', label: 'Gente (PC)', icon: UserCircle },
+        { id: 'notificaciones', label: 'Mensajería', icon: Bell },
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
-        { id: 'servicios', label: 'Servicios', icon: Calendar },
+        { id: 'servicios', label: 'Plan de Culto', icon: Calendar },
+        { id: 'equipos', label: 'Equipos/Servir', icon: Users2 },
+        { id: 'grupos', label: 'Grupos Nexo', icon: Home },
+        { id: 'cancionero', label: 'Cancionero', icon: Music },
     ];
 
     return (

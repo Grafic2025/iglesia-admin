@@ -8,6 +8,9 @@ import NotificacionesView from '../components/views/NotificacionesView'
 import CMSView from '../components/views/CMSView'
 import ServiciosView from '../components/views/ServiciosView'
 import GenteView from '../components/views/GenteView'
+import EquiposView from '../components/views/EquiposView'
+import GruposView from '../components/views/GruposView'
+import CancioneroView from '../components/views/CancioneroView'
 import { LogOut } from 'lucide-react'
 
 export default function AdminDashboard() {
@@ -339,6 +342,7 @@ export default function AdminDashboard() {
               marcarComoEntregado={marcarComoEntregado}
               enviarNotificacionIndividual={enviarNotificacionIndividual}
               hoyArg={hoyArg}
+              supabase={supabase}
             />
           )}
 
@@ -380,6 +384,18 @@ export default function AdminDashboard() {
 
           {activeTab === 'servicios' && (
             <ServiciosView supabase={supabase} />
+          )}
+
+          {activeTab === 'equipos' && (
+            <EquiposView supabase={supabase} />
+          )}
+
+          {activeTab === 'grupos' && (
+            <GruposView supabase={supabase} />
+          )}
+
+          {activeTab === 'cancionero' && (
+            <CancioneroView supabase={supabase} />
           )}
         </section>
       </main>
