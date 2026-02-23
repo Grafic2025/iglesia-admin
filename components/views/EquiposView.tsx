@@ -24,6 +24,7 @@ const EquiposView = ({ supabase, setActiveTab }: { supabase: any, setActiveTab?:
     ];
 
     const [upcomingSchedules, setUpcomingSchedules] = useState<any[]>([]);
+    const [currentMonth, setCurrentMonth] = useState(new Date());
 
     const fetchInitialData = async () => {
         setLoading(true);
@@ -194,38 +195,109 @@ const EquiposView = ({ supabase, setActiveTab }: { supabase: any, setActiveTab?:
                 ))}
             </div>
 
-            <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
-                <div className="p-4 border-b border-[#333] flex items-center justify-between bg-[#222]">
-                    <h3 className="text-white font-bold text-sm flex items-center gap-2">
-                        <Calendar size={16} className="text-[#A8D500]" /> PRÓXIMAS FECHAS (Domingos y Semanal)
-                    </h3>
+            {/* Calendario y Próximas Fechas */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Calendario (Columna Izquierda) */}
+                <div className="lg:col-span-1 bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden">
+                    <div className="p-4 bg-[#222] border-b border-[#333] flex items-center justify-between">
+                        <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                            <Calendar size={16} className="text-[#A8D500]" /> Calendario
+                        </h3>
+                        <div className="flex gap-2">
+                            <button onClick={() => {
+                                const newDate = new Date(currentMonth.setMonth(currentMonth.getMonth() - 1));
+                                setCurrentMonth(new Date(newDate));
+                            }} className="text-[#888] hover:text-white p-1">←</button>
+                            <span className="text-white text-xs font-bold uppercase">
+                                {currentMonth.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                            </span>
+                            <button onClick={() => {
+                                const newDate = new Date(currentMonth.setMonth(currentMonth.getMonth() + 1));
+                                setCurrentMonth(new Date(newDate));
+                            }} className="text-[#888] hover:text-white p-1">→</button>
+                        </div>
+                    </div>
+                    <div className="p-4">
+                        <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map(d => <div key={d} className="text-[#555] text-[10px] font-black">{d}</div>)}
+                        </div>
+                        <div className="grid grid-cols-7 gap-1">
+                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, i) => <div key={i}></div>)}
+                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate() }).map((_, i) => {
+                                const day = i + 1;
+                                const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                                const hasService = upcomingSchedules.some(s => s.fecha === dateStr);
+                                return (
+                                    <div
+                                        key={day}
+                                        className={`aspect-square flex items-center justify-center text-[10px] rounded-lg border ${hasService ? 'bg-[#A8D500] text-black font-bold border-transparent' : 'text-[#888] border-[#333]'
+                                            }`}
+                                    >
+                                        {day}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
-                <div className="p-6">
-                    <div className="space-y-4">
+
+                {/* Lista de Fechas (Columna Derecha) */}
+                <div className="lg:col-span-2 bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden flex flex-col">
+                    <div className="p-4 bg-[#222] border-b border-[#333]">
+                        <h3 className="text-white font-bold text-sm uppercase tracking-widest">Próximos Servicios y Equipos</h3>
+                    </div>
+                    <div className="p-6 flex-1 overflow-y-auto max-h-[400px] space-y-4">
                         {upcomingSchedules.length === 0 ? (
-                            <p className="text-[#555] text-center py-4 italic text-sm">No hay servicios planificados próximamente.</p>
+                            <div className="text-center py-10">
+                                <p className="text-[#555] italic text-sm">No hay servicios planificados próximamente.</p>
+                                <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
+                            </div>
                         ) : (
                             upcomingSchedules.map(s => (
-                                <div key={s.id} className="flex items-center justify-between p-4 bg-[#252525] rounded-xl border border-[#333] hover:border-[#A8D50030] transition-all">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-[#A8D50020] rounded-full flex items-center justify-center text-[#A8D500]">
-                                            <Calendar size={18} />
+                                <div key={s.id} className="bg-[#252525] p-5 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className="bg-[#111] p-3 rounded-xl border border-[#333] text-center min-w-[70px]">
+                                                <p className="text-[#A8D500] text-[10px] font-black uppercase">
+                                                    {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { month: 'short' })}
+                                                </p>
+                                                <p className="text-white text-xl font-black">
+                                                    {new Date(s.fecha + 'T12:00:00').getDate()}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-white font-black text-sm uppercase">
+                                                    {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long' })}
+                                                </p>
+                                                <p className="text-[#888] text-[10px] font-bold">{s.horario}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-white font-bold text-sm uppercase">
-                                                {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                                            </p>
-                                            <p className="text-[#888] text-xs">
-                                                {s.equipo_ids?.length || 0} personas asignadas • {s.horario}
+
+                                        <div className="flex-1 px-4">
+                                            <div className="flex -space-x-2 overflow-hidden mb-1">
+                                                {(s.equipo_ids || []).slice(0, 5).map((staff: any, idx: number) => (
+                                                    <div key={idx} className="inline-block h-6 w-6 rounded-full ring-2 ring-[#252525] bg-[#333] flex items-center justify-center text-[10px] text-white" title={`${staff.nombre} (${staff.rol})`}>
+                                                        {staff.nombre?.[0] || '?'}
+                                                    </div>
+                                                ))}
+                                                {(s.equipo_ids || []).length > 5 && (
+                                                    <div className="inline-block h-6 w-6 rounded-full ring-2 ring-[#252525] bg-[#444] flex items-center justify-center text-[8px] text-[#A8D500] font-bold">
+                                                        +{(s.equipo_ids || []).length - 5}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="text-[#555] text-[10px] font-bold uppercase">
+                                                {(s.equipo_ids || []).length > 0 ? (s.equipo_ids || []).map((st: any) => st.nombre).join(', ') : 'Sin personas asignadas'}
                                             </p>
                                         </div>
+
+                                        <button
+                                            onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Ve a Plan de Culto")}
+                                            className="bg-[#333] hover:bg-[#A8D500] hover:text-black text-white text-[10px] font-black px-4 py-2 rounded-xl transition-all"
+                                        >
+                                            EDITAR DÍA
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Para editar este equipo específico, ve a la pestaña 'Plan de Culto'")}
-                                        className="text-[#A8D500] text-xs font-bold px-3 py-1.5 rounded-lg border border-[#A8D50030] hover:bg-[#A8D50010]"
-                                    >
-                                        VER EQUIPO DEL DÍA
-                                    </button>
                                 </div>
                             ))
                         )}
