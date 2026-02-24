@@ -25,7 +25,7 @@ export async function GET() {
         // pero el feed RSS nos da el último video subido que es lo que el usuario pidió.
 
         const { error } = await supabase.from('noticias').upsert({
-            id: 'youtube-latest',
+            id: '00000000-0000-0000-0000-000000000001', // Fixed UUID for the latest synced video
             titulo: videoTitle,
             imagen_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
             video_url: `https://www.youtube.com/watch?v=${videoId}`,
