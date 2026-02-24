@@ -9,38 +9,46 @@ interface DetailedRow {
     responsable: string;
 }
 
+// ── VISTA DE ADMINISTRACIÓN: GESTIÓN DE SERVICIOS ────────────────────────────
+// Este componente permite a los admin crear y editar cronogramas de cultos,
+// asignar equipos por categorías, seleccionar canciones y notificar al staff.
 const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAuditoria }: {
     supabase: any,
     enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>,
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>
 }) => {
-    const [loading, setLoading] = useState(true);
-    const [schedules, setSchedules] = useState<any[]>([]);
-    const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
-    const [allSongs, setAllSongs] = useState<any[]>([]);
-    const [allTeams, setAllTeams] = useState<any[]>([]);
-    const [allMembers, setAllMembers] = useState<any[]>([]);
-    const [allBlockouts, setAllBlockouts] = useState<any[]>([]);
+    // Estados de datos generales
+    // ── ESTADOS DE DATOS (CONEXIÓN CON BASE DE DATOS) ──
+    const [loading, setLoading] = useState(true);           // Controla si se muestra el spinner de carga
+    const [schedules, setSchedules] = useState<any[]>([]);  // Guarda todos los cronogramas (cultos) creados
+    const [selectedSchedule, setSelectedSchedule] = useState<any>(null); // El cronograma que se está editando ahora
+    const [allSongs, setAllSongs] = useState<any[]>([]);    // Lista de todas las canciones disponibles en la DB
+    const [allTeams, setAllTeams] = useState<any[]>([]);    // Lista de equipos (banda, sonido, etc.) definidos
+    const [allMembers, setAllMembers] = useState<any[]>([]); // Lista de todas las personas que son servidores
+    const [allBlockouts, setAllBlockouts] = useState<any[]>([]); // Días que cada persona marcó como "no puedo servir"
 
-    // Form states
-    const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
-    const [horario, setHorario] = useState('11:00 HS');
-    const [notas, setNotas] = useState('');
-    const [bosquejo, setBosquejo] = useState('');
+    // ── ESTADOS DEL FORMULARIO DE EDICIÓN ──
+    const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]); // Fecha del culto (YYYY-MM-DD)
+    const [horario, setHorario] = useState('11:00 HS');     // Hora del culto
+    const [notas, setNotas] = useState('');                 // Notas privadas que solo los directores ven
+    const [bosquejo, setBosquejo] = useState('');           // Plan general (ej: anuncios, bienvenida) que ven todos
+
+    // Lista de filas del plan detallado (ej: "10 min - Alabanza - Banda")
     const [detailedRows, setDetailedRows] = useState<DetailedRow[]>([
         { id: '1', tiempo: '10 min', actividad: 'Alabanza', responsable: 'Banda' },
         { id: '2', tiempo: '40 min', actividad: 'Predica', responsable: 'Pastor' }
     ]);
-    const [selectedSongIds, setSelectedSongIds] = useState<string[]>([]);
-    const [assignedStaff, setAssignedStaff] = useState<any[]>([]); // {miembro_id, rol, nombre}
 
-    // Modal states
-    const [showModal, setShowModal] = useState(false);
-    const [showSongPicker, setShowSongPicker] = useState(false);
-    const [showStaffPicker, setShowStaffPicker] = useState(false);
-    const [pendingMember, setPendingMember] = useState<any>(null);
-    const [pendingRol, setPendingRol] = useState('Servidor');
-    const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+    const [selectedSongIds, setSelectedSongIds] = useState<string[]>([]); // Los IDs de las canciones elegidas para este día
+    const [assignedStaff, setAssignedStaff] = useState<any[]>([]); // Los servidores elegidos con sus roles respectivos
+
+    // ── ESTADOS DE INTERFAZ (UI) ──
+    const [showModal, setShowModal] = useState(false);      // Controla el modal principal de edición
+    const [showSongPicker, setShowSongPicker] = useState(false); // Modal para elegir canciones del catálogo
+    const [showStaffPicker, setShowStaffPicker] = useState(false); // Modal para elegir personas de la lista
+    const [pendingMember, setPendingMember] = useState<any>(null); // Miembro seleccionado que aún no tiene rol asignado
+    const [pendingRol, setPendingRol] = useState('Servidor'); // Rol temporal que se le va a poner a la persona
+    const [showTemplatePicker, setShowTemplatePicker] = useState(false); // Modal para elegir una estructura pre-armada
 
     const ROLE_CATEGORIES = [
         {
@@ -99,6 +107,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         }
     ];
 
+    // Función para cargar todos los datos necesarios desde Supabase
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -132,8 +141,10 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         fetchData();
     }, [supabase]);
 
+    // Abre el modal para crear un nuevo cronograma o editar uno existente
     const handleOpenModal = (sched: any = null) => {
         if (sched) {
+            // Si hay un objeto 'sched', estamos editando: precargamos los estados con sus valores
             setSelectedSchedule(sched);
             setFecha(sched.fecha);
             setHorario(sched.horario);
@@ -143,6 +154,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setSelectedSongIds(sched.orden_canciones || []);
             setAssignedStaff(sched.equipo_ids || []);
         } else {
+            // Si no hay objeto, estamos creando: reseteamos los estados a valores por defecto
             setSelectedSchedule(null);
             setFecha(new Date().toISOString().split('T')[0]);
             setHorario('11:00 HS');
@@ -158,6 +170,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         setShowModal(true);
     };
 
+    // Guardar los cambios en el cronograma (Inserción o Actualización)
     const handleSave = async () => {
         const payload = {
             fecha,
@@ -185,6 +198,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         }
     };
 
+    // Envío manual de recordatorios mediante notificaciones push
     const notificarEquipoManual = async (sched: any) => {
         if (!sched?.equipo_ids?.length) return alert("No hay equipo asignado.");
         if (!confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
@@ -209,6 +223,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         if (registrarAuditoria) await registrarAuditoria('NOTIFICAR EQUIPO', `Se enviaron recordatorios para el servicio del ${sched.fecha}`);
     };
 
+    // Función para exportar el plan a un archivo CSV descargable
     const exportarCSV = (sched: any) => {
         let content = "TIEMPO;ACTIVIDAD;RESPONSABLE\n";
         sched.plan_detallado?.forEach((row: any) => {
@@ -232,29 +247,33 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         document.body.removeChild(link);
     };
 
+    // Elimina un cronograma permanente de la base de datos tras confirmar
     const deleteSchedule = async (id: string) => {
         if (!confirm("¿Eliminar este cronograma?")) return;
         await supabase.from('cronogramas').delete().eq('id', id);
-        fetchData();
+        fetchData(); // Actualiza la lista principal
     };
 
+    // Añade una fila vacía al plan detallado (minuto a minuto)
     const addDetailedRow = () => {
         setDetailedRows([...detailedRows, { id: Math.random().toString(), tiempo: '', actividad: '', responsable: '' }]);
     };
 
+    // Activa o desactiva una canción de la lista de seleccionadas
     const toggleSong = (id: string) => {
         setSelectedSongIds(prev =>
             prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
         );
     };
 
+    // Asignación de Miembros (con chequeo de conflictos y bloqueos)
     const assignStaff = (m: any) => {
         if (assignedStaff.some(s => s.miembro_id === m.id)) {
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
             return;
         }
 
-        // 1. Check for Overlapping Assignment (Concurrency Conflict)
+        // 1. Chequeo de superposición de horarios (si ya sirve en otro culto el mismo día)
         const overlap = schedules.find(s =>
             s.fecha === fecha &&
             s.id !== selectedSchedule?.id &&
@@ -267,25 +286,25 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             }
         }
 
-        // 2. Check for User Blockout
+        // 2. Chequeo de bloqueos del servidor (Garantiza respetar su tiempo libre)
         const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
         if (bloqueo) {
             if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
                 return;
             }
         }
-        // Mostrar modal de rol en lugar de prompt()
         setPendingMember(m);
         setPendingRol('Servidor');
     };
 
+    // Procesa la asignación final de un rol a un miembro una vez seleccionado en el modal
     const confirmAssignRol = () => {
         if (!pendingMember) return;
         setAssignedStaff([...assignedStaff, {
             miembro_id: pendingMember.id,
             nombre: `${pendingMember.nombre} ${pendingMember.apellido}`,
             rol: pendingRol || 'Servidor',
-            estado: 'pendiente'
+            estado: 'pendiente' // Estado inicial hasta que el servidor acepte en su app
         }]);
         setPendingMember(null);
         setPendingRol('Servidor');
