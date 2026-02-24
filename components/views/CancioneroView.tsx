@@ -19,7 +19,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
     const [bpm, setBpm] = useState('');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [pdfUrl, setPdfUrl] = useState('');
-    const [letra, setLetra] = useState('');
+    const [acordes, setAcordes] = useState('');
     const [showLyricsModal, setShowLyricsModal] = useState(false);
     const [transposedOffset, setTransposedOffset] = useState(0);
 
@@ -52,7 +52,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             setBpm(song.bpm || '');
             setYoutubeUrl(song.youtube_url || '');
             setPdfUrl(song.pdf_url || '');
-            setLetra(song.letra || '');
+            setAcordes(song.acordes || '');
             setTransposedOffset(0);
         } else {
             setCurrentSong(null);
@@ -62,6 +62,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             setBpm('');
             setYoutubeUrl('');
             setPdfUrl('');
+            setAcordes('');
         }
         setShowModal(true);
     };
@@ -76,7 +77,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             bpm,
             youtube_url: youtubeUrl,
             pdf_url: pdfUrl,
-            letra: letra
+            acordes: acordes
         };
 
         let error;
@@ -218,8 +219,8 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                                     </button>
                                                 )}
                                                 <div className="w-px h-4 bg-[#333] mx-2"></div>
-                                                {song.letra && (
-                                                    <button onClick={() => { setCurrentSong(song); setLetra(song.letra); setShowLyricsModal(true); }} className="p-2 text-[#A8D500] bg-[#A8D50010] rounded-lg transition-all flex items-center gap-1 font-bold text-[10px]" title="Ver Letra y Acordes">
+                                                {song.acordes && (
+                                                    <button onClick={() => { setCurrentSong(song); setAcordes(song.acordes); setShowLyricsModal(true); }} className="p-2 text-[#A8D500] bg-[#A8D50010] rounded-lg transition-all flex items-center gap-1 font-bold text-[10px]" title="Ver Letra y Acordes">
                                                         <FileText size={16} /> ACORDES
                                                     </button>
                                                 )}
@@ -315,8 +316,8 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                 <div className="col-span-2">
                                     <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Letra y Acordes (Formato: [Chord] Letra)</label>
                                     <textarea
-                                        value={letra}
-                                        onChange={(e) => setLetra(e.target.value)}
+                                        value={acordes}
+                                        onChange={(e) => setAcordes(e.target.value)}
                                         placeholder="[C] Dios de [F] amor..."
                                         rows={6}
                                         className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] font-mono text-sm"
@@ -366,7 +367,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                         </div>
                         <div className="flex-1 p-8 overflow-y-auto font-mono">
                             <pre className="text-white text-lg whitespace-pre-wrap leading-relaxed">
-                                {getTransposedLetra(letra, transposedOffset).split('\n').map((line, idx) => (
+                                {getTransposedLetra(acordes, transposedOffset).split('\n').map((line, idx) => (
                                     <div key={idx} className="mb-2">
                                         {line.split(/(\[[^\]]*\])/).map((part, i) => (
                                             part.startsWith('[') ?
