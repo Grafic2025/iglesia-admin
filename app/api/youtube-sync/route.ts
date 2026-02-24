@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET() {
+    if (!supabaseAdmin) {
+        return NextResponse.json({ success: false, error: 'Configuración faltante: SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 });
+    }
     try {
         const channelId = 'UCa9xuv0bgR6dTD_9GTbFXQg';
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
