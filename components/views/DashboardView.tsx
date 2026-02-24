@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import {
     BarChart as ReLineBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as ReLineChart, Line, LabelList, Cell
 } from 'recharts';
-import { LucideBarChart, LucideLineChart, LayoutDashboard, CalendarDays, Clock, Users2, MapPin } from 'lucide-react';
+import { LucideBarChart, LucideLineChart, LayoutDashboard, CalendarDays, Clock, Users2 } from 'lucide-react';
 import StatCard from '../StatCard';
 
 interface DashboardViewProps {
@@ -30,7 +30,6 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
     // Calculate Demographic Data
     const demographicData = useMemo(() => {
         const ages = { 'Niños (<13)': 0, 'Adolescentes (13-17)': 0, 'Jóvenes (18-29)': 0, 'Adultos (30-59)': 0, 'Mayores (60+)': 0, 'S/D': 0 };
-        const zones: Record<string, number> = {};
 
         miembros.forEach(m => {
             // Age Group
@@ -45,15 +44,11 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                 ages['S/D']++;
             }
 
-            // Zones
-            const z = m.zona || 'Sin especificar';
-            zones[z] = (zones[z] || 0) + 1;
         });
 
         const ageChart = Object.entries(ages).map(([name, value]) => ({ name, value })).filter(d => d.value > 0);
-        const zoneChart = Object.entries(zones).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 5);
 
-        return { ageChart, zoneChart };
+        return { ageChart };
     }, [miembros]);
 
     // Filter growth data based on selected range
@@ -167,7 +162,7 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
             </div>
 
             {/* Demographics Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                 <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
                     <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
                         <Users2 size={18} className="text-[#FFB400]" /> Edades de la Congregación
@@ -184,25 +179,6 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                     <LabelList dataKey="value" position="right" fill="#fff" fontSize={10} fontWeight="bold" />
-                                </Bar>
-                            </ReLineBarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                    <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
-                        <MapPin size={18} className="text-[#9333EA]" /> Distribución por Zonas
-                    </h3>
-                    <div className="h-[250px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <ReLineBarChart data={demographicData.zoneChart}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                                <XAxis dataKey="name" stroke="#888" fontSize={10} />
-                                <YAxis stroke="#888" fontSize={10} />
-                                <Tooltip contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }} />
-                                <Bar dataKey="value" fill="#9333EA" radius={[4, 4, 0, 0]}>
-                                    <LabelList dataKey="value" position="top" fill="#9333EA" fontSize={10} fontWeight="bold" />
                                 </Bar>
                             </ReLineBarChart>
                         </ResponsiveContainer>

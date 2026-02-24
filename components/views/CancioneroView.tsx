@@ -242,12 +242,15 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             {/* MODAL: Nueva / Editar Canción */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-[#333] flex items-center justify-between">
+                    <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-[#333] flex items-center justify-between shrink-0">
                             <h3 className="text-white font-bold text-xl">{currentSong ? 'Editar Canción' : 'Nueva Canción'}</h3>
-                            <button onClick={() => setShowModal(false)} className="text-[#888] hover:text-white"><X /></button>
+                            <button onClick={() => setShowModal(false)} className="text-[#888] hover:text-white p-2 hover:bg-white/5 rounded-full transition-all">
+                                <X size={24} />
+                            </button>
                         </div>
-                        <div className="p-6 space-y-4">
+
+                        <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="col-span-2">
                                     <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Título de la Canción</label>
@@ -315,26 +318,26 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                         value={letra}
                                         onChange={(e) => setLetra(e.target.value)}
                                         placeholder="[C] Dios de [F] amor..."
-                                        rows={8}
+                                        rows={6}
                                         className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] font-mono text-sm"
                                     />
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="flex gap-3 pt-4">
-                                <button
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 bg-[#222] text-white font-bold py-4 rounded-2xl border border-[#333] hover:bg-[#333] transition-all"
-                                >
-                                    CANCELAR
-                                </button>
-                                <button
-                                    onClick={handleSave}
-                                    className="flex-1 bg-[#A8D500] text-black font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all"
-                                >
-                                    {currentSong ? 'GUARDAR CAMBIOS' : 'CREAR CANCIÓN'}
-                                </button>
-                            </div>
+                        <div className="p-6 border-t border-[#333] bg-[#1A1A1A] flex gap-3 shrink-0">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="flex-1 bg-[#222] text-white font-bold py-4 rounded-2xl border border-[#333] hover:bg-[#333] transition-all"
+                            >
+                                CANCELAR
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="flex-1 bg-[#A8D500] text-black font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all"
+                            >
+                                {currentSong ? 'GUARDAR CAMBIOS' : 'CREAR CANCIÓN'}
+                            </button>
                         </div>
                     </div>
                 </div>
