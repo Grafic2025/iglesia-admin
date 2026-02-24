@@ -39,11 +39,11 @@ const NotificacionesView = ({
     const [nHora, setNHora] = useState('');
 
     const filteredLogs = useMemo(() => {
-        return logs.filter(l => {
+        return (logs || []).filter(l => {
             const matchSearch = !logSearch ||
                 l.titulo?.toLowerCase().includes(logSearch.toLowerCase()) ||
                 l.mensaje?.toLowerCase().includes(logSearch.toLowerCase()) ||
-                new Date(l.fecha).toLocaleDateString().includes(logSearch);
+                (l.fecha ? new Date(l.fecha).toLocaleDateString().includes(logSearch) : false);
             const matchStatus = logStatusFilter === 'Todos' || l.estado === logStatusFilter;
             return matchSearch && matchStatus;
         });

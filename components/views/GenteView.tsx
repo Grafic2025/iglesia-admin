@@ -82,18 +82,18 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
         return list;
     }, [miembros, search, timeFilter, showArchived]);
 
-    const totalPages = Math.max(1, Math.ceil(filteredMiembros.length / PAGE_SIZE));
-    const paginatedList = filteredMiembros.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    const totalPages = Math.max(1, Math.ceil((filteredMiembros || []).length / PAGE_SIZE));
+    const paginatedList = (filteredMiembros || []).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     // Stats
-    const totalActivos = miembros.filter(m => m.activo !== false).length;
-    const totalServidores = miembros.filter(m => m.es_servidor).length;
+    const totalActivos = (miembros || []).filter(m => m.activo !== false).length;
+    const totalServidores = (miembros || []).filter(m => m.es_servidor).length;
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
-    const nuevosHoy = miembros.filter(m => new Date(m.created_at) >= hoy).length;
+    const nuevosHoy = (miembros || []).filter(m => m.created_at && new Date(m.created_at) >= hoy).length;
     const hace7d = new Date();
     hace7d.setDate(hace7d.getDate() - 7);
-    const nuevosSemana = miembros.filter(m => new Date(m.created_at) >= hace7d).length;
+    const nuevosSemana = (miembros || []).filter(m => m.created_at && new Date(m.created_at) >= hace7d).length;
 
     return (
         <div className="space-y-6">

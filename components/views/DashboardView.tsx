@@ -64,12 +64,12 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
     }, [crecimientoAnual, growthRange]);
 
     // Calculate trend for "Total Hoy" comparing yesterday to today
-    const todayCount = asistencias.length;
-    const yesterdayCount = asistencias7dias.length >= 2 ? asistencias7dias[asistencias7dias.length - 2]?.total || 0 : 0;
+    const todayCount = (asistencias || []).length;
+    const yesterdayCount = (asistencias7dias || []).length >= 2 ? asistencias7dias[asistencias7dias.length - 2]?.total || 0 : 0;
     const todayTrend = yesterdayCount > 0 ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100) : null;
 
     // Quick service info from attendance
-    const lastServiceDate = asistencias7dias.filter(d => d.total > 0).slice(-1)[0];
+    const lastServiceDate = (asistencias7dias || []).filter(d => d.total > 0).slice(-1)[0];
     const nextSunday = new Date();
     nextSunday.setDate(nextSunday.getDate() + ((7 - nextSunday.getDay()) % 7 || 7));
 
@@ -227,7 +227,7 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                         </div>
                         <div className="p-4 bg-[#111] rounded-2xl border border-[#222] text-center">
                             <p className="text-[#888] text-[10px] font-black uppercase tracking-widest mb-1">Asistencia Hoy</p>
-                            <p className="text-3xl font-black text-[#A8D500]">{asistencias.length}</p>
+                            <p className="text-3xl font-black text-[#A8D500]">{(asistencias || []).length}</p>
                         </div>
                     </div>
                 </div>
@@ -235,11 +235,11 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                <StatCard label="Total Hoy" value={asistencias.length} color="#A8D500" isActive={asistencias.length > 0} icon={<LayoutDashboard size={18} />} trend={todayTrend} />
-                {horariosDisponibles.map(h => (
-                    <StatCard key={h} label={`${h} HS`} value={asistencias.filter(a => a.horario_reunion === h).length} color="#fff" isActive={asistencias.filter(a => a.horario_reunion === h).length > 0} />
+                <StatCard label="Total Hoy" value={(asistencias || []).length} color="#A8D500" isActive={(asistencias || []).length > 0} icon={<LayoutDashboard size={18} />} trend={todayTrend} />
+                {(horariosDisponibles || []).map(h => (
+                    <StatCard key={h} label={`${h} HS`} value={(asistencias || []).filter(a => a.horario_reunion === h).length} color="#fff" isActive={(asistencias || []).filter(a => a.horario_reunion === h).length > 0} />
                 ))}
-                <StatCard label="Extra" value={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length} color="#FFB400" isActive={asistencias.filter(a => a.horario_reunion === 'Extraoficial').length > 0} />
+                <StatCard label="Extra" value={(asistencias || []).filter(a => a.horario_reunion === 'Extraoficial').length} color="#FFB400" isActive={(asistencias || []).filter(a => a.horario_reunion === 'Extraoficial').length > 0} />
                 <StatCard label="Oraciones" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
                 <StatCard label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>

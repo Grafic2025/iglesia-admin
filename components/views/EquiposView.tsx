@@ -71,7 +71,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
 
             setBlockouts(blocksData?.map((b: any) => ({
                 id: b.id,
-                name: `${b.miembros.nombre} ${b.miembros.apellido}`,
+                name: b.miembros ? `${b.miembros.nombre || ''} ${b.miembros.apellido || ''}` : 'Sin nombre',
                 date: `${new Date(b.fecha_inicio + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })} - ${new Date(b.fecha_fin + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })}`,
                 reason: b.motivo
             })) || []);

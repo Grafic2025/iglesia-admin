@@ -15,17 +15,17 @@ const AuditoriaView = ({ logs }: AuditoriaViewProps) => {
 
     // Get unique action types for filter dropdown
     const actionTypes = useMemo(() => {
-        const types = new Set(logs.map(l => l.accion));
+        const types = new Set((logs || []).map(l => l.accion));
         return ['Todas', ...Array.from(types)];
     }, [logs]);
 
     const filteredLogs = useMemo(() => {
-        return logs.filter(l => {
+        return (logs || []).filter(l => {
             const matchSearch = !search ||
                 l.accion?.toLowerCase().includes(search.toLowerCase()) ||
                 l.detalle?.toLowerCase().includes(search.toLowerCase()) ||
                 l.admin_id?.toLowerCase().includes(search.toLowerCase()) ||
-                new Date(l.created_at).toLocaleString('es-AR').includes(search);
+                (l.created_at ? new Date(l.created_at).toLocaleString('es-AR').includes(search) : false);
             const matchAction = actionFilter === 'Todas' || l.accion === actionFilter;
             return matchSearch && matchAction;
         });
