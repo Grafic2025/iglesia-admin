@@ -42,6 +42,29 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [pendingRol, setPendingRol] = useState('Servidor');
     const [showTemplatePicker, setShowTemplatePicker] = useState(false);
 
+    const ROLE_CATEGORIES = [
+        {
+            name: "Audio",
+            roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio"]
+        },
+        {
+            name: "Banda",
+            roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano"]
+        },
+        {
+            name: "Medios",
+            roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM"]
+        },
+        {
+            name: "Voces",
+            roles: ["Soprano", "Tenor", "Worship Leader"]
+        },
+        {
+            name: "General",
+            roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"]
+        }
+    ];
+
     const SERVICE_TEMPLATES = [
         {
             name: "Culto General",
@@ -52,7 +75,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { id: '4', tiempo: '5 min', actividad: 'Ofrendas / Anuncios', responsable: 'Ujieres' },
                 { id: '5', tiempo: '10 min', actividad: 'Ministración / Cierre', responsable: 'Banda' }
             ],
-            staffRoles: ['Director/Pastor', 'Líder Alabanza', 'Vocal 1', 'Vocal 2', 'Batería', 'Bajo', 'Guitarra', 'Teclados', 'Sonido', 'Proyección']
+            staffRoles: ['Director/Pastor', 'Worship Leader', 'Soprano', 'Tenor', 'Batería', 'Bajo', 'Guitarra Eléctrica 1', 'Piano', 'Sonidista', 'Slides TV']
         },
         {
             name: "Culto de Jóvenes",
@@ -62,7 +85,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { id: '3', tiempo: '40 min', actividad: 'Charla / Word', responsable: 'Líder' },
                 { id: '4', tiempo: '20 min', actividad: 'After / Compartir', responsable: 'Todos' }
             ],
-            staffRoles: ['Líder Jóvenes', 'Banda', 'Sonido', 'Bienvenida']
+            staffRoles: ['Líder Jóvenes', 'Directora Musical', 'Batería', 'Sonidista', 'Pantalla LED', 'YouTube CM']
         },
         {
             name: "Santa Cena",
@@ -72,7 +95,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { id: '3', tiempo: '15 min', actividad: 'Reparto de Elementos', responsable: 'Diáconos' },
                 { id: '4', tiempo: '10 min', actividad: 'Acción de Gracias', responsable: 'Pastor' }
             ],
-            staffRoles: ['Pastor', 'Banda', 'Diácono 1', 'Diácono 2', 'Ujier']
+            staffRoles: ['Director/Pastor', 'Worship Leader', 'Piano', 'Guitarra Acústica', 'Sonidista', 'Ujier']
         }
     ];
 
@@ -607,14 +630,21 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                             className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] mb-3"
                             autoFocus
                         />
-                        <div className="flex flex-wrap gap-2 mb-5">
-                            {['Servidor', 'Guitarra', 'Batería', 'Bajo', 'Teclados', 'Voz', 'Sonido', 'Proyección', 'Bienvenida'].map(r => (
-                                <button
-                                    key={r}
-                                    onClick={() => setPendingRol(r)}
-                                    className={`text-xs px-3 py-1.5 rounded-lg font-bold transition-all ${pendingRol === r ? 'bg-[#A8D500] text-black' : 'bg-[#222] text-[#888] hover:bg-[#333]'
-                                        }`}
-                                >{r}</button>
+                        <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                            {ROLE_CATEGORIES.map(cat => (
+                                <div key={cat.name}>
+                                    <p className="text-[10px] text-[#A8D500] font-black uppercase mb-2 tracking-wider">{cat.name}</p>
+                                    <div className="flex flex-wrap gap-2 mb-4">
+                                        {cat.roles.map(r => (
+                                            <button
+                                                key={r}
+                                                onClick={() => setPendingRol(r)}
+                                                className={`text-[10px] px-3 py-2 rounded-xl border font-bold transition-all ${pendingRol === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                    }`}
+                                            >{r}</button>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </div>
                         <div className="flex gap-3">
