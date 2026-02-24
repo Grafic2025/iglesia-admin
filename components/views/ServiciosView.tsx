@@ -39,6 +39,41 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [showStaffPicker, setShowStaffPicker] = useState(false);
     const [pendingMember, setPendingMember] = useState<any>(null);
     const [pendingRol, setPendingRol] = useState('Servidor');
+    const [showTemplatePicker, setShowTemplatePicker] = useState(false);
+
+    const SERVICE_TEMPLATES = [
+        {
+            name: "Culto General",
+            plan: [
+                { id: '1', tiempo: '10 min', actividad: 'Oración Inicial', responsable: 'Pastor' },
+                { id: '2', tiempo: '20 min', actividad: 'Alabanza (3-4 canciones)', responsable: 'Banda/Gpo Alabanza' },
+                { id: '3', tiempo: '40 min', actividad: 'Predica', responsable: 'Pastor/Invitado' },
+                { id: '4', tiempo: '5 min', actividad: 'Ofrendas / Anuncios', responsable: 'Ujieres' },
+                { id: '5', tiempo: '10 min', actividad: 'Ministración / Cierre', responsable: 'Banda' }
+            ],
+            staffRoles: ['Director/Pastor', 'Líder Alabanza', 'Vocal 1', 'Vocal 2', 'Batería', 'Bajo', 'Guitarra', 'Teclados', 'Sonido', 'Proyección']
+        },
+        {
+            name: "Culto de Jóvenes",
+            plan: [
+                { id: '1', tiempo: '15 min', actividad: 'Dinámica / Bienvenida', responsable: 'Líder Jóvenes' },
+                { id: '2', tiempo: '30 min', actividad: 'Adoración fuerte', responsable: 'Banda Jóvenes' },
+                { id: '3', tiempo: '40 min', actividad: 'Charla / Word', responsable: 'Líder' },
+                { id: '4', tiempo: '20 min', actividad: 'After / Compartir', responsable: 'Todos' }
+            ],
+            staffRoles: ['Líder Jóvenes', 'Banda', 'Sonido', 'Bienvenida']
+        },
+        {
+            name: "Santa Cena",
+            plan: [
+                { id: '1', tiempo: '30 min', actividad: 'Adoración', responsable: 'Banda' },
+                { id: '2', tiempo: '20 min', actividad: 'Mensaje Santa Cena', responsable: 'Pastor' },
+                { id: '3', tiempo: '15 min', actividad: 'Reparto de Elementos', responsable: 'Diáconos' },
+                { id: '4', tiempo: '10 min', actividad: 'Acción de Gracias', responsable: 'Pastor' }
+            ],
+            staffRoles: ['Pastor', 'Banda', 'Diácono 1', 'Diácono 2', 'Ujier']
+        }
+    ];
 
     const fetchData = async () => {
         setLoading(true);
@@ -191,6 +226,21 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
             return;
         }
+
+        // 1. Check for Overlapping Assignment (Concurrency Conflict)
+        const overlap = schedules.find(s =>
+            s.fecha === fecha &&
+            s.id !== selectedSchedule?.id &&
+            s.equipo_ids?.some((e: any) => e.miembro_id === m.id)
+        );
+
+        if (overlap) {
+            if (!confirm(`🚨 CONFLICTO DE HORARIO: ${m.nombre} ya está asignado al servicio de las ${overlap.horario} este mismo día.\n\n¿Quieres asignarlo también a este horario?`)) {
+                return;
+            }
+        }
+
+        // 2. Check for User Blockout
         const bloqueo = allBlockouts.find(b => b.miembro_id === m.id && fecha >= b.fecha_inicio && fecha <= b.fecha_fin);
         if (bloqueo) {
             if (!confirm(`⚠️ ALERTA: ${m.nombre} marcó este día como NO DISPONIBLE.\nMotivo: ${bloqueo.motivo || 'No especificado'}\n\n¿Deseas asignarlo de todas formas?`)) {
@@ -312,6 +362,21 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                             </div>
                             <button onClick={() => setShowModal(false)} className="text-[#888] hover:text-white"><X /></button>
                         </div>
+
+                        {!selectedSchedule && assignedStaff.length === 0 && (
+                            <div className="bg-[#A8D50010] p-4 flex items-center justify-between border-b border-[#A8D50020]">
+                                <div className="flex items-center gap-3">
+                                    <div className="bg-[#A8D500] text-black p-2 rounded-lg"><CheckCircle2 size={16} /></div>
+                                    <p className="text-[#A8D500] text-xs font-bold uppercase tracking-widest">¿Quieres cargar una estructura predefinida?</p>
+                                </div>
+                                <button
+                                    onClick={() => setShowTemplatePicker(true)}
+                                    className="bg-[#A8D500] text-black px-4 py-1.5 rounded-lg text-[10px] font-black hover:scale-105 transition-all"
+                                >
+                                    USAR PLANTILLA
+                                </button>
+                            </div>
+                        )}
 
                         <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-8">
                             {/* Columna Izquierda: Orden del Culto */}
@@ -550,6 +615,38 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                 className="flex-1 py-3 bg-[#A8D500] text-black font-black rounded-xl"
                             >CONFIRMAR</button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: Plantillas */}
+            {showTemplatePicker && (
+                <div className="fixed inset-0 bg-black/95 z-[70] flex items-center justify-center p-4">
+                    <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] p-8 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-white font-bold text-xl uppercase tracking-widest">Seleccionar Plantilla</h3>
+                            <button onClick={() => setShowTemplatePicker(false)} className="text-[#888]"><X /></button>
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                            {SERVICE_TEMPLATES.map(t => (
+                                <button
+                                    key={t.name}
+                                    onClick={() => {
+                                        setDetailedRows(t.plan);
+                                        // Optional: prefill roles as empty slots if needed
+                                        setShowTemplatePicker(false);
+                                    }}
+                                    className="bg-[#222] border border-[#333] p-6 rounded-2xl text-left hover:border-[#A8D500] transition-all group"
+                                >
+                                    <h4 className="text-white font-black text-lg group-hover:text-[#A8D500]">{t.name}</h4>
+                                    <p className="text-[#555] text-xs mt-1">{t.plan.length} momentos definidos • {t.staffRoles.join(', ')}</p>
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowTemplatePicker(false)}
+                            className="mt-8 w-full py-4 bg-[#222] text-[#555] font-bold rounded-2xl border border-[#333] uppercase text-xs"
+                        >CANCELAR</button>
                     </div>
                 </div>
             )}

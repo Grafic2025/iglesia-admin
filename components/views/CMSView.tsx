@@ -5,9 +5,7 @@ import { ImageIcon, RefreshCw, Trash2, Edit, PlusCircle, Droplets, Info, Plus } 
 interface CMSViewProps {
     noticias: any[];
     syncYouTube: (alert: boolean) => void;
-    editarNoticia: (n: any) => void;
     eliminarNoticia: (id: string) => void;
-    agregarNoticia: () => void;
     bautismos: any[];
     ayuda: any[];
     supabase: any;
@@ -16,7 +14,7 @@ interface CMSViewProps {
 }
 
 const CMSView = ({
-    noticias, syncYouTube, editarNoticia, eliminarNoticia, agregarNoticia,
+    noticias, syncYouTube, eliminarNoticia,
     bautismos, ayuda, supabase, fetchNoticias, registrarAuditoria
 }: CMSViewProps) => {
     const [showModal, setShowModal] = React.useState(false);

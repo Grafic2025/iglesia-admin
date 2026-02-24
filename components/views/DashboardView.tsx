@@ -1,9 +1,9 @@
 'use client'
 import React, { useState, useMemo } from 'react';
 import {
-    BarChart as ReLineBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as ReLineChart, Line, LabelList
+    BarChart as ReLineBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart as ReLineChart, Line, LabelList, Cell
 } from 'recharts';
-import { LucideBarChart, LucideLineChart, LayoutDashboard, CalendarDays, Clock } from 'lucide-react';
+import { LucideBarChart, LucideLineChart, LayoutDashboard, CalendarDays, Clock, Users2, MapPin } from 'lucide-react';
 import StatCard from '../StatCard';
 
 interface DashboardViewProps {
@@ -15,6 +15,7 @@ interface DashboardViewProps {
     horariosDisponibles: any[];
     retencion: { total: number; activos: number; porcentaje: number };
     heatmap: any[];
+    miembros?: any[]; // Added for demographics
 }
 
 const GROWTH_RANGES = [
@@ -23,8 +24,39 @@ const GROWTH_RANGES = [
     { key: '12M', label: '12 meses', months: 12 },
 ];
 
-const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevosMes, crecimientoAnual, horariosDisponibles, retencion, heatmap }: DashboardViewProps) => {
+const COLORS = ['#A8D500', '#00D9FF', '#FFB400', '#9333EA', '#FF4444', '#3B82F6'];
+
+const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevosMes, crecimientoAnual, horariosDisponibles, retencion, heatmap, miembros = [] }: DashboardViewProps) => {
     const [growthRange, setGrowthRange] = useState('12M');
+
+    // Calculate Demographic Data
+    const demographicData = useMemo(() => {
+        const ages = { 'Niños (<13)': 0, 'Adolescentes (13-17)': 0, 'Jóvenes (18-29)': 0, 'Adultos (30-59)': 0, 'Mayores (60+)': 0, 'S/D': 0 };
+        const zones: Record<string, number> = {};
+
+        miembros.forEach(m => {
+            // Age Group
+            if (m.fecha_nacimiento) {
+                const age = new Date().getFullYear() - new Date(m.fecha_nacimiento).getFullYear();
+                if (age < 13) ages['Niños (<13)']++;
+                else if (age < 18) ages['Adolescentes (13-17)']++;
+                else if (age < 30) ages['Jóvenes (18-29)']++;
+                else if (age < 60) ages['Adultos (30-59)']++;
+                else ages['Mayores (60+)']++;
+            } else {
+                ages['S/D']++;
+            }
+
+            // Zones
+            const z = m.zona || 'Sin especificar';
+            zones[z] = (zones[z] || 0) + 1;
+        });
+
+        const ageChart = Object.entries(ages).map(([name, value]) => ({ name, value })).filter(d => d.value > 0);
+        const zoneChart = Object.entries(zones).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 5);
+
+        return { ageChart, zoneChart };
+    }, [miembros]);
 
     // Filter growth data based on selected range
     const filteredGrowth = useMemo(() => {
@@ -131,6 +163,50 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                                 </Line>
                                 <Line type="monotone" dataKey="meta" stroke="#333" strokeDasharray="5 5" />
                             </ReLineChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            </div>
+
+            {/* Demographics Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
+                    <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
+                        <Users2 size={18} className="text-[#FFB400]" /> Edades de la Congregación
+                    </h3>
+                    <div className="h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ReLineBarChart data={demographicData.ageChart} layout="vertical">
+                                <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
+                                <XAxis type="number" stroke="#888" fontSize={10} />
+                                <YAxis dataKey="name" type="category" stroke="#888" fontSize={10} width={120} />
+                                <Tooltip contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }} />
+                                <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                    {demographicData.ageChart.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                    <LabelList dataKey="value" position="right" fill="#fff" fontSize={10} fontWeight="bold" />
+                                </Bar>
+                            </ReLineBarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
+                    <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
+                        <MapPin size={18} className="text-[#9333EA]" /> Distribución por Zonas
+                    </h3>
+                    <div className="h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ReLineBarChart data={demographicData.zoneChart}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                                <XAxis dataKey="name" stroke="#888" fontSize={10} />
+                                <YAxis stroke="#888" fontSize={10} />
+                                <Tooltip contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }} />
+                                <Bar dataKey="value" fill="#9333EA" radius={[4, 4, 0, 0]}>
+                                    <LabelList dataKey="value" position="top" fill="#9333EA" fontSize={10} fontWeight="bold" />
+                                </Bar>
+                            </ReLineBarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>

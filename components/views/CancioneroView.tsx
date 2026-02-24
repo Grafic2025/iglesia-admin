@@ -19,6 +19,9 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
     const [bpm, setBpm] = useState('');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [pdfUrl, setPdfUrl] = useState('');
+    const [letra, setLetra] = useState('');
+    const [showLyricsModal, setShowLyricsModal] = useState(false);
+    const [transposedOffset, setTransposedOffset] = useState(0);
 
     const fetchSongs = async () => {
         setLoading(true);
@@ -49,6 +52,8 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             setBpm(song.bpm || '');
             setYoutubeUrl(song.youtube_url || '');
             setPdfUrl(song.pdf_url || '');
+            setLetra(song.letra || '');
+            setTransposedOffset(0);
         } else {
             setCurrentSong(null);
             setTitulo('');
@@ -70,7 +75,8 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
             tono,
             bpm,
             youtube_url: youtubeUrl,
-            pdf_url: pdfUrl
+            pdf_url: pdfUrl,
+            letra: letra
         };
 
         let error;
@@ -103,7 +109,33 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
         return matchesSearch && matchesKey;
     });
 
-    const keys = ['A', 'A#', 'B', 'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'];
+    const keys = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    const transposeChord = (chord: string, semitones: number) => {
+        const chordMap: Record<string, number> = {
+            'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4, 'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9, 'A#': 10, 'Bb': 10, 'B': 11
+        };
+        const reverseMap = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+        // Extract the root note and the rest (m, 7, sus4, etc)
+        const match = chord.match(/^([A-G][#b]?)(.*)/);
+        if (!match) return chord;
+        const [_, root, suffix] = match;
+
+        if (chordMap[root] === undefined) return chord;
+
+        let newIdx = (chordMap[root] + semitones) % 12;
+        if (newIdx < 0) newIdx += 12;
+
+        return reverseMap[newIdx] + suffix;
+    };
+
+    const getTransposedLetra = (content: string, offset: number) => {
+        if (offset === 0) return content;
+        return content.replace(/\[([A-G][#b]?[^\]]*)\]/g, (match, chord) => {
+            return `[${transposeChord(chord, offset)}]`;
+        });
+    };
 
     return (
         <div className="space-y-6">
@@ -186,6 +218,11 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                                     </button>
                                                 )}
                                                 <div className="w-px h-4 bg-[#333] mx-2"></div>
+                                                {song.letra && (
+                                                    <button onClick={() => { setCurrentSong(song); setLetra(song.letra); setShowLyricsModal(true); }} className="p-2 text-[#A8D500] bg-[#A8D50010] rounded-lg transition-all flex items-center gap-1 font-bold text-[10px]" title="Ver Letra y Acordes">
+                                                        <FileText size={16} /> ACORDES
+                                                    </button>
+                                                )}
                                                 <button onClick={() => handleOpenModal(song)} className="p-2 text-[#888] hover:text-[#A8D500] hover:bg-[#A8D50010] rounded-lg transition-all" title="Editar">
                                                     <Edit2 size={16} />
                                                 </button>
@@ -272,6 +309,16 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                         className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500]"
                                     />
                                 </div>
+                                <div className="col-span-2">
+                                    <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Letra y Acordes (Formato: [Chord] Letra)</label>
+                                    <textarea
+                                        value={letra}
+                                        onChange={(e) => setLetra(e.target.value)}
+                                        placeholder="[C] Dios de [F] amor..."
+                                        rows={8}
+                                        className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] font-mono text-sm"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex gap-3 pt-4">
@@ -288,6 +335,50 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
                                     {currentSong ? 'GUARDAR CAMBIOS' : 'CREAR CANCIÓN'}
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL: Visualizar Letra con Transposición */}
+            {showLyricsModal && currentSong && (
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-[60] flex items-center justify-center p-0 md:p-10">
+                    <div className="bg-[#0A0A0A] w-full h-full md:h-auto md:max-w-4xl md:rounded-3xl border border-[#333] shadow-2xl flex flex-col overflow-hidden">
+                        <div className="p-6 border-b border-[#333] flex items-center justify-between bg-[#111]">
+                            <div>
+                                <h3 className="text-white font-bold text-xl">{currentSong.titulo}</h3>
+                                <p className="text-[#A8D500] text-sm font-bold uppercase">{currentSong.artista} • {currentSong.tono} • {currentSong.bpm} BPM</p>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-2 bg-[#222] p-1 rounded-xl border border-[#333]">
+                                    <button onClick={() => setTransposedOffset(p => p - 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">-</button>
+                                    <div className="px-4 py-1 text-center">
+                                        <p className="text-[10px] text-[#555] font-black uppercase">Tono</p>
+                                        <p className="text-[#A8D500] font-black text-sm">{transposeChord(currentSong.tono, transposedOffset)}</p>
+                                    </div>
+                                    <button onClick={() => setTransposedOffset(p => p + 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">+</button>
+                                </div>
+                                <button onClick={() => { setShowLyricsModal(false); setTransposedOffset(0); }} className="p-3 text-[#888] hover:text-white rounded-full bg-[#222]"><X size={24} /></button>
+                            </div>
+                        </div>
+                        <div className="flex-1 p-8 overflow-y-auto font-mono">
+                            <pre className="text-white text-lg whitespace-pre-wrap leading-relaxed">
+                                {getTransposedLetra(letra, transposedOffset).split('\n').map((line, idx) => (
+                                    <div key={idx} className="mb-2">
+                                        {line.split(/(\[[^\]]*\])/).map((part, i) => (
+                                            part.startsWith('[') ?
+                                                <span key={i} className="text-[#A8D500] font-black">{part.slice(1, -1)}</span> :
+                                                <span key={i}>{part}</span>
+                                        ))}
+                                    </div>
+                                ))}
+                            </pre>
+                        </div>
+                        <div className="p-6 border-t border-[#333] bg-[#111] flex justify-between items-center">
+                            <p className="text-[#555] text-xs italic">* Los acordes en verde se transponen automáticamente</p>
+                            <button onClick={() => window.print()} className="text-[#888] hover:text-white flex items-center gap-2 text-sm font-bold">
+                                <FileText size={16} /> IMPRIMIR LETRA
+                            </button>
                         </div>
                     </div>
                 </div>

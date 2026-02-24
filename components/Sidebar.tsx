@@ -13,7 +13,8 @@ import {
     Users2,
     Home,
     Clock,
-    History
+    History,
+    ShieldAlert
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -28,6 +29,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
         { id: 'miembros', label: 'Asistencias', icon: Users },
         { id: 'gente', label: 'Gente', icon: UserCircle },
         { id: 'notificaciones', label: 'Mensajería', icon: Bell },
+        { id: 'alertas', label: 'Retención (Alertas)', icon: ShieldAlert },
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
         { id: 'servicios', label: 'Plan de Culto', icon: Calendar },
         { id: 'equipos', label: 'Equipos/Servir', icon: Users2 },

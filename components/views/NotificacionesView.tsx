@@ -89,11 +89,16 @@ const NotificacionesView = ({
                                 className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
                             >
                                 <option value="Todas">Toda la Iglesia</option>
+                                <option value="Lideres">Solo Líderes</option>
+                                <option value="Servidores">Todos los Servidores</option>
+                                <option value="Nuevos">Nuevos (Último mes)</option>
+                                <option value="Varones">Segmento: Varones</option>
+                                <option value="Mujeres">Segmento: Mujeres</option>
+                                <option value="Adolescentes">Segmento: Adolescentes</option>
+                                <option value="EquipoMusica">Equipo de Música</option>
                                 {horariosDisponibles.map(h => (
                                     <option key={h} value={h}>Reunión {h} hs</option>
                                 ))}
-                                <option value="Lideres">Solo Líderes</option>
-                                <option value="Nuevos">Nuevos (Último mes)</option>
                             </select>
                         </div>
                         <div className="bg-[#A8D50015] border border-[#A8D50030] p-3 rounded-xl">
