@@ -27,7 +27,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
         setLoading(true);
         try {
             const { data, error } = await supabase
-                .from('canciones')
+                .from('Canciones')
                 .select('*')
                 .order('titulo', { ascending: true });
             if (error) throw error;
