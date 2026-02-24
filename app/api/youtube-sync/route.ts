@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET() {
     try {
@@ -24,7 +24,7 @@ export async function GET() {
         // Para detectar específicamente el vivo real, el endpoint /live es mejor, 
         // pero el feed RSS nos da el último video subido que es lo que el usuario pidió.
 
-        const { error } = await supabase.from('noticias').upsert({
+        const { error } = await supabaseAdmin.from('noticias').upsert({
             id: '00000000-0000-0000-0000-000000000001', // Fixed UUID for the latest synced video
             titulo: videoTitle,
             imagen_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
