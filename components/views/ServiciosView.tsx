@@ -26,6 +26,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
     const [horario, setHorario] = useState('11:00 HS');
     const [notas, setNotas] = useState('');
+    const [bosquejo, setBosquejo] = useState('');
     const [detailedRows, setDetailedRows] = useState<DetailedRow[]>([
         { id: '1', tiempo: '10 min', actividad: 'Alabanza', responsable: 'Banda' },
         { id: '2', tiempo: '40 min', actividad: 'Predica', responsable: 'Pastor' }
@@ -114,6 +115,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setFecha(sched.fecha);
             setHorario(sched.horario);
             setNotas(sched.notas_generales || '');
+            setBosquejo(sched.bosquejo || '');
             setDetailedRows(sched.plan_detallado || []);
             setSelectedSongIds(sched.orden_canciones || []);
             setAssignedStaff(sched.equipo_ids || []);
@@ -122,6 +124,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setFecha(new Date().toISOString().split('T')[0]);
             setHorario('11:00 HS');
             setNotas('');
+            setBosquejo('');
             setDetailedRows([
                 { id: '1', tiempo: '10 min', actividad: 'Alabanza', responsable: 'Banda' },
                 { id: '2', tiempo: '40 min', actividad: 'Predica', responsable: 'Pastor' }
@@ -137,6 +140,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             fecha,
             horario,
             notas_generales: notas,
+            bosquejo: bosquejo,
             plan_detallado: detailedRows,
             orden_canciones: selectedSongIds,
             equipo_ids: assignedStaff
@@ -489,7 +493,15 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                         value={notas}
                                         onChange={e => setNotas(e.target.value)}
                                         placeholder="Indicaciones generales para el equipo..."
-                                        className="w-full bg-[#1A1A1A] border border-[#333] rounded-2xl p-4 text-white text-sm h-32 outline-none focus:border-[#A8D500] resize-none"
+                                        className="w-full bg-[#1A1A1A] border border-[#333] rounded-2xl p-4 text-white text-sm h-24 outline-none focus:border-[#A8D500] resize-none mb-4"
+                                    />
+
+                                    <h4 className="text-[#A8D500] text-[10px] font-black uppercase mb-4 tracking-[0.2em]">Bosquejo del Mensaje (Público)</h4>
+                                    <textarea
+                                        value={bosquejo}
+                                        onChange={e => setBosquejo(e.target.value)}
+                                        placeholder="Versículos clave y puntos del sermón para que los miembros tomen notas..."
+                                        className="w-full bg-[#1A1A1A] border border-[#333] rounded-2xl p-4 text-[#888] text-sm h-40 outline-none focus:border-[#A8D500] resize-none"
                                     />
                                 </div>
                             </div>
