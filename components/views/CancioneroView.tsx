@@ -82,10 +82,10 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
 
         let error;
         if (currentSong) {
-            const { error: err } = await supabase.from('canciones').update(payload).eq('id', currentSong.id);
+            const { error: err } = await supabase.from('Canciones').update(payload).eq('id', currentSong.id);
             error = err;
         } else {
-            const { error: err } = await supabase.from('canciones').insert([payload]);
+            const { error: err } = await supabase.from('Canciones').insert([payload]);
             error = err;
         }
 
@@ -98,7 +98,7 @@ const CancioneroView = ({ supabase }: { supabase: any }) => {
 
     const handleDelete = async (id: string) => {
         if (!confirm("¿Eliminar esta canción permanentemente?")) return;
-        const { error } = await supabase.from('canciones').delete().eq('id', id);
+        const { error } = await supabase.from('Canciones').delete().eq('id', id);
         if (error) alert("Error: " + error.message);
         else fetchSongs();
     };
