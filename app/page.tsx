@@ -12,7 +12,20 @@ import EquiposView from '../components/views/EquiposView'
 import CancioneroView from '../components/views/CancioneroView'
 import AgendaConfigView from '../components/views/AgendaConfigView'
 import AuditoriaView from '../components/views/AuditoriaView'
-import { LogOut } from 'lucide-react'
+import { LogOut, ShieldAlert } from 'lucide-react'
+
+const TAB_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  miembros: 'Asistencias',
+  gente: 'Gente',
+  notificaciones: 'Mensajería',
+  cms: 'Contenido',
+  servicios: 'Plan de Culto',
+  equipos: 'Equipos / Servir',
+  cancionero: 'Cancionero',
+  agenda_config: 'Configuración de Agenda',
+  auditoria: 'Auditoría',
+};
 
 export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
@@ -47,12 +60,21 @@ export default function AdminDashboard() {
   const [exportStart, setExportStart] = useState('')
   const [exportEnd, setExportEnd] = useState('')
   const [showExportModal, setShowExportModal] = useState(false)
+  const [asistencias7dias, setAsistencias7dias] = useState<any[]>([])
+  const [loginAttempts, setLoginAttempts] = useState(0)
+  const [loginLocked, setLoginLocked] = useState(false)
+  const [lockTimer, setLockTimer] = useState(0)
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
   useEffect(() => {
     const isAuth = localStorage.getItem('admin_auth')
     if (isAuth === 'true') setAuthorized(true)
+
+    // HTTPS check (only in production)
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'https:') {
+      window.location.href = window.location.href.replace('http:', 'https:');
+    }
   }, [])
 
   useEffect(() => {
@@ -70,6 +92,7 @@ export default function AdminDashboard() {
       fetchLogs();
       syncYouTube();
       fetchCrecimientoAnual();
+      fetchAsistencias7dias();
       fetchHorarios();
       fetchAuditLogs();
       fetchAnalytics();
@@ -95,7 +118,7 @@ export default function AdminDashboard() {
 
   const fetchLogs = async () => {
     try {
-      const { data, error } = await supabase.from('notificacion_logs').select('*').order('fecha', { ascending: false }).limit(10);
+      const { data, error } = await supabase.from('notificacion_logs').select('*').order('fecha', { ascending: false }).limit(200);
       if (error) setLogsError(error.message);
       else { setLogs(data || []); setLogsError(null); }
     } catch (e: any) { setLogsError(e.message); }
@@ -143,6 +166,22 @@ export default function AdminDashboard() {
       data.push({ mes: meses[d.getMonth()], c: count || 0 });
     }
     setCrecimientoAnual(data);
+  }
+
+  const fetchAsistencias7dias = async () => {
+    const dias = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+    const data = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const fecha = d.toLocaleDateString('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' });
+      const { count } = await supabase
+        .from('asistencias')
+        .select('*', { count: 'exact', head: true })
+        .eq('fecha', fecha);
+      data.push({ dia: dias[d.getDay()], total: count || 0, fecha });
+    }
+    setAsistencias7dias(data);
   }
 
   const fetchAnalytics = async () => {
@@ -261,9 +300,30 @@ export default function AdminDashboard() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
+    if (loginLocked) return;
     if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
       setAuthorized(true); localStorage.setItem('admin_auth', 'true');
-    } else alert('Contraseña incorrecta');
+      setLoginAttempts(0);
+    } else {
+      const newAttempts = loginAttempts + 1;
+      setLoginAttempts(newAttempts);
+      if (newAttempts >= 5) {
+        setLoginLocked(true);
+        let seconds = 30;
+        setLockTimer(seconds);
+        const interval = setInterval(() => {
+          seconds--;
+          setLockTimer(seconds);
+          if (seconds <= 0) {
+            clearInterval(interval);
+            setLoginLocked(false);
+            setLoginAttempts(0);
+          }
+        }, 1000);
+        return;
+      }
+      alert(`Contraseña incorrecta (${newAttempts}/5 intentos)`);
+    }
   }
 
   const handleLogout = () => {
@@ -379,7 +439,14 @@ export default function AdminDashboard() {
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-4 mb-6 rounded-2xl border border-[#444] bg-[#222] text-white outline-none focus:border-[#A8D500] transition-all"
         />
-        <button type="submit" className="w-full p-4 bg-[#A8D500] hover:bg-[#b0f000] text-black rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 shadow-[0_10px_20px_rgba(168,213,0,0.2)]">ENTRAR</button>
+        {loginLocked && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-center">
+            <ShieldAlert size={20} className="text-red-500 mx-auto mb-1" />
+            <p className="text-red-400 text-sm font-bold">Demasiados intentos</p>
+            <p className="text-red-300 text-xs">Espera {lockTimer}s para reintentar</p>
+          </div>
+        )}
+        <button type="submit" disabled={loginLocked} className={`w-full p-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 ${loginLocked ? 'bg-[#333] text-[#666] cursor-not-allowed' : 'bg-[#A8D500] hover:bg-[#b0f000] text-black shadow-[0_10px_20px_rgba(168,213,0,0.2)]'}`}>{loginLocked ? `BLOQUEADO (${lockTimer}s)` : 'ENTRAR'}</button>
       </form>
     </div>
   )
@@ -396,7 +463,7 @@ export default function AdminDashboard() {
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
-              {activeTab.replace('_', ' ')}
+              {TAB_LABELS[activeTab] || activeTab.replace('_', ' ')}
             </h1>
             <p className="text-[#888] text-sm">Gestión del sistema Iglesia del Salvador</p>
           </div>
@@ -446,6 +513,7 @@ export default function AdminDashboard() {
           {activeTab === 'dashboard' && (
             <DashboardView
               asistencias={asistencias}
+              asistencias7dias={asistencias7dias}
               oracionesActivas={oracionesActivas}
               nuevosMes={nuevosMes}
               crecimientoAnual={crecimientoAnual}

@@ -1,6 +1,6 @@
 'use client'
-import React from 'react';
-import { Send, UserCircle } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Send, UserCircle, ChevronLeft, ChevronRight, User, X } from 'lucide-react';
 
 interface MiembrosViewProps {
     busqueda: string;
@@ -19,12 +19,24 @@ interface MiembrosViewProps {
     horariosDisponibles: any[];
 }
 
+const PAGE_SIZE = 25;
+
 const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
     marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase,
     fetchAsistencias, fetchMiembros, horariosDisponibles
 }: MiembrosViewProps) => {
+
+    const [page, setPage] = useState(1);
+    const [selectedMember, setSelectedMember] = useState<any>(null);
+
+    const totalPages = Math.max(1, Math.ceil(datosFiltrados.length / PAGE_SIZE));
+    const paginatedData = datosFiltrados.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    // Reset page when filters change
+    const handleBusqueda = (v: string) => { setBusqueda(v); setPage(1); };
+    const handleFiltro = (v: string) => { setFiltroHorario(v); setPage(1); };
 
     const rewardLevels = [
         { level: 30, title: 'Entrada a Retiro (30+ asistencias)', icon: '🎟️', color: '#9333EA', key: 'nivel30' },
@@ -89,16 +101,16 @@ const MiembrosView = ({
 
             {/* Search and Table */}
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
-                <div className="p-4 border-b border-[#333] flex flex-col md:flex-row gap-4">
+                <div className="p-4 border-b border-[#333] flex flex-col md:flex-row gap-4 items-start md:items-center">
                     <input
                         placeholder="🔍 Buscar por nombre o apellido..."
                         value={busqueda}
-                        onChange={(e) => setBusqueda(e.target.value)}
+                        onChange={(e) => handleBusqueda(e.target.value)}
                         className="flex-1 bg-[#252525] text-white px-4 py-2.5 rounded-xl border border-[#444] outline-none focus:border-[#A8D500] transition-all"
                     />
                     <select
                         value={filtroHorario}
-                        onChange={(e) => setFiltroHorario(e.target.value)}
+                        onChange={(e) => handleFiltro(e.target.value)}
                         className="bg-[#A8D500] text-black font-bold px-4 py-2.5 rounded-xl outline-none cursor-pointer"
                     >
                         <option value="Todas">Todas las Reuniones</option>
@@ -107,6 +119,7 @@ const MiembrosView = ({
                         ))}
                         <option value="Extraoficial">Extraoficiales</option>
                     </select>
+                    <span className="text-[#555] text-xs font-bold whitespace-nowrap">{datosFiltrados.length} registros</span>
                 </div>
 
                 <div className="overflow-x-auto">
@@ -121,10 +134,10 @@ const MiembrosView = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#2a2a2a]">
-                            {datosFiltrados.map((a) => {
+                            {paginatedData.map((a) => {
                                 const esNuevo = a.miembros?.created_at && new Date(a.miembros.created_at).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }) === hoyArg;
                                 return (
-                                    <tr key={a.id} className="hover:bg-[#222] transition-colors group">
+                                    <tr key={a.id} className="hover:bg-[#222] transition-colors group cursor-pointer" onClick={() => setSelectedMember(a)}>
                                         <td className="px-6 py-4">
                                             <div className="font-bold text-white">{a.miembros?.nombre} {a.miembros?.apellido}</div>
                                             {esNuevo && <span className="mt-1 inline-block bg-[#A8D500] text-black text-[10px] font-bold px-2 py-0.5 rounded-full">NUEVO</span>}
@@ -146,7 +159,7 @@ const MiembrosView = ({
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-6 py-4 text-center" onClick={(e) => e.stopPropagation()}>
                                             <div className="flex items-center justify-center gap-2">
                                                 {a.miembros?.token_notificacion && (
                                                     <button
@@ -181,7 +194,80 @@ const MiembrosView = ({
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-[#252525] bg-[#151515]">
+                        <span className="text-[#555] text-xs font-bold">Página {page} de {totalPages} • {datosFiltrados.length} registros</span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setPage(p => Math.max(1, p - 1))}
+                                disabled={page === 1}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-[#252525] text-white text-xs font-bold rounded-lg disabled:opacity-30 hover:bg-[#333] transition-all"
+                            >
+                                <ChevronLeft size={14} /> Anterior
+                            </button>
+                            <button
+                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-[#252525] text-white text-xs font-bold rounded-lg disabled:opacity-30 hover:bg-[#333] transition-all"
+                            >
+                                Siguiente <ChevronRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
+
+            {/* Member Profile Modal */}
+            {selectedMember && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedMember(null)}>
+                    <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6 border-b border-[#333] flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-14 h-14 bg-[#252525] rounded-full flex items-center justify-center border-2 border-[#A8D500]">
+                                    {selectedMember.miembros?.foto_url ? (
+                                        <img src={selectedMember.miembros.foto_url} alt="" className="w-full h-full rounded-full object-cover" />
+                                    ) : (
+                                        <User className="text-[#A8D500]" size={24} />
+                                    )}
+                                </div>
+                                <div>
+                                    <h3 className="text-white font-bold text-lg">{selectedMember.miembros?.nombre} {selectedMember.miembros?.apellido}</h3>
+                                    <p className="text-[#888] text-xs">ID: {selectedMember.miembro_id?.slice(0, 8)}...</p>
+                                </div>
+                            </div>
+                            <button onClick={() => setSelectedMember(null)} className="text-[#888] hover:text-white p-2"><X /></button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-[#222] p-4 rounded-xl text-center">
+                                    <p className="text-2xl font-bold text-[#A8D500]">{selectedMember.racha >= 4 ? '🔥' : ''} {selectedMember.racha}</p>
+                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Racha</p>
+                                </div>
+                                <div className="bg-[#222] p-4 rounded-xl text-center">
+                                    <p className="text-2xl font-bold text-white">{selectedMember.hora_entrada || '-'}</p>
+                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Hora hoy</p>
+                                </div>
+                                <div className="bg-[#222] p-4 rounded-xl text-center">
+                                    <p className="text-2xl font-bold text-white">{selectedMember.horario_reunion}</p>
+                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Reunión</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${selectedMember.miembros?.es_servidor ? 'bg-[#A8D50020] text-[#A8D500] border border-[#A8D50030]' : 'bg-[#222] text-[#555]'}`}>
+                                    {selectedMember.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
+                                </div>
+                            </div>
+                            {selectedMember.miembros?.created_at && (
+                                <p className="text-[#555] text-xs text-center">
+                                    Miembro desde {new Date(selectedMember.miembros.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

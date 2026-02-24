@@ -1,6 +1,6 @@
 'use client'
-import React from 'react';
-import { Bell, AlertCircle, Trash2, Clock } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Bell, AlertCircle, Trash2, Clock, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface NotificacionesViewProps {
     tituloPush: string;
@@ -18,14 +18,39 @@ interface NotificacionesViewProps {
     supabase: any;
     logs: any[];
     logsError: string | null;
+    horariosDisponibles?: string[];
 }
+
+const LOGS_PER_PAGE = 20;
 
 const NotificacionesView = ({
     tituloPush, setTituloPush, mensajePush, setMensajePush, filtroHorario, setFiltroHorario,
     enviarNotificacion, enviando, notificacionStatus,
     programaciones, eliminarProgramacion, fetchProgramaciones, supabase,
-    logs, logsError
+    logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00']
 }: NotificacionesViewProps) => {
+    const [logSearch, setLogSearch] = useState('');
+    const [logPage, setLogPage] = useState(1);
+    const [logStatusFilter, setLogStatusFilter] = useState('Todos');
+
+    // New schedule states
+    const [nMensaje, setNMensaje] = useState('');
+    const [nDia, setNDia] = useState('Todos los días');
+    const [nHora, setNHora] = useState('');
+
+    const filteredLogs = useMemo(() => {
+        return logs.filter(l => {
+            const matchSearch = !logSearch ||
+                l.titulo?.toLowerCase().includes(logSearch.toLowerCase()) ||
+                l.mensaje?.toLowerCase().includes(logSearch.toLowerCase()) ||
+                new Date(l.fecha).toLocaleDateString().includes(logSearch);
+            const matchStatus = logStatusFilter === 'Todos' || l.estado === logStatusFilter;
+            return matchSearch && matchStatus;
+        });
+    }, [logs, logSearch, logStatusFilter]);
+
+    const totalPages = Math.max(1, Math.ceil(filteredLogs.length / LOGS_PER_PAGE));
+    const paginatedLogs = filteredLogs.slice((logPage - 1) * LOGS_PER_PAGE, logPage * LOGS_PER_PAGE);
 
     return (
         <div className="space-y-6">
@@ -64,9 +89,9 @@ const NotificacionesView = ({
                                 className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
                             >
                                 <option value="Todas">Toda la Iglesia</option>
-                                <option value="09:00">Reunión 09:00 hs</option>
-                                <option value="11:00">Reunión 11:00 hs</option>
-                                <option value="20:00">Reunión 20:00 hs</option>
+                                {horariosDisponibles.map(h => (
+                                    <option key={h} value={h}>Reunión {h} hs</option>
+                                ))}
                                 <option value="Lideres">Solo Líderes</option>
                                 <option value="Nuevos">Nuevos (Último mes)</option>
                             </select>
@@ -92,8 +117,40 @@ const NotificacionesView = ({
                     </div>
                 </div>
 
-                {/* Scheduler Section */}
-                <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
+                {/* Phone Preview */}
+                <div className="hidden xl:flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-2xl border border-[#333]">
+                    <h3 className="text-[#888] text-[10px] font-bold uppercase mb-6 tracking-widest">Vista Previa (Teléfono)</h3>
+                    <div className="relative w-[280px] h-[550px] bg-[#000] rounded-[50px] border-[8px] border-[#333] overflow-hidden shadow-2xl">
+                        {/* Speaker/Camera Notch */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#333] rounded-b-2xl z-10"></div>
+
+                        {/* Background Mockup */}
+                        <div className="absolute inset-0 bg-[#333] opacity-20"></div>
+
+                        {/* Notification Bubble */}
+                        <div className="absolute top-20 left-4 right-4 bg-[#ffffffdd] rounded-3xl p-4 shadow-lg animate-in zoom-in-95 duration-300">
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-5 h-5 bg-[#000] rounded-md flex items-center justify-center">
+                                    <span className="text-[10px] text-white">⛪</span>
+                                </div>
+                                <span className="text-[10px] font-bold text-black uppercase">{tituloPush || 'Nombre App'}</span>
+                                <span className="text-[10px] text-gray-500 ml-auto">ahora</span>
+                            </div>
+                            <p className="text-sm font-bold text-black mb-1">{tituloPush || 'Iglesia del Salvador'}</p>
+                            <p className="text-xs text-black leading-tight line-clamp-3 overflow-hidden">{mensajePush || 'Tu mensaje aparecerá aquí...'}</p>
+                        </div>
+
+                        {/* Time/Date on phone */}
+                        <div className="absolute top-32 left-0 right-0 items-center flex flex-col pointer-events-none opacity-40">
+                            <span className="text-4xl font-light text-white">10:45</span>
+                            <span className="text-[10px] text-white">Martes, 24 de Febrero</span>
+                        </div>
+                    </div>
+                    <p className="text-[10px] text-[#555] mt-6 italic">Así es como el usuario verá la notificación push.</p>
+                </div>
+
+                {/* Scheduler Section (Moved to col-span-1) */}
+                <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] lg:col-span-2 xl:col-span-1">
                     <h3 className="text-[#FFB400] text-lg font-bold flex items-center gap-2 mb-2">
                         <Clock size={20} /> Programación Automática
                     </h3>
@@ -103,27 +160,35 @@ const NotificacionesView = ({
                         <div className="flex flex-col gap-3">
                             <input
                                 placeholder="Mensaje o 'VERSICULO'"
-                                id="prog-msj-v2"
+                                value={nMensaje}
+                                onChange={e => setNMensaje(e.target.value)}
                                 className="bg-[#252525] border border-[#444] rounded-xl px-4 py-3 text-white outline-none focus:border-[#FFB400]"
                             />
                             <div className="flex gap-2">
-                                <select id="prog-dia-v2" className="flex-1 bg-[#252525] border border-[#444] rounded-xl px-4 py-3 text-white outline-none">
+                                <select
+                                    value={nDia}
+                                    onChange={e => setNDia(e.target.value)}
+                                    className="flex-1 bg-[#252525] border border-[#444] rounded-xl px-4 py-3 text-white outline-none"
+                                >
                                     <option>Todos los días</option>
                                     <option>Lunes</option><option>Martes</option><option>Miércoles</option>
                                     <option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option>
                                 </select>
-                                <input type="time" id="prog-hora-v2" className="flex-1 bg-[#252525] border border-[#444] rounded-xl px-4 py-3 text-white outline-none" />
+                                <input
+                                    type="time"
+                                    value={nHora}
+                                    onChange={e => setNHora(e.target.value)}
+                                    className="flex-1 bg-[#252525] border border-[#444] rounded-xl px-4 py-3 text-white outline-none"
+                                />
                             </div>
                             <button
                                 onClick={async () => {
-                                    const mensaje = (document.getElementById('prog-msj-v2') as HTMLInputElement).value;
-                                    const dia = (document.getElementById('prog-dia-v2') as HTMLSelectElement).value;
-                                    const hora = (document.getElementById('prog-hora-v2') as HTMLInputElement).value;
-                                    if (!mensaje || !hora) return alert('Completa mensaje y hora');
-                                    const { error } = await supabase.from('programaciones').insert([{ mensaje, dia_semana: dia, hora, activo: true, ultimo_estado: 'Pendiente' }]);
-                                    if (error) alert('Error');
+                                    if (!nMensaje || !nHora) return alert('Completa mensaje y hora');
+                                    const { error } = await supabase.from('programaciones').insert([{ mensaje: nMensaje, dia_semana: nDia, hora: nHora, activo: true, ultimo_estado: 'Pendiente' }]);
+                                    if (error) alert('Error: ' + error.message);
                                     else {
-                                        (document.getElementById('prog-msj-v2') as HTMLInputElement).value = '';
+                                        setNMensaje('');
+                                        setNHora('');
                                         fetchProgramaciones();
                                     }
                                 }}
@@ -155,11 +220,36 @@ const NotificacionesView = ({
                 </div>
             </div>
 
-            {/* History Table */}
+            {/* History Table with Search & Pagination */}
             <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                <h3 className="text-white text-lg font-bold flex items-center gap-2 mb-6">
-                    <AlertCircle size={20} className="text-[#888]" /> Historial de Envío
-                </h3>
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
+                    <h3 className="text-white text-lg font-bold flex items-center gap-2">
+                        <AlertCircle size={20} className="text-[#888]" /> Historial de Envío
+                        <span className="text-[10px] bg-[#333] text-[#888] px-2 py-1 rounded-full ml-2 font-bold">
+                            {filteredLogs.length} de {logs.length}
+                        </span>
+                    </h3>
+                    <div className="flex gap-3 flex-wrap">
+                        <div className="relative">
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
+                            <input
+                                placeholder="Buscar por título, mensaje o fecha..."
+                                value={logSearch}
+                                onChange={(e) => { setLogSearch(e.target.value); setLogPage(1); }}
+                                className="bg-[#252525] border border-[#333] rounded-xl pl-9 pr-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] w-72"
+                            />
+                        </div>
+                        <select
+                            value={logStatusFilter}
+                            onChange={(e) => { setLogStatusFilter(e.target.value); setLogPage(1); }}
+                            className="bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none"
+                        >
+                            <option value="Todos">Todos los estados</option>
+                            <option value="Exitoso">✅ Exitoso</option>
+                            <option value="Error">❌ Error</option>
+                        </select>
+                    </div>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
@@ -172,18 +262,49 @@ const NotificacionesView = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#252525]">
-                            {logs.map((l) => (
-                                <tr key={l.id} className="text-sm">
-                                    <td className="px-4 py-4 text-[#888]">{new Date(l.fecha).toLocaleDateString()}</td>
-                                    <td className="px-4 py-4 text-white font-medium">{l.titulo}</td>
-                                    <td className="px-4 py-4 text-[#aaa] max-w-xs truncate">{l.mensaje}</td>
-                                    <td className="px-4 py-4 text-[#888]">{l.destinatarios_count} pers.</td>
-                                    <td className={`px-4 py-4 font-bold ${l.estado === 'Exitoso' ? 'text-[#A8D500]' : 'text-red-500'}`}>{l.estado}</td>
+                            {paginatedLogs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-4 py-10 text-center text-[#555] italic">
+                                        {logSearch ? 'No se encontraron resultados para tu búsqueda.' : 'Sin registros de envío.'}
+                                    </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                paginatedLogs.map((l) => (
+                                    <tr key={l.id} className="text-sm hover:bg-[#222] transition-colors">
+                                        <td className="px-4 py-4 text-[#888]">{new Date(l.fecha).toLocaleDateString('es-AR')}</td>
+                                        <td className="px-4 py-4 text-white font-medium">{l.titulo}</td>
+                                        <td className="px-4 py-4 text-[#aaa] max-w-xs truncate">{l.mensaje}</td>
+                                        <td className="px-4 py-4 text-[#888]">{l.destinatarios_count} pers.</td>
+                                        <td className={`px-4 py-4 font-bold ${l.estado === 'Exitoso' ? 'text-[#A8D500]' : 'text-red-500'}`}>{l.estado}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#252525]">
+                        <span className="text-[#555] text-xs">Página {logPage} de {totalPages}</span>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setLogPage(p => Math.max(1, p - 1))}
+                                disabled={logPage === 1}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-[#252525] text-white text-xs font-bold rounded-lg disabled:opacity-30 hover:bg-[#333] transition-all"
+                            >
+                                <ChevronLeft size={14} /> Anterior
+                            </button>
+                            <button
+                                onClick={() => setLogPage(p => Math.min(totalPages, p + 1))}
+                                disabled={logPage === totalPages}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-[#252525] text-white text-xs font-bold rounded-lg disabled:opacity-30 hover:bg-[#333] transition-all"
+                            >
+                                Siguiente <ChevronRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -118,27 +118,56 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
         if (res.error) alert("Error: " + res.error.message);
         else {
-            // Notificar al equipo asignado
-            if (enviarNotificacionIndividual && assignedStaff.length > 0) {
-                const fechaFormat = new Date(fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
-
-                for (const staff of assignedStaff) {
-                    // Solo notificar si está pendiente (nuevo o reiniciado)
-                    if (staff.estado === 'pendiente' || !staff.estado) {
-                        const miembro = allMembers.find(m => m.id === staff.miembro_id);
-                        if (miembro?.token_notificacion) {
-                            await enviarNotificacionIndividual(
-                                miembro.token_notificacion,
-                                miembro.nombre,
-                                `🙌 Has sido seleccionado para ${staff.rol} el día ${fechaFormat} (${horario}). ¿Deseas aceptar?`
-                            );
-                        }
-                    }
-                }
-            }
             setShowModal(false);
             fetchData();
         }
+    };
+
+    const notificarEquipoManual = async (sched: any) => {
+        if (!sched?.equipo_ids?.length) return alert("No hay equipo asignado.");
+        if (!confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
+
+        let enviados = 0;
+        const fechaFormat = new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+        for (const staff of sched.equipo_ids) {
+            if (staff.estado === 'pendiente' || !staff.estado) {
+                const miembro = allMembers.find(m => m.id === staff.miembro_id);
+                if (miembro?.token_notificacion && enviarNotificacionIndividual) {
+                    await enviarNotificacionIndividual(
+                        miembro.token_notificacion,
+                        miembro.nombre,
+                        `🙌 Recordatorio: Has sido seleccionado para ${staff.rol} el día ${fechaFormat} (${sched.horario}).`
+                    );
+                    enviados++;
+                }
+            }
+        }
+        alert(`Se enviaron ${enviados} notificaciones.`);
+        if (registrarAuditoria) await registrarAuditoria('NOTIFICAR EQUIPO', `Se enviaron recordatorios para el servicio del ${sched.fecha}`);
+    };
+
+    const exportarCSV = (sched: any) => {
+        let content = "TIEMPO;ACTIVIDAD;RESPONSABLE\n";
+        sched.plan_detallado?.forEach((row: any) => {
+            content += `${row.tiempo};${row.actividad};${row.responsable}\n`;
+        });
+
+        content += "\nCANCIONES\n";
+        sched.orden_canciones?.forEach((id: string, idx: number) => {
+            const s = allSongs.find(song => song.id === id);
+            if (s) content += `${idx + 1};${s.titulo};${s.artista}\n`;
+        });
+
+        const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Plan_Servicio_${sched.fecha}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     const deleteSchedule = async (id: string) => {
@@ -225,12 +254,28 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                             </div>
                         </div>
 
-                        <button
-                            onClick={() => handleOpenModal(s)}
-                            className="w-full mt-4 py-2 bg-[#252525] text-white text-xs font-bold rounded-lg border border-[#333] hover:bg-[#A8D500] hover:text-black hover:border-transparent transition-all"
-                        >
-                            EDITAR PLAN
-                        </button>
+                        <div className="flex gap-2 mt-4">
+                            <button
+                                onClick={() => handleOpenModal(s)}
+                                className="flex-1 py-2 bg-[#252525] text-white text-[10px] font-bold rounded-lg border border-[#333] hover:bg-[#A8D500] hover:text-black transition-all uppercase"
+                            >
+                                <Plus size={12} className="inline mr-1" /> Editar
+                            </button>
+                            <button
+                                onClick={() => notificarEquipoManual(s)}
+                                className="p-2 bg-[#A8D500]/10 text-[#A8D500] rounded-lg border border-[#A8D500]/20 hover:bg-[#A8D500] hover:text-black transition-all"
+                                title="Notificar Equipo"
+                            >
+                                <Users2 size={14} />
+                            </button>
+                            <button
+                                onClick={() => exportarCSV(s)}
+                                className="p-2 bg-[#3B82F6]/10 text-[#3B82F6] rounded-lg border border-[#3B82F6]/20 hover:bg-[#3B82F6] hover:text-white transition-all"
+                                title="Exportar CSV"
+                            >
+                                <Save size={14} />
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -386,8 +431,28 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                         </div>
 
                         <div className="p-6 border-t border-[#333] bg-[#1A1A1A] flex justify-between gap-4">
-                            <button onClick={() => setShowModal(false)} className="px-8 py-3 bg-[#252525] text-white font-bold rounded-xl border border-[#333]">CANCELAR</button>
-                            <button onClick={handleSave} className="px-10 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.5)] transition-all flex items-center gap-2 uppercase tracking-widest"><Save size={18} /> Guardar Planificación</button>
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowModal(false)} className="px-6 py-3 bg-[#252525] text-white font-bold rounded-xl border border-[#333] text-xs">CANCELAR</button>
+                                {selectedSchedule && (
+                                    <button
+                                        onClick={() => exportarCSV(selectedSchedule)}
+                                        className="px-6 py-3 bg-[#3B82F610] text-[#3B82F6] border border-[#3B82F633] font-bold rounded-xl hover:bg-[#3B82F6] hover:text-white transition-all text-xs flex items-center gap-2"
+                                    >
+                                        <Save size={14} /> EXPORTAR CSV
+                                    </button>
+                                )}
+                            </div>
+                            <div className="flex gap-2">
+                                {selectedSchedule && (
+                                    <button
+                                        onClick={() => notificarEquipoManual(selectedSchedule)}
+                                        className="px-6 py-3 bg-[#A8D50010] text-[#A8D500] border border-[#A8D50033] font-bold rounded-xl hover:bg-[#A8D500] hover:text-black transition-all text-xs flex items-center gap-2"
+                                    >
+                                        <Users2 size={14} /> NOTIFICAR EQUIPO
+                                    </button>
+                                )}
+                                <button onClick={handleSave} className="px-10 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.5)] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"><Save size={18} /> Guardar Plan</button>
+                            </div>
                         </div>
                     </div>
                 </div>

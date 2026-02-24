@@ -29,6 +29,7 @@ const CMSView = ({
     const [imagenUrl, setImagenUrl] = React.useState('');
     const [categoria, setCategoria] = React.useState('Aviso');
     const [activa, setActiva] = React.useState(true);
+    const [venceEl, setVenceEl] = React.useState('');
 
     const openEdit = (n: any) => {
         setCurrentNews(n);
@@ -37,6 +38,7 @@ const CMSView = ({
         setImagenUrl(n.imagen_url);
         setCategoria(n.categoria || 'Aviso');
         setActiva(n.activa);
+        setVenceEl(n.vence_el || '');
         setShowModal(true);
     };
 
@@ -47,11 +49,20 @@ const CMSView = ({
         setImagenUrl('');
         setCategoria('Aviso');
         setActiva(true);
+        setVenceEl('');
         setShowModal(true);
     };
 
     const handleSave = async () => {
-        const payload = { titulo, descripcion, imagen_url: imagenUrl, categoria, activa, es_youtube: currentNews?.es_youtube || false };
+        const payload = {
+            titulo,
+            descripcion,
+            imagen_url: imagenUrl,
+            categoria,
+            activa,
+            es_youtube: currentNews?.es_youtube || false,
+            vence_el: venceEl || null
+        };
         let error;
         if (currentNews?.id) {
             const { error: err } = await supabase.from('noticias').update(payload).eq('id', currentNews.id);
@@ -149,19 +160,16 @@ const CMSView = ({
                 {/* News Modal */}
                 {showModal && (
                     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                        <div className="bg-[#1E1E1E] border border-[#333] w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200">
-                            <div className="p-6 border-b border-[#333] flex justify-between items-center bg-[#252525]">
-                                <h3 className="text-white font-bold text-lg">{currentNews ? 'Editar Noticia' : 'Nueva Noticia'}</h3>
-                                <button onClick={() => setShowModal(false)} className="text-[#888] hover:text-white">✕</button>
-                            </div>
-                            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                        <div className="bg-[#1E1E1E] border border-[#333] w-full max-w-4xl rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in duration-200 flex flex-col md:flex-row">
+                            <div className="flex-1 p-6 space-y-4 max-h-[85vh] overflow-y-auto border-r border-[#333]">
+                                <h3 className="text-white font-bold text-lg mb-4">{currentNews ? 'Editar Noticia' : 'Nueva Noticia'}</h3>
                                 <div>
                                     <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Título</label>
-                                    <input value={titulo} onChange={e => setTitulo(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500]" />
+                                    <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={60} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500]" />
                                 </div>
                                 <div>
                                     <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Descripción (Opcional)</label>
-                                    <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500] h-24 resize-none" />
+                                    <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} maxLength={150} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500] h-20 resize-none" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
@@ -171,29 +179,69 @@ const CMSView = ({
                                             <option>Evento</option>
                                             <option>Serie</option>
                                             <option>Inscripción</option>
+                                            <option>Campaña</option>
+                                            <option>Importante</option>
                                         </select>
                                     </div>
-                                    <div className="flex items-center gap-2 pt-6">
+                                    <div>
+                                        <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Vence el: (Opcional)</label>
+                                        <input type="date" value={venceEl} onChange={e => setVenceEl(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]" />
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center gap-2">
                                         <input type="checkbox" checked={activa} onChange={e => setActiva(e.target.checked)} className="accent-[#A8D500]" />
-                                        <span className="text-white text-xs font-bold">Noticia Activa</span>
+                                        <span className="text-white text-xs font-bold">Activa</span>
                                     </div>
                                 </div>
                                 <div>
                                     <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Imagen</label>
                                     <div className="flex gap-2">
-                                        <input value={imagenUrl} onChange={e => setImagenUrl(e.target.value)} placeholder="URL o sube archivo..." className="flex-1 bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[#A8D500]" />
+                                        <input value={imagenUrl} onChange={e => setImagenUrl(e.target.value)} placeholder="https://..." className="flex-1 bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[#A8D500]" />
                                         <label className="bg-[#333] p-2 rounded-xl cursor-pointer hover:bg-[#444] transition-all">
                                             <Plus size={20} className="text-[#A8D500]" />
                                             <input type="file" onChange={handleUpload} className="hidden" accept="image/*" />
                                         </label>
                                     </div>
                                     {isUploading && <p className="text-[#A8D500] text-[10px] mt-1 italic animate-pulse">Subiendo imagen...</p>}
-                                    {imagenUrl && <img src={imagenUrl} className="mt-3 w-full h-32 object-cover rounded-xl border border-[#333]" alt="Preview" />}
+                                </div>
+                                <div className="pt-4 flex gap-3">
+                                    <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-[#888] font-bold bg-[#333] rounded-xl">CANCELAR</button>
+                                    <button onClick={handleSave} className="flex-1 py-3 bg-[#A8D500] text-black font-bold rounded-xl shadow-lg shadow-[#A8D50030]">GUARDAR</button>
                                 </div>
                             </div>
-                            <div className="p-6 bg-[#252525] flex gap-3">
-                                <button onClick={() => setShowModal(false)} className="flex-1 py-3 text-[#888] font-bold">CANCELAR</button>
-                                <button onClick={handleSave} className="flex-1 py-3 bg-[#A8D500] text-black font-bold rounded-xl shadow-lg shadow-[#A8D50030]">GUARDAR</button>
+
+                            {/* PREVIEW PANEL */}
+                            <div className="w-full md:w-[320px] bg-[#121212] p-6 flex flex-col items-center justify-center">
+                                <h4 className="text-[#555] text-[9px] font-bold uppercase mb-4 self-start tracking-widest">Vista Previa App</h4>
+                                <div className="w-[280px] h-[180px] rounded-3xl overflow-hidden relative shadow-2xl border border-white/5 bg-[#1E1E1E]">
+                                    {imagenUrl ? (
+                                        <img src={imagenUrl} className="w-full h-full object-cover" alt="" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-[#222]">
+                                            <ImageIcon size={32} className="text-[#333]" />
+                                        </div>
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 flex flex-col justify-end">
+                                        <div className="bg-[#A8D500] px-2 py-0.5 rounded text-[8px] font-black text-black self-start mb-1 uppercase tracking-wider">
+                                            {categoria}
+                                        </div>
+                                        <h5 className="text-white font-bold text-sm leading-tight">{titulo || 'Título de la Noticia'}</h5>
+                                        {descripcion && <p className="text-white/60 text-[10px] mt-1 truncate">{descripcion}</p>}
+                                    </div>
+                                </div>
+                                <div className="mt-8 bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] w-full">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-[#A8D50020] flex items-center justify-center text-[#A8D500] font-bold text-xs italic">
+                                            {titulo?.[0] || '?'}
+                                        </div>
+                                        <div>
+                                            <div className="text-[10px] text-white font-bold">{titulo || 'Nueva Noticia'}</div>
+                                            <div className="text-[8px] text-[#555]">Hace unos segundos</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className="text-[9px] text-[#444] mt-6 text-center italic">Así se verá en el carrusel principal.</p>
                             </div>
                         </div>
                     </div>
