@@ -96,7 +96,7 @@ const NotificacionesView = ({
                                 <option value="Mujeres">Segmento: Mujeres</option>
                                 <option value="Adolescentes">Segmento: Adolescentes</option>
                                 <option value="EquipoMusica">Equipo de Música</option>
-                                {horariosDisponibles.map(h => (
+                                {horariosDisponibles?.map(h => (
                                     <option key={h} value={h}>Reunión {h} hs</option>
                                 ))}
                             </select>

@@ -144,11 +144,13 @@ export default function AdminDashboard() {
     setRetencionData({ total, activos: activosUnicos, porcentaje });
 
     const { data: heat } = await supabase.from('asistencias').select('fecha').gte('fecha', hace30dStr);
-    if (heat) {
+    if (heat && Array.isArray(heat)) {
       const counts: Record<string, number> = {};
       heat.forEach(a => {
-        const day = new Date(a.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'short' });
-        counts[day] = (counts[day] || 0) + 1;
+        if (a.fecha) {
+          const day = new Date(a.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'short' });
+          counts[day] = (counts[day] || 0) + 1;
+        }
       });
       const order = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
       setHeatmapData(order.map(o => ({ label: o.toUpperCase(), value: counts[o] || 0 })));
@@ -327,10 +329,10 @@ export default function AdminDashboard() {
     setShowExportModal(false);
   }
 
-  const datosFiltrados = useMemo(() => asistencias.filter(a => {
-    const nombre = `${a.miembros?.nombre} ${a.miembros?.apellido}`.toLowerCase();
+  const datosFiltrados = useMemo(() => (asistencias || []).filter(a => {
+    const nombre = `${a.miembros?.nombre || ''} ${a.miembros?.apellido || ''}`.toLowerCase();
     const cumpleHorario = filtroHorario === 'Todas' || a.horario_reunion === filtroHorario;
-    return nombre.includes(busqueda.toLowerCase()) && cumpleHorario;
+    return nombre.includes((busqueda || '').toLowerCase()) && cumpleHorario;
   }), [asistencias, filtroHorario, busqueda]);
 
   if (!authorized) return (
@@ -477,6 +479,7 @@ export default function AdminDashboard() {
               supabase={supabase}
               logs={logs}
               logsError={logsError}
+              horariosDisponibles={horariosDisponibles}
             />
           )}
 

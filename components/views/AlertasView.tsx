@@ -45,8 +45,9 @@ const AlertasView = ({ supabase, registrarAuditoria }: AlertasViewProps) => {
             const faltasConsecutivas = susAsistencias.length === 0;
 
             // Calculate last seen
-            const lastSeen = susAsistencias.length > 0
-                ? new Date(Math.max(...susAsistencias.map(a => new Date(a.fecha).getTime())))
+            const times = susAsistencias.map(a => new Date(a.fecha).getTime()).filter(t => !isNaN(t));
+            const lastSeen = times.length > 0
+                ? new Date(Math.max(...times))
                 : null;
 
             return {
@@ -54,7 +55,11 @@ const AlertasView = ({ supabase, registrarAuditoria }: AlertasViewProps) => {
                 alerta: faltasConsecutivas,
                 ultimoRegistro: lastSeen
             };
-        }).filter(m => m.alerta && !search || (m.alerta && `${m.nombre} ${m.apellido}`.toLowerCase().includes(search.toLowerCase())));
+        }).filter(m => {
+            const fullName = `${m.nombre || ''} ${m.apellido || ''}`.toLowerCase();
+            const matchSearch = !search || fullName.includes(search.toLowerCase());
+            return m.alerta && matchSearch;
+        });
     }, [miembros, asistencias, search]);
 
     if (loading) return <div className="text-white p-10 text-center">Calculando informes de retención...</div>;
@@ -100,11 +105,11 @@ const AlertasView = ({ supabase, registrarAuditoria }: AlertasViewProps) => {
                 {alertas.map(m => (
                     <div key={m.id} className="bg-[#1E1E1E] p-6 rounded-3xl border border-[#333] hover:border-red-500/50 transition-all group">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center font-black text-2xl">
-                                {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover rounded-2xl" /> : m.nombre[0]}
+                            <div className="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center font-black text-2xl overflow-hidden">
+                                {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover" /> : (m.nombre?.[0] || '?')}
                             </div>
                             <div className="flex-1">
-                                <h3 className="text-white font-bold text-lg leading-tight">{m.nombre} {m.apellido}</h3>
+                                <h3 className="text-white font-bold text-lg leading-tight">{m.nombre || 'Sin'} {m.apellido || 'Nombre'}</h3>
                                 <p className="text-red-400 text-[10px] font-black uppercase tracking-tighter">Ausencia: +30 DÍAS</p>
                             </div>
                         </div>
@@ -124,7 +129,7 @@ const AlertasView = ({ supabase, registrarAuditoria }: AlertasViewProps) => {
                             {m.celular && (
                                 <button
                                     onClick={() => {
-                                        window.open(`https://wa.me/${m.celular.replace(/\D/g, '')}?text=Hola%20${m.nombre},%20te%20escribimos%20de%20la%20Iglesia%20del%20Salvador,%20esperamos%20que%20estés%20bien!%20Te%20extrañamos%20por%20acá.`, '_blank');
+                                        window.open(`https://wa.me/${(m.celular || '').replace(/\D/g, '')}?text=Hola%20${m.nombre || ''},%20te%20escribimos%20de%20la%20Iglesia%20del%20Salvador,%20esperamos%20que%20estés%20bien!%20Te%20extrañamos%20por%20acá.`, '_blank');
                                         if (registrarAuditoria) registrarAuditoria('SEGUIMIENTO PASTORAL', `Se inició contacto con ${m.nombre} ${m.apellido}`);
                                     }}
                                     className="flex-1 bg-green-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.02] transition-all"
