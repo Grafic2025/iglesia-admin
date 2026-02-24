@@ -299,6 +299,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         setAssignedStaff([...assignedStaff, {
             miembro_id: pendingMember.id,
             nombre: `${pendingMember.nombre} ${pendingMember.apellido}`,
+            foto_url: pendingMember.foto_url,
             rol: pendingRol || 'Servidor',
             estado: 'pendiente' // Estado inicial hasta que el servidor acepte en su app
         }]);
@@ -490,11 +491,22 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                     </h4>
                                     <div className="space-y-2">
                                         {assignedStaff.map(s => (
-                                            <div key={s.miembro_id} className="flex flex-col p-3 bg-[#1A1A1A] rounded-xl border border-[#333] gap-2">
+                                            <div key={s.miembro_id} className="flex flex-col p-3 bg-[#1A1A1A] rounded-xl border border-[#333] gap-2 group/item">
                                                 <div className="flex items-center justify-between w-full">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="text-right mr-3">
-                                                            <p className="text-white font-bold text-sm">{s.nombre}</p>
+                                                        <div className="w-8 h-8 rounded-full bg-[#222] border border-[#333] overflow-hidden flex items-center justify-center">
+                                                            {(() => {
+                                                                const m = allMembers.find(mem => mem.id === s.miembro_id);
+                                                                const foto = m?.foto_url || s.foto_url;
+                                                                return foto ? (
+                                                                    <img src={foto} className="w-full h-full object-cover" alt="" />
+                                                                ) : (
+                                                                    <span className="text-[10px] text-[#555] font-black">{s.nombre?.[0]}</span>
+                                                                );
+                                                            })()}
+                                                        </div>
+                                                        <div className="text-left">
+                                                            <p className="text-white font-bold text-sm line-clamp-1">{s.nombre}</p>
                                                             <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.rol}</p>
                                                         </div>
                                                         <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :

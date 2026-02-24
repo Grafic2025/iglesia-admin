@@ -340,11 +340,20 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
 
                                         <div className="flex-1 px-4">
                                             <div className="flex -space-x-2 overflow-hidden mb-1">
-                                                {(s.equipo_ids || []).slice(0, 10).map((staff: any, idx: number) => (
-                                                    <div key={idx} className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#333] flex items-center justify-center text-xs text-white border border-[#A8D50030]" title={`${staff.nombre} (${staff.rol})`}>
-                                                        {staff.nombre?.[0] || '?'}
-                                                    </div>
-                                                ))}
+                                                {(s.equipo_ids || []).slice(0, 10).map((staff: any, idx: number) => {
+                                                    const memberWithPhoto = members.find(m => m.id === staff.miembro_id);
+                                                    const foto = memberWithPhoto?.foto_url || staff.foto_url;
+
+                                                    return (
+                                                        <div key={idx} className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#333] overflow-hidden flex items-center justify-center text-[10px] text-white border border-[#A8D50030]" title={`${staff.nombre} (${staff.rol})`}>
+                                                            {foto ? (
+                                                                <img src={foto} alt="" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                staff.nombre?.[0] || '?'
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
                                                 {(s.equipo_ids || []).length > 10 && (
                                                     <div className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#444] flex items-center justify-center text-[10px] text-[#A8D500] font-bold">
                                                         +{(s.equipo_ids || []).length - 10}
