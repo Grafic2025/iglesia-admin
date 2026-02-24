@@ -103,17 +103,17 @@ export default function AdminDashboard() {
   }, []);
 
   const cargarPremiosEntregados = useCallback(async () => {
-    const { data } = await supabase.from('premios_entregados').select('*').order('fecha', { ascending: false });
+    const { data } = await supabase.from('premios_entregados').select('*').order('created_at', { ascending: false });
     if (data) setPremiosEntregados(data);
   }, []);
 
   const fetchBautismos = useCallback(async () => {
-    const { data } = await supabase.from('ayuda_bautismo').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setBautismos(data);
   }, []);
 
   const fetchAyuda = useCallback(async () => {
-    const { data } = await supabase.from('ayuda_social').select('*').order('created_at', { ascending: false });
+    const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setAyuda(data);
   }, []);
 
