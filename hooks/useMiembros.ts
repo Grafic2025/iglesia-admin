@@ -21,14 +21,14 @@ export const useMiembros = () => {
         }
     }, []);
 
-    const toggleServerStatus = async (id: string, currentStatus: boolean) => {
+    const toggleServerStatus = useCallback(async (id: string, currentStatus: boolean) => {
         const { error } = await supabase
             .from('miembros')
             .update({ es_servidor: !currentStatus })
             .eq('id', id);
         if (!error) await fetchMiembros();
         return { error };
-    };
+    }, [fetchMiembros]);
 
     return { miembros, loading, fetchMiembros, toggleServerStatus };
 };

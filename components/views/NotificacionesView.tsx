@@ -12,7 +12,7 @@ interface NotificacionesViewProps {
     enviarNotificacion: () => void;
     enviando: boolean;
     notificacionStatus: any;
-    programaciones: any[];
+    cronogramas: any[];
     eliminarProgramacion: (id: string) => void;
     fetchProgramaciones: () => void;
     supabase: any;
@@ -26,7 +26,7 @@ const LOGS_PER_PAGE = 20;
 const NotificacionesView = ({
     tituloPush, setTituloPush, mensajePush, setMensajePush, filtroHorario, setFiltroHorario,
     enviarNotificacion, enviando, notificacionStatus,
-    programaciones, eliminarProgramacion, fetchProgramaciones, supabase,
+    cronogramas, eliminarProgramacion, fetchProgramaciones, supabase,
     logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00']
 }: NotificacionesViewProps) => {
     const [logSearch, setLogSearch] = useState('');
@@ -189,7 +189,7 @@ const NotificacionesView = ({
                             <button
                                 onClick={async () => {
                                     if (!nMensaje || !nHora) return alert('Completa mensaje y hora');
-                                    const { error } = await supabase.from('programaciones').insert([{ mensaje: nMensaje, dia_semana: nDia, hora: nHora, activo: true, ultimo_estado: 'Pendiente' }]);
+                                    const { error } = await supabase.from('cronogramas').insert([{ mensaje: nMensaje, dia_semana: nDia, hora: nHora, activo: true, ultimo_estado: 'Pendiente' }]);
                                     if (error) alert('Error: ' + error.message);
                                     else {
                                         setNMensaje('');
@@ -205,7 +205,7 @@ const NotificacionesView = ({
                     </div>
 
                     <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2">
-                        {programaciones.map((p) => (
+                        {cronogramas.map((p) => (
                             <div key={p.id} className="bg-[#252525] p-3 rounded-xl border border-[#333] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
                                     <div className={`w-2 h-2 rounded-full ${p.ultimo_estado === 'Exitoso' ? 'bg-[#A8D500]' : 'bg-[#555]'}`} />

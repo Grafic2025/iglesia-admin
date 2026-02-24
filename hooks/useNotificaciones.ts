@@ -24,7 +24,7 @@ export const useNotificaciones = () => {
         }
     }, []);
 
-    const enviarPushGeneral = async (titulo: string, mensaje: string) => {
+    const enviarPushGeneral = useCallback(async (titulo: string, mensaje: string) => {
         try {
             const res = await fetch('/api/send-push', {
                 method: 'POST',
@@ -40,7 +40,7 @@ export const useNotificaciones = () => {
         } catch (e) {
             return { success: false, error: 'Error de conexión' };
         }
-    };
+    }, [fetchLogs]);
 
     return { logs, loading, error, fetchLogs, enviarPushGeneral };
 };

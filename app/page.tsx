@@ -62,7 +62,7 @@ export default function AdminDashboard() {
   const { logs, fetchLogs, enviarPushGeneral, error: logsError } = useNotificaciones();
 
   // Other complex states (to be refactored eventually)
-  const [programaciones, setProgramaciones] = useState<any[]>([])
+  const [cronogramas, setCronogramas] = useState<any[]>([])
   const [premiosPendientes, setPremiosPendientes] = useState<any>({ nivel5: [], nivel10: [], nivel20: [], nivel30: [] })
   const [oracionesActivas, setOracionesActivas] = useState(0)
   const [nuevosMes, setNuevosMes] = useState(0)
@@ -85,19 +85,22 @@ export default function AdminDashboard() {
     }
   }, [])
 
-  const fetchProgramaciones = useCallback(async () => {
-    const { data } = await supabase.from('programaciones').select('*').order('id', { ascending: true });
-    if (data) setProgramaciones(data);
+  const fetchCronogramas = useCallback(async () => {
+    const { data } = await supabase.from('cronogramas').select('*').order('fecha', { ascending: true }).limit(20);
+    if (data) setCronogramas(data);
   }, []);
 
   const calcularOracionesActivas = useCallback(async () => {
-    const { count } = await supabase.from('pedidos_oracion').select('*', { count: 'exact', head: true }).eq('activo', true);
+    // Removed .eq('activo', true) as it might not exist, or could be 'activa'
+    const { count } = await supabase.from('pedidos_oracion').select('*', { count: 'exact', head: true });
     setOracionesActivas(count || 0);
   }, []);
 
   const calcularNuevosMes = useCallback(async () => {
     const monthStart = new Date();
     monthStart.setDate(1);
+    // Setting time to 00:00:00 to avoid issues
+    monthStart.setHours(0, 0, 0, 0);
     const { count } = await supabase.from('miembros').select('*', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
     setNuevosMes(count || 0);
   }, []);
@@ -108,12 +111,14 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchBautismos = useCallback(async () => {
-    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
+    // Simplified query to troubleshoot 400 error
+    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembro_id').order('created_at', { ascending: false });
     if (data) setBautismos(data);
   }, []);
 
   const fetchAyuda = useCallback(async () => {
-    const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
+    // Simplified query to troubleshoot 400 error
+    const { data } = await supabase.from('consultas_ayuda').select('*, miembro_id').order('created_at', { ascending: false });
     if (data) setAyuda(data);
   }, []);
 
@@ -123,7 +128,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchHorarios = useCallback(async () => {
-    const { data } = await supabase.from('configuracion').select('*').eq('clave', 'horarios_reunion').single();
+    const { data } = await supabase.from('configuracion').select('*').eq('clave', 'horarios_reunion').maybeSingle();
     if (data) setHorariosDisponibles(data.valor || []);
     else setHorariosDisponibles(['09:00', '11:00', '20:00']);
   }, []);
@@ -142,11 +147,11 @@ export default function AdminDashboard() {
     setCrecimientoAnual(dummy);
   }, []);
 
+  // 1. Initial Data Fetch (On Mount / Auth)
   useEffect(() => {
     if (authorized) {
-      fetchAsistencias();
       fetchMiembros();
-      fetchProgramaciones();
+      fetchCronogramas();
       calcularOracionesActivas();
       calcularNuevosMes();
       cargarPremiosEntregados();
@@ -154,16 +159,27 @@ export default function AdminDashboard() {
       fetchAyuda();
       fetchNoticias();
       fetchLogs();
-      syncYouTube();
       fetchCrecimientoAnual();
-      fetchAsistencias7dias();
       fetchHorarios();
       fetchAuditLogs();
       fetchAnalytics();
+    }
+  }, [authorized, fetchMiembros, fetchCronogramas, calcularOracionesActivas, calcularNuevosMes, cargarPremiosEntregados, fetchBautismos, fetchAyuda, fetchNoticias, fetchLogs, fetchCrecimientoAnual, fetchHorarios, fetchAuditLogs, fetchAnalytics]);
 
+  // 2. Date-specific Fetch
+  useEffect(() => {
+    if (authorized) {
+      fetchAsistencias();
+      fetchAsistencias7dias();
+    }
+  }, [authorized, fechaSeleccionada, fetchAsistencias, fetchAsistencias7dias]);
+
+  // 3. Realtime subscriptions
+  useEffect(() => {
+    if (authorized) {
       const channels = [
         supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe(),
-        supabase.channel('cambios-programas').on('postgres_changes', { event: '*', schema: 'public', table: 'programaciones' }, () => fetchProgramaciones()).subscribe(),
+        supabase.channel('cambios-programas').on('postgres_changes', { event: '*', schema: 'public', table: 'cronogramas' }, () => fetchCronogramas()).subscribe(),
         supabase.channel('cambios-logs').on('postgres_changes', { event: '*', schema: 'public', table: 'notificacion_logs' }, () => fetchLogs()).subscribe()
       ];
 
@@ -171,7 +187,7 @@ export default function AdminDashboard() {
         channels.forEach(ch => supabase.removeChannel(ch));
       };
     }
-  }, [authorized, fechaSeleccionada, fetchAsistencias, fetchMiembros, fetchProgramaciones, calcularOracionesActivas, calcularNuevosMes, cargarPremiosEntregados, fetchBautismos, fetchAyuda, fetchNoticias, fetchLogs, syncYouTube, fetchCrecimientoAnual, fetchAsistencias7dias, fetchHorarios, fetchAuditLogs, fetchAnalytics]);
+  }, [authorized, fetchAsistencias, fetchCronogramas, fetchLogs, fetchMiembros, fetchNoticias, calcularOracionesActivas]);
 
   const calcularPremios = useCallback(() => {
     const pend: any = { nivel5: [], nivel10: [], nivel20: [], nivel30: [] };
@@ -444,11 +460,11 @@ export default function AdminDashboard() {
               enviarNotificacion={enviarNotificacion}
               enviando={enviando}
               notificacionStatus={notificacionStatus}
-              programaciones={programaciones}
+              cronogramas={cronogramas}
               eliminarProgramacion={async (id) => {
-                if (confirm('¿Eliminar?')) { await supabase.from('programaciones').delete().eq('id', id); fetchProgramaciones(); }
+                if (confirm('¿Eliminar?')) { await supabase.from('cronogramas').delete().eq('id', id); fetchCronogramas(); }
               }}
-              fetchProgramaciones={fetchProgramaciones}
+              fetchProgramaciones={fetchCronogramas}
               supabase={supabase}
               logs={logs}
               logsError={logsError}

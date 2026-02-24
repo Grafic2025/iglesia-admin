@@ -21,13 +21,7 @@ export const useNoticias = () => {
         }
     }, []);
 
-    const eliminarNoticia = async (id: string) => {
-        const { error } = await supabase.from('noticias').delete().eq('id', id);
-        if (!error) await fetchNoticias();
-        return { error };
-    };
-
-    const syncYouTube = async () => {
+    const syncYouTube = useCallback(async () => {
         try {
             const res = await fetch('/api/youtube-sync');
             const data = await res.json();
@@ -39,7 +33,13 @@ export const useNoticias = () => {
         } catch (e) {
             return { success: false, error: 'Error de conexión' };
         }
-    };
+    }, [fetchNoticias]);
+
+    const eliminarNoticia = useCallback(async (id: string) => {
+        const { error } = await supabase.from('noticias').delete().eq('id', id);
+        if (!error) await fetchNoticias();
+        return { error };
+    }, [fetchNoticias]);
 
     return { noticias, loading, fetchNoticias, eliminarNoticia, syncYouTube };
 };
