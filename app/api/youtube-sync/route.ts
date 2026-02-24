@@ -37,7 +37,10 @@ export async function GET() {
             created_at: new Date().toISOString()
         });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase Upsert Error:', error);
+            return NextResponse.json({ success: false, error: `Error de DB: ${error.message}` }, { status: 500 });
+        }
 
         return NextResponse.json({
             success: true,
@@ -46,7 +49,10 @@ export async function GET() {
         });
 
     } catch (error: any) {
-        console.error('YouTube Sync Error:', error);
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+        console.error('YouTube Sync Catch Error:', error);
+        return NextResponse.json({
+            success: false,
+            error: error.message || 'Error interno desconocido'
+        }, { status: 500 });
     }
 }

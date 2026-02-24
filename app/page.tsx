@@ -86,7 +86,7 @@ export default function AdminDashboard() {
   }, [])
 
   const fetchProgramaciones = useCallback(async () => {
-    const { data } = await supabase.from('programaciones').select('*').order('fecha', { ascending: true });
+    const { data } = await supabase.from('programaciones').select('*').order('id', { ascending: true });
     if (data) setProgramaciones(data);
   }, []);
 
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchAuditLogs = useCallback(async () => {
-    const { data } = await supabase.from('auditoria').select('*').order('fecha', { ascending: false }).limit(100);
+    const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(100);
     if (data) setAuditLogs(data);
   }, []);
 
