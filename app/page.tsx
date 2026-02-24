@@ -71,8 +71,6 @@ export default function AdminDashboard() {
   const [ayuda, setAyuda] = useState<any[]>([])
   const [horariosDisponibles, setHorariosDisponibles] = useState<any[]>([])
   const [auditLogs, setAuditLogs] = useState<any[]>([])
-  const [retencionData, setRetencionData] = useState({ total: 0, activos: 0, porcentaje: 0 })
-  const [heatmapData, setHeatmapData] = useState<any[]>([])
   const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([])
 
   const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
@@ -131,30 +129,7 @@ export default function AdminDashboard() {
   }, []);
 
   const fetchAnalytics = useCallback(async () => {
-    const hace30d = new Date();
-    hace30d.setDate(hace30d.getDate() - 30);
-    const hace30dStr = hace30d.toISOString().split('T')[0];
-
-    const { data: totalM } = await supabase.from('miembros').select('id');
-    const { data: activosM } = await supabase.from('asistencias').select('miembro_id').gte('fecha', hace30dStr);
-
-    const total = totalM?.length || 0;
-    const activosUnicos = new Set(activosM?.map(a => a.miembro_id)).size;
-    const porcentaje = total > 0 ? Math.round((activosUnicos / total) * 100) : 0;
-    setRetencionData({ total, activos: activosUnicos, porcentaje });
-
-    const { data: heat } = await supabase.from('asistencias').select('fecha').gte('fecha', hace30dStr);
-    if (heat && Array.isArray(heat)) {
-      const counts: Record<string, number> = {};
-      heat.forEach(a => {
-        if (a.fecha) {
-          const day = new Date(a.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'short' });
-          counts[day] = (counts[day] || 0) + 1;
-        }
-      });
-      const order = ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'];
-      setHeatmapData(order.map(o => ({ label: o.toUpperCase(), value: counts[o] || 0 })));
-    }
+    // Analytics simplified
   }, []);
 
   const fetchCrecimientoAnual = useCallback(async () => {
@@ -429,8 +404,6 @@ export default function AdminDashboard() {
               nuevosMes={nuevosMes}
               crecimientoAnual={crecimientoAnual}
               horariosDisponibles={horariosDisponibles}
-              retencion={retencionData}
-              heatmap={heatmapData}
               miembros={miembros}
             />
           )}
