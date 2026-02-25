@@ -213,7 +213,7 @@ const NotificacionesView = ({
                                         <div className={`text-sm font-bold ${p.mensaje === 'VERSICULO' ? 'text-[#FFB400]' : 'text-white'}`}>
                                             {p.mensaje === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
                                         </div>
-                                        <div className="text-[10px] text-[#888]">{p.dia_semana} • {p.hora.substring(0, 5)} hs</div>
+                                        <div className="text-[10px] text-[#888]">{p.dia_semana} • {p.hora ? p.hora.substring(0, 5) : '--:--'} hs</div>
                                     </div>
                                 </div>
                                 <button onClick={() => eliminarProgramacion(p.id)} className="text-red-500 p-2 hover:bg-red-500/10 rounded-lg">

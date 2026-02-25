@@ -112,13 +112,13 @@ export default function AdminDashboard() {
 
   const fetchBautismos = useCallback(async () => {
     // Simplified query to troubleshoot 400 error
-    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembro_id').order('created_at', { ascending: false });
+    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setBautismos(data);
   }, []);
 
   const fetchAyuda = useCallback(async () => {
     // Simplified query to troubleshoot 400 error
-    const { data } = await supabase.from('consultas_ayuda').select('*, miembro_id').order('created_at', { ascending: false });
+    const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setAyuda(data);
   }, []);
 
