@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useMemo } from 'react';
-import { Send, UserCircle, ShieldCheck, ChevronLeft, ChevronRight, User, X } from 'lucide-react';
+import { Send, UserCircle, ChevronLeft, ChevronRight, User, X } from 'lucide-react';
 
 interface MiembrosViewProps {
     busqueda: string;
@@ -186,22 +186,6 @@ const MiembrosView = ({
                                                 >
                                                     <UserCircle size={16} />
                                                 </button>
-                                                <button
-                                                    onClick={async () => {
-                                                        const newVal = !a.miembros?.es_admin;
-                                                        const { error } = await supabase.from('miembros').update({ es_admin: newVal }).eq('id', a.miembro_id);
-                                                        if (!error) {
-                                                            await fetchAsistencias();
-                                                            await fetchMiembros();
-                                                        } else {
-                                                            alert("Error: " + error.message);
-                                                        }
-                                                    }}
-                                                    className={`p-2 rounded-full transition-all ${a.miembros?.es_admin ? 'bg-[#FFB400] text-black' : 'bg-[#333] text-[#555] hover:text-[#FFB400]'}`}
-                                                    title={a.miembros?.es_admin ? "Quitar Acceso Admin" : "Dar Acceso Admin"}
-                                                >
-                                                    <ShieldCheck size={16} />
-                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -273,9 +257,6 @@ const MiembrosView = ({
                             <div className="flex gap-3">
                                 <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${selectedMember.miembros?.es_servidor ? 'bg-[#A8D50020] text-[#A8D500] border border-[#A8D50030]' : 'bg-[#222] text-[#555]'}`}>
                                     {selectedMember.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
-                                </div>
-                                <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${selectedMember.miembros?.es_admin ? 'bg-[#FFB40020] text-[#FFB400] border border-[#FFB40030]' : 'bg-[#222] text-[#555]'}`}>
-                                    {selectedMember.miembros?.es_admin ? '🛡️ Administrador' : '👤 No es Admin'}
                                 </div>
                             </div>
                             {selectedMember.miembros?.created_at && (

@@ -39,6 +39,27 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
         }
     };
 
+    const toggleAdminStatus = async (miembro: any) => {
+        const nuevoEstado = !miembro.es_admin;
+        const { error } = await supabase
+            .from('miembros')
+            .update({ es_admin: nuevoEstado })
+            .eq('id', miembro.id);
+
+        if (error) {
+            alert("Error al actualizar: " + error.message);
+        } else {
+            if (nuevoEstado && miembro.token_notificacion) {
+                await enviarNotificacionIndividual(
+                    miembro.token_notificacion,
+                    miembro.nombre,
+                    `¡Hola ${miembro.nombre}! 🛡️ Has sido designado como ADMINISTRADOR en Iglesia del Salvador. Ahora podés ver todos los planes de culto desde tu app.`
+                );
+            }
+            await fetchMiembros();
+        }
+    };
+
     const handleArchive = async (miembro: any) => {
         if (!confirm(`¿Archivar a ${miembro.nombre} ${miembro.apellido}? Ya no aparecerá en la lista principal.`)) return;
         const { error } = await supabase.from('miembros').update({ activo: false }).eq('id', miembro.id);
@@ -197,6 +218,7 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                                         <span className="flex items-center gap-1">📍 Se unió el {new Date(m.created_at).toLocaleDateString()}</span>
                                         {esNuevo && <span className="bg-[#00D9FF20] px-2 py-0.5 rounded text-[#00D9FF] font-bold">NUEVO</span>}
                                         {m.es_servidor && <span className="bg-[#A8D50020] px-2 py-0.5 rounded text-[#A8D500] font-bold">SERVIDOR</span>}
+                                        {m.es_admin && <span className="bg-[#FFB40020] px-2 py-0.5 rounded text-[#FFB400] font-bold">ADMIN</span>}
                                     </div>
                                 </div>
                             </div>
@@ -219,6 +241,16 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                                 >
                                     <UserCircle size={16} />
                                     {m.es_servidor ? 'ES SERVIDOR' : 'HACER SERVIDOR'}
+                                </button>
+                                <button
+                                    onClick={() => toggleAdminStatus(m)}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${m.es_admin
+                                        ? 'bg-[#FFB400] text-black shadow-[0_0_15px_rgba(255,180,0,0.3)]'
+                                        : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'
+                                        }`}
+                                >
+                                    <ShieldCheck size={16} />
+                                    {m.es_admin ? 'ES ADMIN' : 'HACER ADMIN'}
                                 </button>
                                 {showArchived ? (
                                     <button
