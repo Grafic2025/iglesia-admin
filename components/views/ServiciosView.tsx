@@ -30,7 +30,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
     // ── ESTADOS DEL FORMULARIO DE EDICIÓN ──
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]); // Fecha del culto (YYYY-MM-DD)
-    const [horario, setHorario] = useState('11:00 HS');     // Hora del culto
+    const [horario, setHorario] = useState('');     // Hora(s) del culto (puede ser múltiple: '9:00 HS, 11:00 HS')
+    const HORARIOS_DISPONIBLES = ['9:00 HS', '11:00 HS', '20:00 HS'];
     const [notas, setNotas] = useState('');                 // Notas privadas que solo los directores ven
 
     // Lista de filas del plan detallado (ej: "10 min - Alabanza - Banda")
@@ -159,8 +160,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         } else {
             // Si no hay objeto, estamos creando: reseteamos los estados a valores por defecto
             setSelectedSchedule(null);
-            setFecha(new Date().toISOString().split('T')[0]);
-            setHorario('11:00 HS');
+            setFecha('');
+            setHorario('');
             setNotas('');
             setDetailedRows([
                 { id: '1', tiempo: '10 min', actividad: 'Alabanza', responsable: 'Banda' },
@@ -433,13 +434,68 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                         />
                                     </div>
                                     <div className="flex flex-col">
-                                        <label className="text-[10px] text-[#555] font-black uppercase mb-1">Horario</label>
-                                        <input
-                                            type="time"
-                                            value={horario}
-                                            onChange={e => setHorario(e.target.value)}
-                                            className="bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] transition-all w-36 cursor-pointer [color-scheme:dark]"
-                                        />
+                                        <label className="text-[10px] text-[#555] font-black uppercase mb-1">Horario(s)</label>
+                                        <div className="flex flex-wrap gap-2 items-center">
+                                            {HORARIOS_DISPONIBLES.map(h => {
+                                                const selected = horario.split(', ').filter(Boolean).includes(h);
+                                                return (
+                                                    <button
+                                                        key={h}
+                                                        onClick={() => {
+                                                            const current = horario ? horario.split(', ').filter(Boolean) : [];
+                                                            const updated = selected
+                                                                ? current.filter(x => x !== h)
+                                                                : [...current, h];
+                                                            setHorario(updated.join(', '));
+                                                        }}
+                                                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${selected
+                                                            ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_10px_rgba(168,213,0,0.3)]'
+                                                            : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                            }`}
+                                                    >
+                                                        {h}
+                                                    </button>
+                                                );
+                                            })}
+                                            <span className="text-[#333] text-xs mx-1">|</span>
+                                            <input
+                                                type="time"
+                                                id="custom-time-input"
+                                                className="bg-[#222] border border-[#333] rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#A8D500] transition-all w-28 cursor-pointer [color-scheme:dark]"
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const input = document.getElementById('custom-time-input') as HTMLInputElement;
+                                                    if (input?.value) {
+                                                        const formatted = input.value + ' HS';
+                                                        const current = horario ? horario.split(', ').filter(Boolean) : [];
+                                                        if (!current.includes(formatted)) {
+                                                            setHorario([...current, formatted].join(', '));
+                                                        }
+                                                        input.value = '';
+                                                    }
+                                                }}
+                                                className="bg-[#333] text-[#A8D500] px-3 py-2 rounded-xl text-xs font-bold hover:bg-[#A8D500] hover:text-black transition-all border border-[#444]"
+                                            >
+                                                + Agregar
+                                            </button>
+                                        </div>
+                                        {horario && (
+                                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                                {horario.split(', ').filter(Boolean).map(h => (
+                                                    <span key={h} className="flex items-center gap-1 bg-[#A8D50015] text-[#A8D500] text-[10px] font-bold px-2.5 py-1 rounded-lg border border-[#A8D50030]">
+                                                        🕐 {h}
+                                                        <button
+                                                            onClick={() => {
+                                                                const updated = horario.split(', ').filter(Boolean).filter(x => x !== h);
+                                                                setHorario(updated.join(', '));
+                                                            }}
+                                                            className="text-[#A8D500] hover:text-red-400 ml-1"
+                                                        >×</button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
