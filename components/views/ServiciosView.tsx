@@ -167,6 +167,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         setShowModal(true);
     };
 
+    const [notificarAlGuardar, setNotificarAlGuardar] = useState(false);
+
     // Guardar los cambios en el cronograma (Inserción o Actualización)
     const handleSave = async () => {
         const payload = {
@@ -189,15 +191,18 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
         if (res.error) alert("Error: " + res.error.message);
         else {
+            if (notificarAlGuardar) {
+                await notificarEquipoManual({ ...payload, id: selectedSchedule?.id }, true);
+            }
             setShowModal(false);
             fetchData();
         }
     };
 
     // Envío manual de recordatorios mediante notificaciones push
-    const notificarEquipoManual = async (sched: any) => {
+    const notificarEquipoManual = async (sched: any, skipConfirm: boolean = false) => {
         if (!sched?.equipo_ids?.length) return alert("No hay equipo asignado.");
-        if (!confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
+        if (!skipConfirm && !confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
 
         let enviados = 0;
         const fechaFormat = new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -561,15 +566,16 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                     </button>
                                 )}
                             </div>
-                            <div className="flex gap-2">
-                                {selectedSchedule && (
-                                    <button
-                                        onClick={() => notificarEquipoManual(selectedSchedule)}
-                                        className="px-6 py-3 bg-[#A8D50010] text-[#A8D500] border border-[#A8D50033] font-bold rounded-xl hover:bg-[#A8D500] hover:text-black transition-all text-xs flex items-center gap-2"
-                                    >
-                                        <Users2 size={14} /> NOTIFICAR EQUIPO
-                                    </button>
-                                )}
+                            <div className="flex gap-4 items-center">
+                                <label className="flex items-center gap-2 text-white text-xs font-bold cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={notificarAlGuardar}
+                                        onChange={e => setNotificarAlGuardar(e.target.checked)}
+                                        className="w-4 h-4 accent-[#A8D500]"
+                                    />
+                                    NOTIFICAR AL GUARDAR
+                                </label>
                                 <button onClick={handleSave} className="px-10 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.5)] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"><Save size={18} /> Guardar Plan</button>
                             </div>
                         </div>
