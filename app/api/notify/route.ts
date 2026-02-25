@@ -33,7 +33,7 @@ export async function POST(req: Request) {
       const { data: miembros } = await query;
       tokens = miembros
         ?.map(m => m.token_notificacion)
-        .filter(t => t && t.startsWith('ExponentPushToken')) as string[] || [];
+        .filter(t => t && (t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken'))) as string[] || [];
 
       // Asegurar tokens únicos
       tokens = [...new Set(tokens)];
