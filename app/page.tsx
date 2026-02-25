@@ -35,6 +35,11 @@ const TAB_LABELS: Record<string, string> = {
   alertas: 'Retención (Alertas)',
 };
 
+/**
+ * Componente raíz del Panel de Administración.
+ * Maneja la autenticación, el estado de las pestañas principales (vistas),
+ * y la coordinación de datos globales entre los diferentes módulos (Asistencias, CMS, Planta de Culto, etc.).
+ */
 export default function AdminDashboard() {
   const [authorized, setAuthorized] = useState(false)
   const [password, setPassword] = useState('')
@@ -85,17 +90,26 @@ export default function AdminDashboard() {
     }
   }, [])
 
+  /**
+   * Obtiene los próximos cronogramas (planes de culto) desde la base de datos.
+   */
   const fetchCronogramas = useCallback(async () => {
     const { data } = await supabase.from('cronogramas').select('*').order('fecha', { ascending: true }).limit(20);
     if (data) setCronogramas(data);
   }, []);
 
+  /**
+   * Cuenta la cantidad total de pedidos de oración registrados.
+   */
   const calcularOracionesActivas = useCallback(async () => {
     // Removed .eq('activo', true) as it might not exist, or could be 'activa'
     const { count } = await supabase.from('pedidos_oracion').select('*', { count: 'exact', head: true });
     setOracionesActivas(count || 0);
   }, []);
 
+  /**
+   * Calcula cuántos miembros nuevos se registraron en el mes actual.
+   */
   const calcularNuevosMes = useCallback(async () => {
     const monthStart = new Date();
     monthStart.setDate(1);
@@ -105,28 +119,43 @@ export default function AdminDashboard() {
     setNuevosMes(count || 0);
   }, []);
 
+  /**
+   * Carga el historial de premios de racha que ya han sido entregados a los miembros.
+   */
   const cargarPremiosEntregados = useCallback(async () => {
     const { data } = await supabase.from('premios_entregados').select('*').order('created_at', { ascending: false });
     if (data) setPremiosEntregados(data);
   }, []);
 
+  /**
+   * Recupera las solicitudes de bautismo pendientes y procesadas.
+   */
   const fetchBautismos = useCallback(async () => {
     // Simplified query to troubleshoot 400 error
     const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setBautismos(data);
   }, []);
 
+  /**
+   * Recupera las consultas de ayuda cargadas por los usuarios de la app.
+   */
   const fetchAyuda = useCallback(async () => {
     // Simplified query to troubleshoot 400 error
     const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
     if (data) setAyuda(data);
   }, []);
 
+  /**
+   * Obtiene los logs de auditoría para rastrear las acciones realizadas por los administradores.
+   */
   const fetchAuditLogs = useCallback(async () => {
     const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(100);
     if (data) setAuditLogs(data);
   }, []);
 
+  /**
+   * Obtiene la configuración de horarios de reunión base desde la tabla de configuración.
+   */
   const fetchHorarios = useCallback(async () => {
     const { data } = await supabase.from('configuracion').select('*').eq('clave', 'horarios_reunion').maybeSingle();
     if (data) setHorariosDisponibles(data.valor || []);
@@ -137,6 +166,9 @@ export default function AdminDashboard() {
     // Analytics simplified
   }, []);
 
+  /**
+   * Prepara datos estáticos o calculados para el gráfico de crecimiento anual.
+   */
   const fetchCrecimientoAnual = useCallback(async () => {
     const dummy = [
       { mes: 'Ene', c: 150 }, { mes: 'Feb', c: 165 }, { mes: 'Mar', c: 180 },
@@ -189,6 +221,10 @@ export default function AdminDashboard() {
     }
   }, [authorized, fetchAsistencias, fetchCronogramas, fetchLogs, fetchMiembros, fetchNoticias, calcularOracionesActivas]);
 
+  /**
+   * Analiza la racha de asistencias de todos los miembros para determinar quiénes
+   * tienen premios pendientes de entrega (niveles 5, 10, 20, 30).
+   */
   const calcularPremios = useCallback(() => {
     const pend: any = { nivel5: [], nivel10: [], nivel20: [], nivel30: [] };
     miembros.forEach(m => {
@@ -206,11 +242,24 @@ export default function AdminDashboard() {
     calcularPremios();
   }, [miembros, asistencias, calcularPremios]);
 
+  /**
+   * Registra una acción administrativa en la tabla de auditoría.
+   * 
+   * @param accion Breve descripción de la acción (ej: "EDITAR_MIEMBRO").
+   * @param detalle Información adicional o resumen del cambio.
+   */
   const registrarAuditoria = async (accion: string, detalle: string) => {
     await supabase.from('auditoria').insert([{ accion, detalle, admin_id: 'admin_general' }]);
     fetchAuditLogs();
   }
 
+  /**
+   * Crea un registro indicando que se ha entregado físicamente un premio de racha a un miembro.
+   * 
+   * @param miembroId ID del miembro.
+   * @param nivel Nivel del premio (5, 10, 20 o 30).
+   * @param nombreCompleto Nombre del miembro para el mensaje de confirmación.
+   */
   const marcarComoEntregado = async (miembroId: string, nivel: number, nombreCompleto: string) => {
     if (!confirm(`¿Marcar como entregado el premio de nivel ${nivel} para ${nombreCompleto}?`)) return;
     const { error } = await supabase.from('premios_entregados').insert({ miembro_id: miembroId, nivel, entregado_por: 'Admin', notas: '' });
@@ -218,6 +267,10 @@ export default function AdminDashboard() {
     else { alert('✅ Premio entregado'); cargarPremiosEntregados(); fetchAsistencias(); }
   }
 
+  /**
+   * Valida la contraseña del administrador contra la variable de entorno configurada.
+   * Implementa un bloqueo temporal tras 5 intentos fallidos.
+   */
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (loginLocked) return;
@@ -246,10 +299,16 @@ export default function AdminDashboard() {
     }
   }
 
+  /**
+   * Finaliza la sesión del administrador y limpia el estado local.
+   */
   const handleLogout = () => {
     localStorage.removeItem('admin_auth'); setAuthorized(false); setPassword('');
   }
 
+  /**
+   * Envía una notificación push global a todos los usuarios que tengan la app instalada.
+   */
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
@@ -264,6 +323,13 @@ export default function AdminDashboard() {
     setTimeout(() => setNotificacionStatus({ show: false, message: '', error: false }), 4000);
   }
 
+  /**
+   * Envía una notificación push dirigida a un solo dispositivo mediante su token.
+   * 
+   * @param token Push Token del dispositivo (Expo/Firebase).
+   * @param nombre Nombre del usuario (para la UI).
+   * @param mensajeCustom Opcional: El mensaje a enviar; si no se provee, se solicita mediante un prompt.
+   */
   const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string) => {
     const mensaje = mensajeCustom || prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
     if (!mensaje) return;
@@ -283,6 +349,9 @@ export default function AdminDashboard() {
     }
   }
 
+  /**
+   * Genera y descarga un archivo CSV con las asistencias registradas en la fecha seleccionada actualmente.
+   */
   const exportarCSV = () => {
     const encabezados = "ID,Nombre,Apellido,DNI/ID_Miembro,Reunion,Hora Ingreso,Fecha,Racha Actual\n";
     const filas = asistencias.map(a => `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha},${a.racha}`).join("\n");
@@ -294,6 +363,9 @@ export default function AdminDashboard() {
     link.click();
   }
 
+  /**
+   * Obtiene asistencias de un rango de fechas y las exporta a un archivo CSV.
+   */
   const exportarCSVRango = async () => {
     const desde = exportStart || fechaSeleccionada;
     const hasta = exportEnd || fechaSeleccionada;

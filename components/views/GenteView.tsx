@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useMemo } from 'react';
-import { UserPlus, Phone, Search, ShieldCheck, UserCircle, Archive, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { UserPlus, Phone, Search, ShieldCheck, UserCircle, Archive, ChevronLeft, ChevronRight, Filter, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface GenteViewProps {
@@ -17,6 +17,9 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
     const [page, setPage] = useState(1);
     const [timeFilter, setTimeFilter] = useState('Todos');
     const [showArchived, setShowArchived] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newMember, setNewMember] = useState({ nombre: '', apellido: '', celular: '' });
+    const [saving, setSaving] = useState(false);
 
     const toggleServerStatus = async (miembro: any) => {
         const nuevoEstado = !miembro.es_servidor;
@@ -73,6 +76,29 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
         else await fetchMiembros();
     };
 
+    const handleCreateMember = async () => {
+        if (!newMember.nombre || !newMember.apellido) return alert("Nombre y apellido son obligatorios");
+        setSaving(true);
+        const { error } = await supabase.from('miembros').insert([{
+            nombre: newMember.nombre,
+            apellido: newMember.apellido,
+            celular: newMember.celular,
+            activo: true,
+            es_servidor: false,
+            es_admin: false,
+            created_at: new Date().toISOString()
+        }]);
+
+        if (error) {
+            alert("Error al crear miembro: " + error.message);
+        } else {
+            setShowCreateModal(false);
+            setNewMember({ nombre: '', apellido: '', celular: '' });
+            await fetchMiembros();
+        }
+        setSaving(false);
+    };
+
     const filteredMiembros = useMemo(() => {
         let list = miembros;
 
@@ -125,13 +151,22 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                     </h2>
                     <p className="text-[#888] text-sm italic">Gestioná toda la gente de la iglesia y sus permisos</p>
                 </div>
-                <button
-                    onClick={() => { setShowArchived(!showArchived); setPage(1); }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${showArchived ? 'bg-[#FFB400] text-black' : 'bg-[#222] text-[#888] border border-[#333] hover:text-white'}`}
-                >
-                    <Archive size={14} />
-                    {showArchived ? 'VER ACTIVOS' : 'VER ARCHIVADOS'}
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowCreateModal(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#00D9FF] text-black rounded-xl text-sm font-black hover:bg-[#00c4e6] transition-all active:scale-95"
+                    >
+                        <UserPlus size={16} />
+                        NUEVO MIEMBRO
+                    </button>
+                    <button
+                        onClick={() => { setShowArchived(!showArchived); setPage(1); }}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${showArchived ? 'bg-[#FFB400] text-black' : 'bg-[#222] text-[#888] border border-[#333] hover:text-white'}`}
+                    >
+                        <Archive size={14} />
+                        {showArchived ? 'VER ACTIVOS' : 'VER ARCHIVADOS'}
+                    </button>
+                </div>
             </div>
 
             {/* Quick Stats */}
@@ -294,6 +329,74 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                         >
                             Siguiente <ChevronRight size={14} />
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal para Nuevo Miembro */}
+            {showCreateModal && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+                    <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-white font-bold text-xl uppercase tracking-widest flex items-center gap-2">
+                                <UserPlus className="text-[#00D9FF]" size={24} />
+                                Nuevo Miembro
+                            </h3>
+                            <button onClick={() => setShowCreateModal(false)} className="text-[#555] hover:text-white transition-colors">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4 mb-8">
+                            <div>
+                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Nombre</label>
+                                <input
+                                    type="text"
+                                    value={newMember.nombre}
+                                    onChange={e => setNewMember({ ...newMember, nombre: e.target.value })}
+                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
+                                    placeholder="Ej: Juan"
+                                    autoFocus
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Apellido</label>
+                                <input
+                                    type="text"
+                                    value={newMember.apellido}
+                                    onChange={e => setNewMember({ ...newMember, apellido: e.target.value })}
+                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
+                                    placeholder="Ej: Pérez"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Celular / WhatsApp</label>
+                                <input
+                                    type="text"
+                                    value={newMember.celular}
+                                    onChange={e => setNewMember({ ...newMember, celular: e.target.value })}
+                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
+                                    placeholder="Ej: 5493751000000"
+                                />
+                                <p className="text-[9px] text-[#444] mt-1 pr-1 italic text-right">Incluir código de área sin el +</p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowCreateModal(false)}
+                                className="flex-1 py-4 bg-[#222] text-[#888] font-bold rounded-2xl border border-[#333] hover:text-white transition-all text-xs"
+                            >
+                                CANCELAR
+                            </button>
+                            <button
+                                onClick={handleCreateMember}
+                                disabled={saving}
+                                className="flex-1 py-4 bg-[#00D9FF] text-black font-black rounded-2xl hover:bg-[#00c4e6] disabled:opacity-50 transition-all text-xs uppercase tracking-widest shadow-[0_10px_20px_rgba(0,217,255,0.2)]"
+                            >
+                                {saving ? 'GUARDANDO...' : 'CREAR'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

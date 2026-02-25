@@ -12,6 +12,16 @@ interface DetailedRow {
 // ── VISTA DE ADMINISTRACIÓN: GESTIÓN DE SERVICIOS ────────────────────────────
 // Este componente permite a los admin crear y editar cronogramas de cultos,
 // asignar equipos por categorías, seleccionar canciones y notificar al staff.
+/**
+ * Componente de Vista para la Gestión de Servicios (Planes de Culto).
+ * Permite a los administradores:
+ * - Crear cronogramas detallados minuto a minuto.
+ * - Asignar equipos por categorías (Banda, Audio, Medios, etc.).
+ * - Seleccionar canciones del catálogo.
+ * - Gestionar conflictos de horarios y bloqueos de servidores.
+ * - Notificar al staff mediante notificaciones push.
+ * - Exportar planes a CSV.
+ */
 const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAuditoria }: {
     supabase: any,
     enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>,
@@ -108,7 +118,13 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         }
     ];
 
-    // Función para cargar todos los datos necesarios desde Supabase
+    /**
+     * Recupera todos los datos iniciales necesarios para la vista:
+     * - Próximos cronogramas.
+     * - Catálogo completo de canciones.
+     * - Lista de servidores (miembros).
+     * - Bloqueos de servidores y pre-asignaciones a equipos.
+     */
     const fetchData = async () => {
         setLoading(true);
         try {
@@ -146,7 +162,12 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         fetchData();
     }, [supabase]);
 
-    // Abre el modal para crear un nuevo cronograma o editar uno existente
+    /**
+     * Prepara el formulario para crear un nuevo cronograma o editar uno existente.
+     * Si recibe un objeto `sched`, precarga los campos con sus datos actuales.
+     * 
+     * @param sched Opcional objeto del cronograma a editar.
+     */
     const handleOpenModal = (sched: any = null) => {
         if (sched) {
             // Si hay un objeto 'sched', estamos editando: precargamos los estados con sus valores
@@ -175,7 +196,11 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
     const [notificarAlGuardar, setNotificarAlGuardar] = useState(false);
 
-    // Guardar los cambios en el cronograma (Inserción o Actualización)
+    /**
+     * Guarda los cambios del cronograma en la base de datos (Insert o Update).
+     * Preserva los estados de confirmación existentes de los miembros si se trata de una edición.
+     * Opcionalmente envía notificaciones al guardar.
+     */
     const handleSave = async () => {
         // Validaciones básicas de campos obligatorios
         if (!fecha) return alert("⚠️ Debes seleccionar una fecha para el servicio.");
@@ -233,7 +258,13 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         }
     };
 
-    // Envío manual de recordatorios mediante notificaciones push
+    /**
+     * Envía notificaciones push de recordatorio a todos los miembros del equipo que aún tengan
+     * su invitación en estado 'pendiente'.
+     * 
+     * @param sched El objeto del cronograma.
+     * @param skipConfirm Si es true, omite la ventana de confirmación del navegador.
+     */
     const notificarEquipoManual = async (sched: any, skipConfirm: boolean = false) => {
         if (!sched?.equipo_ids?.length) return alert("No hay equipo asignado.");
         if (!skipConfirm && !confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
@@ -258,7 +289,11 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         if (registrarAuditoria) await registrarAuditoria('NOTIFICAR EQUIPO', `Se enviaron recordatorios para el servicio del ${sched.fecha}`);
     };
 
-    // Función para exportar el plan a un archivo CSV descargable
+    /**
+     * Genera un archivo CSV con el plan detallado y las canciones, y lo descarga en el navegador.
+     * 
+     * @param sched El objeto del cronograma a exportar.
+     */
     const exportarCSV = (sched: any) => {
         let content = "TIEMPO;ACTIVIDAD;RESPONSABLE\n";
         sched.plan_detallado?.forEach((row: any) => {
@@ -282,26 +317,41 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         document.body.removeChild(link);
     };
 
-    // Elimina un cronograma permanente de la base de datos tras confirmar
+    /**
+     * Elimina permanentemente un cronograma de la base de datos.
+     * 
+     * @param id ID del cronograma a eliminar.
+     */
     const deleteSchedule = async (id: string) => {
         if (!confirm("¿Eliminar este cronograma?")) return;
         await supabase.from('cronogramas').delete().eq('id', id);
         fetchData(); // Actualiza la lista principal
     };
 
-    // Añade una fila vacía al plan detallado (minuto a minuto)
+    /**
+     * Agrega una fila vacía a la tabla de planificación minuto a minuto.
+     */
     const addDetailedRow = () => {
         setDetailedRows([...detailedRows, { id: Math.random().toString(), tiempo: '', actividad: '', responsable: '' }]);
     };
 
-    // Activa o desactiva una canción de la lista de seleccionadas
+    /**
+     * Agrega o quita una canción de la lista de canciones seleccionadas para el servicio.
+     * 
+     * @param id ID de la canción.
+     */
     const toggleSong = (id: string) => {
         setSelectedSongIds(prev =>
             prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
         );
     };
 
-    // Asignación de Miembros (con chequeo de conflictos y bloqueos)
+    /**
+     * Asigna un miembro al staff del servicio.
+     * Verifica conflictos de horario con otros cultos el mismo día y bloqueos de disponibilidad.
+     * 
+     * @param m Objeto del miembro a asignar.
+     */
     const assignStaff = (m: any) => {
         if (assignedStaff.some(s => s.miembro_id === m.id)) {
             setAssignedStaff(prev => prev.filter(s => s.miembro_id !== m.id));
@@ -334,7 +384,9 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         setPendingRol(assignedRole || 'Servidor');
     };
 
-    // Procesa la asignación final de un rol a un miembro una vez seleccionado en el modal
+    /**
+     * Confirma la asignación de un rol específico a un miembro previamente seleccionado.
+     */
     const confirmAssignRol = () => {
         if (!pendingMember) return;
         setAssignedStaff([...assignedStaff, {

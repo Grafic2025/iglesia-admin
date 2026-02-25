@@ -21,6 +21,11 @@ interface MiembrosViewProps {
 
 const PAGE_SIZE = 25;
 
+/**
+ * Componente de Vista para la Gestión de Miembros y Asistencias.
+ * Muestra una lista paginada de personas que asistieron hoy o en una fecha seleccionada.
+ * Gestiona el sistema de premios por racha de asistencia y permite asignar roles de servidor.
+ */
 const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
@@ -35,7 +40,13 @@ const MiembrosView = ({
     const paginatedData = datosFiltrados.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     // Reset page when filters change
+    /**
+     * Actualiza el término de búsqueda y reinicia la paginación a la primera página.
+     */
     const handleBusqueda = (v: string) => { setBusqueda(v); setPage(1); };
+    /**
+     * Filtra los miembros por horario de reunión y reinicia la paginación.
+     */
     const handleFiltro = (v: string) => { setFiltroHorario(v); setPage(1); };
 
     const rewardLevels = [
