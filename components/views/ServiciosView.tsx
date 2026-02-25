@@ -111,6 +111,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const fetchData = async () => {
         setLoading(true);
         try {
+            const today = new Date().toISOString().split('T')[0];
             const [
                 { data: scheds },
                 { data: songs },
@@ -119,7 +120,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { data: blocks },
                 { data: memberTeams }
             ] = await Promise.all([
-                supabase.from('cronogramas').select('*').order('fecha', { ascending: false }),
+                supabase.from('cronogramas').select('*').gte('fecha', today).order('fecha', { ascending: true }),
                 supabase.from('canciones').select('*').order('titulo', { ascending: true }),
                 supabase.from('equipos').select('*'),
                 supabase.from('miembros').select('*').eq('es_servidor', true),

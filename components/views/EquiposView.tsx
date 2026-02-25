@@ -24,6 +24,29 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDateSchedule, setSelectedDateSchedule] = useState<any>(null);
 
+    const ROLE_CATEGORIES = [
+        {
+            name: "Audio",
+            roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"]
+        },
+        {
+            name: "Banda",
+            roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano", "Teclados", "Guitarra"]
+        },
+        {
+            name: "Medios",
+            roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM", "Proyección"]
+        },
+        {
+            name: "Voces",
+            roles: ["Soprano", "Tenor", "Worship Leader", "Voz", "Vocal 1", "Vocal 2"]
+        },
+        {
+            name: "General",
+            roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"]
+        }
+    ];
+
     const fetchInitialData = async () => {
         setLoading(true);
         try {
@@ -312,13 +335,20 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                         )}
                     </div>
                     <div className="p-6 flex-1 overflow-y-auto max-h-[400px] space-y-4">
-                        {(selectedDateSchedule ? [selectedDateSchedule] : upcomingSchedules).length === 0 ? (
-                            <div className="text-center py-10">
-                                <p className="text-[#555] italic text-sm">No hay servicios para mostrar.</p>
-                                <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
-                            </div>
-                        ) : (
-                            (selectedDateSchedule ? [selectedDateSchedule] : upcomingSchedules).map(s => (
+                        {(() => {
+                            const todayStr = new Date().toISOString().split('T')[0];
+                            const filteredList = (selectedDateSchedule ? [selectedDateSchedule] : upcomingSchedules.filter(s => s.fecha >= todayStr));
+
+                            if (filteredList.length === 0) {
+                                return (
+                                    <div className="text-center py-10">
+                                        <p className="text-[#555] italic text-sm">No hay servicios próximos para mostrar.</p>
+                                        <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
+                                    </div>
+                                );
+                            }
+
+                            return filteredList.map(s => (
                                 <div key={s.id} className="bg-[#252525] p-5 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all">
                                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                         <div className="flex items-center gap-4">
@@ -373,8 +403,8 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                                         </button>
                                     </div>
                                 </div>
-                            ))
-                        )}
+                            ));
+                        })()}
                     </div>
                 </div>
             </div>
@@ -475,8 +505,25 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                                     placeholder="Ej: Guitarra, Sonido, Proyección..."
                                     value={assignRole}
                                     onChange={(e) => setAssignRole(e.target.value)}
-                                    className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500]"
+                                    className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] mb-3"
                                 />
+                                <div className="space-y-4 mb-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar border-b border-[#333] pb-4">
+                                    {ROLE_CATEGORIES.map(cat => (
+                                        <div key={cat.name}>
+                                            <p className="text-[9px] text-[#A8D500] font-black uppercase mb-2 tracking-wider opacity-70">{cat.name}</p>
+                                            <div className="flex flex-wrap gap-1.5 mb-2">
+                                                {cat.roles.map(r => (
+                                                    <button
+                                                        key={r}
+                                                        onClick={() => setAssignRole(r)}
+                                                        className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                            }`}
+                                                    >{r}</button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
                             <div>
