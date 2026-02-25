@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus, Clock, Save, Trash2, GripVertical, Music, Users2, X, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Calendar, Plus, Clock, Save, Trash2, GripVertical, Music, Users2, X, ChevronRight, CheckCircle2, Search } from 'lucide-react';
 
 interface DetailedRow {
     id: string;
@@ -57,6 +57,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [showModal, setShowModal] = useState(false);      // Controla el modal principal de edición
     const [showSongPicker, setShowSongPicker] = useState(false); // Modal para elegir canciones del catálogo
     const [showStaffPicker, setShowStaffPicker] = useState(false); // Modal para elegir personas de la lista
+    const [staffSearch, setStaffSearch] = useState('');     // Término de búsqueda para filtrar la lista de miembros
+    const [songSearch, setSongSearch] = useState('');       // Término de búsqueda para filtrar la lista de canciones
     const [pendingMember, setPendingMember] = useState<any>(null); // Miembro seleccionado que aún no tiene rol asignado
     const [pendingRol, setPendingRol] = useState('Servidor'); // Rol temporal que se le va a poner a la persona
     const [showTemplatePicker, setShowTemplatePicker] = useState(false); // Modal para elegir una estructura pre-armada
@@ -64,19 +66,19 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const ROLE_CATEGORIES = [
         {
             name: "Audio",
-            roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio"]
+            roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"]
         },
         {
             name: "Banda",
-            roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano"]
+            roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano", "Teclados", "Guitarra"]
         },
         {
             name: "Medios",
-            roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM"]
+            roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM", "Proyección"]
         },
         {
             name: "Voces",
-            roles: ["Soprano", "Tenor", "Worship Leader"]
+            roles: ["Soprano", "Tenor", "Worship Leader", "Voz", "Vocal 1", "Vocal 2"]
         },
         {
             name: "General",
@@ -730,12 +732,25 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             {showSongPicker && (
                 <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4">
                     <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] p-6 max-h-[80vh] flex flex-col">
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex justify-between items-center mb-4">
                             <h3 className="text-white font-bold uppercase tracking-widest">Seleccionar Canciones</h3>
-                            <button onClick={() => setShowSongPicker(false)} className="text-[#888]"><X /></button>
+                            <button onClick={() => { setShowSongPicker(false); setSongSearch(''); }} className="text-[#888]"><X /></button>
+                        </div>
+                        <div className="relative mb-4">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Buscar canción por título o artista..."
+                                value={songSearch}
+                                onChange={e => setSongSearch(e.target.value)}
+                                className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[#A8D500] transition-all"
+                            />
                         </div>
                         <div className="overflow-y-auto flex-1 space-y-2 pr-2">
-                            {allSongs.map(s => (
+                            {allSongs.filter(s =>
+                                s.titulo.toLowerCase().includes(songSearch.toLowerCase()) ||
+                                s.artista.toLowerCase().includes(songSearch.toLowerCase())
+                            ).map(s => (
                                 <button
                                     key={s.id}
                                     onClick={() => toggleSong(s.id)}
@@ -746,7 +761,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                 </button>
                             ))}
                         </div>
-                        <button onClick={() => setShowSongPicker(false)} className="mt-6 w-full py-4 bg-[#A8D500] text-black font-black rounded-2xl uppercase tracking-widest">Listo</button>
+                        <button onClick={() => { setShowSongPicker(false); setSongSearch(''); }} className="mt-6 w-full py-4 bg-[#A8D500] text-black font-black rounded-2xl uppercase tracking-widest">Listo</button>
                     </div>
                 </div>
             )}
@@ -755,12 +770,24 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             {showStaffPicker && (
                 <div className="fixed inset-0 bg-black/95 z-[60] flex items-center justify-center p-4">
                     <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] p-6 max-h-[80vh] flex flex-col">
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex justify-between items-center mb-4">
                             <h3 className="text-white font-bold uppercase tracking-widest">Asignar Equipo</h3>
-                            <button onClick={() => setShowStaffPicker(false)} className="text-[#888]"><X /></button>
+                            <button onClick={() => { setShowStaffPicker(false); setStaffSearch(''); }} className="text-[#888]"><X /></button>
+                        </div>
+                        <div className="relative mb-4">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
+                            <input
+                                type="text"
+                                placeholder="Buscar servidor por nombre..."
+                                value={staffSearch}
+                                onChange={e => setStaffSearch(e.target.value)}
+                                className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[#3B82F6] transition-all"
+                            />
                         </div>
                         <div className="overflow-y-auto flex-1 space-y-2 pr-2">
-                            {allMembers.map(m => (
+                            {allMembers.filter(m =>
+                                `${m.nombre} ${m.apellido}`.toLowerCase().includes(staffSearch.toLowerCase())
+                            ).map(m => (
                                 <button
                                     key={m.id}
                                     onClick={() => assignStaff(m)}
@@ -779,7 +806,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                 </button>
                             ))}
                         </div>
-                        <button onClick={() => setShowStaffPicker(false)} className="mt-6 w-full py-4 bg-[#3B82F6] text-white font-black rounded-2xl uppercase tracking-widest">Listo</button>
+                        <button onClick={() => { setShowStaffPicker(false); setStaffSearch(''); }} className="mt-6 w-full py-4 bg-[#3B82F6] text-white font-black rounded-2xl uppercase tracking-widest">Listo</button>
                     </div>
                 </div>
             )}
@@ -803,14 +830,25 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                                 <div key={cat.name}>
                                     <p className="text-[10px] text-[#A8D500] font-black uppercase mb-2 tracking-wider">{cat.name}</p>
                                     <div className="flex flex-wrap gap-2 mb-4">
-                                        {cat.roles.map(r => (
-                                            <button
-                                                key={r}
-                                                onClick={() => setPendingRol(r)}
-                                                className={`text-[10px] px-3 py-2 rounded-xl border font-bold transition-all ${pendingRol === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
-                                                    }`}
-                                            >{r}</button>
-                                        ))}
+                                        {cat.roles.map(r => {
+                                            const roles = pendingRol.split(', ').filter(Boolean);
+                                            const isSelected = roles.includes(r);
+                                            return (
+                                                <button
+                                                    key={r}
+                                                    onClick={() => {
+                                                        if (isSelected) setPendingRol(roles.filter(x => x !== r).join(', '));
+                                                        else setPendingRol([...roles, r].join(', '));
+                                                    }}
+                                                    className={`text-[10px] px-3 py-2 rounded-xl border font-bold transition-all ${isSelected
+                                                        ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_10px_rgba(168,213,0,0.3)]'
+                                                        : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                        }`}
+                                                >
+                                                    {r}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             ))}
