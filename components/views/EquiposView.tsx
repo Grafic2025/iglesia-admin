@@ -577,7 +577,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                             <div>
                                 <label className="text-[#888] text-xs font-bold mb-2 block">ICONO (EMOJI)</label>
                                 <div className="grid grid-cols-5 gap-2">
-                                    {['🎸', '🎥', '☕', '🎨', '🛡️', '🚌', '🍕', '🙏', '🔌', '💻'].map(emoji => (
+                                    {['🎸', '🎤', '🎥', '☕', '🎨', '🛡️', '🚌', '🍕', '🙏', '🔌', '💻'].map(emoji => (
                                         <button
                                             key={emoji}
                                             onClick={() => setNewTeamIcon(emoji)}
