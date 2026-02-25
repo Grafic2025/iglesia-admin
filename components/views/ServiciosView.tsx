@@ -26,6 +26,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const [allTeams, setAllTeams] = useState<any[]>([]);    // Lista de equipos (banda, sonido, etc.) definidos
     const [allMembers, setAllMembers] = useState<any[]>([]); // Lista de todas las personas que son servidores
     const [allBlockouts, setAllBlockouts] = useState<any[]>([]); // Días que cada persona marcó como "no puedo servir"
+    const [allMemberTeams, setAllMemberTeams] = useState<any[]>([]); // Roles pre-asignados en la sección Equipos
 
     // ── ESTADOS DEL FORMULARIO DE EDICIÓN ──
     const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]); // Fecha del culto (YYYY-MM-DD)
@@ -115,13 +116,15 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { data: songs },
                 { data: teams },
                 { data: members },
-                { data: blocks }
+                { data: blocks },
+                { data: memberTeams }
             ] = await Promise.all([
                 supabase.from('cronogramas').select('*').order('fecha', { ascending: false }),
                 supabase.from('canciones').select('*').order('titulo', { ascending: true }),
                 supabase.from('equipos').select('*'),
                 supabase.from('miembros').select('*').eq('es_servidor', true),
-                supabase.from('bloqueos_servidores').select('*')
+                supabase.from('bloqueos_servidores').select('*'),
+                supabase.from('miembros_equipos').select('*')
             ]);
 
             setSchedules(scheds || []);
@@ -129,6 +132,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             setAllTeams(teams || []);
             setAllMembers(members || []);
             setAllBlockouts(blocks || []);
+            setAllMemberTeams(memberTeams || []);
         } catch (error) {
             console.error(error);
         } finally {
@@ -171,13 +175,41 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
     // Guardar los cambios en el cronograma (Inserción o Actualización)
     const handleSave = async () => {
+        // Validaciones básicas de campos obligatorios
+        if (!fecha) return alert("⚠️ Debes seleccionar una fecha para el servicio.");
+        if (!horario) return alert("⚠️ Debes indicar el horario del servicio.");
+
+        let finalStaff = [...assignedStaff];
+
+        // ── LÓGICA DE PRESERVACIÓN DE ESTADO ──
+        // Si estamos editando, traemos el estado más reciente de la DB para no pisar
+        // las confirmaciones/rechazos que hayan hecho los miembros mientras el admin editaba.
+        if (selectedSchedule) {
+            const { data: latest } = await supabase
+                .from('cronogramas')
+                .select('equipo_ids')
+                .eq('id', selectedSchedule.id)
+                .single();
+
+            if (latest?.equipo_ids) {
+                finalStaff = assignedStaff.map(staff => {
+                    const dbStaff = latest.equipo_ids.find((d: any) => d.miembro_id === staff.miembro_id);
+                    if (dbStaff) {
+                        // Preservamos el estado y motivo de la base de datos
+                        return { ...staff, estado: dbStaff.estado, motivo: dbStaff.motivo };
+                    }
+                    return staff;
+                });
+            }
+        }
+
         const payload = {
             fecha,
             horario,
             notas_generales: notas,
             plan_detallado: detailedRows,
             orden_canciones: selectedSongIds,
-            equipo_ids: assignedStaff
+            equipo_ids: finalStaff
         };
 
         let res;
@@ -295,7 +327,9 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
             }
         }
         setPendingMember(m);
-        setPendingRol('Servidor');
+        // Intentar detectar automáticamente el rol que tiene asignado en "Equipos"
+        const assignedRole = allMemberTeams.find(mt => mt.miembro_id === m.id)?.rol;
+        setPendingRol(assignedRole || 'Servidor');
     };
 
     // Procesa la asignación final de un rol a un miembro una vez seleccionado en el modal
@@ -336,8 +370,8 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                             <div className="p-2 bg-[#A8D50010] rounded-lg">
                                 <Calendar size={20} className="text-[#A8D500]" />
                             </div>
-                            <button onClick={() => deleteSchedule(s.id)} className="text-red-500 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/10 rounded">
-                                <Trash2 size={16} />
+                            <button onClick={() => deleteSchedule(s.id)} className="text-red-600 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-600/10 rounded">
+                                <Trash2 size={16} color="red" />
                             </button>
                         </div>
                         <h3 className="text-white font-black text-lg uppercase">{new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })}</h3>
