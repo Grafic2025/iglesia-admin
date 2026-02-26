@@ -680,7 +680,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                                                 <div className="h-px bg-gradient-to-r from-[#A8D50030] to-transparent flex-1"></div>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                {membersInCat.map((s, idx) => (
+                                                {membersInCat.map((s: any, idx: number) => (
                                                     <div key={`${s.miembro_id}-${s.specificRol}-${idx}`} className="flex items-center gap-4 p-3 bg-[#1E1E1E] rounded-2xl border border-[#333] hover:border-[#A8D50030] transition-all">
                                                         <div className="w-10 h-10 rounded-full bg-[#111] border border-[#333] overflow-hidden flex items-center justify-center relative">
                                                             {(() => {
