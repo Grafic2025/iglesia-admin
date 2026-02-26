@@ -11,6 +11,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     const [showAssignModal, setShowAssignModal] = useState(false);
     const [showNewTeamModal, setShowNewTeamModal] = useState(false);
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
+    const [showTeamCompositionModal, setShowTeamCompositionModal] = useState(false);
 
     // Form states
     const [newTeamName, setNewTeamName] = useState('');
@@ -395,12 +396,23 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                                             </p>
                                         </div>
 
-                                        <button
-                                            onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Ve a Plan de Culto")}
-                                            className="bg-[#A8D500] text-black text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(168,213,0,0.4)] active:scale-95"
-                                        >
-                                            EDITAR DÍA
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedDateSchedule(s);
+                                                    setShowTeamCompositionModal(true);
+                                                }}
+                                                className="bg-[#252525] text-[#A8D500] border border-[#A8D50030] text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:bg-[#A8D500] hover:text-black active:scale-95"
+                                            >
+                                                VER EQUIPO
+                                            </button>
+                                            <button
+                                                onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Ve a Plan de Culto")}
+                                                className="bg-[#A8D500] text-black text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(168,213,0,0.4)] active:scale-95"
+                                            >
+                                                EDITAR DÍA
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ));
@@ -602,6 +614,107 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
                                     CREAR
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* MODAL: Team Composition (Grouped by Category) */}
+            {showTeamCompositionModal && selectedDateSchedule && (
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+                    <div className="bg-[#151515] w-full max-w-2xl rounded-3xl border border-[#333] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="p-6 border-b border-[#333] flex items-center justify-between bg-[#1A1A1A]">
+                            <div>
+                                <h3 className="text-white font-black text-[14px] uppercase tracking-widest flex items-center gap-3">
+                                    <Users2 className="text-[#A8D500]" size={18} /> Composición del Equipo
+                                </h3>
+                                <p className="text-[#888] text-[10px] font-bold uppercase mt-1">
+                                    {new Date(selectedDateSchedule.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} — {selectedDateSchedule.horario}
+                                </p>
+                            </div>
+                            <button onClick={() => setShowTeamCompositionModal(false)} className="text-[#888] hover:text-white p-2">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="p-8 max-h-[70vh] overflow-y-auto space-y-8 custom-scrollbar">
+                            {(() => {
+                                const getRoleCategory = (rol: string) => {
+                                    for (const cat of ROLE_CATEGORIES) {
+                                        if (cat.roles.some(r => rol.includes(r))) return cat.name.toUpperCase();
+                                    }
+                                    return "GENERAL";
+                                };
+
+                                const categories = ["VOCES", "BANDA", "AUDIO", "MEDIOS", "GENERAL"];
+                                const staff = selectedDateSchedule.equipo_ids || [];
+
+                                if (staff.length === 0) {
+                                    return (
+                                        <div className="text-center py-20">
+                                            <div className="w-20 h-20 bg-[#222] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#333]">
+                                                <ShieldAlert className="text-[#555]" size={32} />
+                                            </div>
+                                            <p className="text-[#555] font-bold italic">No hay personas asignadas para este día.</p>
+                                        </div>
+                                    );
+                                }
+
+                                return categories.map(catName => {
+                                    // Separar y agrupar roles
+                                    const membersInCat = staff.reduce((acc: any[], s: any) => {
+                                        const roles = (s.rol || 'Servidor').split(', ').filter(Boolean);
+                                        roles.forEach((r: string) => {
+                                            if (getRoleCategory(r) === catName) {
+                                                acc.push({ ...s, specificRol: r });
+                                            }
+                                        });
+                                        return acc;
+                                    }, []);
+
+                                    if (membersInCat.length === 0) return null;
+
+                                    return (
+                                        <div key={catName} className="space-y-4">
+                                            <div className="flex items-center gap-4">
+                                                <h4 className="text-[#A8D500] text-[10px] font-black uppercase tracking-[0.3em]">{catName}</h4>
+                                                <div className="h-px bg-gradient-to-r from-[#A8D50030] to-transparent flex-1"></div>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                {membersInCat.map((s, idx) => (
+                                                    <div key={`${s.miembro_id}-${s.specificRol}-${idx}`} className="flex items-center gap-4 p-3 bg-[#1E1E1E] rounded-2xl border border-[#333] hover:border-[#A8D50030] transition-all">
+                                                        <div className="w-10 h-10 rounded-full bg-[#111] border border-[#333] overflow-hidden flex items-center justify-center relative">
+                                                            {(() => {
+                                                                const m = members.find(mem => mem.id === s.miembro_id);
+                                                                const foto = m?.foto_url || s.foto_url;
+                                                                return foto ? (
+                                                                    <img src={foto} className="w-full h-full object-cover" alt="" />
+                                                                ) : (
+                                                                    <span className="text-xs text-[#555] font-black">{s.nombre?.[0]}</span>
+                                                                );
+                                                            })()}
+                                                            <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#1E1E1E] ${s.estado === 'confirmado' ? 'bg-[#A8D500]' : s.estado === 'rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="text-white font-bold text-sm leading-tight">{s.nombre}</p>
+                                                            <p className="text-[#A8D500] text-[10px] font-black uppercase tracking-wider">{s.specificRol}</p>
+                                                        </div>
+                                                        {s.estado === 'confirmado' && <CheckCircle2 size={16} className="text-[#A8D500] opacity-50" />}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                });
+                            })()}
+                        </div>
+
+                        <div className="p-6 border-t border-[#333] bg-[#1A1A1A] flex justify-end">
+                            <button
+                                onClick={() => setShowTeamCompositionModal(false)}
+                                className="px-8 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all uppercase tracking-widest text-xs"
+                            >
+                                Entendido
+                            </button>
                         </div>
                     </div>
                 </div>
