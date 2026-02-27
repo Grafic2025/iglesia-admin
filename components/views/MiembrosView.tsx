@@ -1,6 +1,10 @@
 'use client'
-import React, { useState, useMemo } from 'react';
-import { Send, UserCircle, ChevronLeft, ChevronRight, User, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Send, UserCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+
+// Modular Components
+import MemberRewards from './members/MemberRewards';
+import MemberProfileModal from './members/MemberProfileModal';
 
 interface MiembrosViewProps {
     busqueda: string;
@@ -21,11 +25,6 @@ interface MiembrosViewProps {
 
 const PAGE_SIZE = 25;
 
-/**
- * Componente de Vista para la Gestión de Miembros y Asistencias.
- * Muestra una lista paginada de personas que asistieron hoy o en una fecha seleccionada.
- * Gestiona el sistema de premios por racha de asistencia y permite asignar roles de servidor.
- */
 const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
@@ -39,76 +38,16 @@ const MiembrosView = ({
     const totalPages = Math.max(1, Math.ceil(datosFiltrados.length / PAGE_SIZE));
     const paginatedData = datosFiltrados.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-    // Reset page when filters change
-    /**
-     * Actualiza el término de búsqueda y reinicia la paginación a la primera página.
-     */
     const handleBusqueda = (v: string) => { setBusqueda(v); setPage(1); };
-    /**
-     * Filtra los miembros por horario de reunión y reinicia la paginación.
-     */
     const handleFiltro = (v: string) => { setFiltroHorario(v); setPage(1); };
-
-    const rewardLevels = [
-        { level: 30, title: 'Entrada a Retiro (30+ asistencias)', icon: '🎟️', color: '#9333EA', key: 'nivel30' },
-        { level: 20, title: 'Libro Cristiano (20-29 asistencias)', icon: '📚', color: '#3B82F6', key: 'nivel20' },
-        { level: 10, title: 'Café Gratis (10-19 asistencias)', icon: '☕', color: '#FFB400', key: 'nivel10' },
-        { level: 5, title: 'Sticker IDS (5-9 asistencias)', icon: '⭐', color: '#A8D500', key: 'nivel5' },
-    ];
 
     return (
         <div className="space-y-6">
-            {/* Rewards Section */}
-            <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                <h3 className="text-[#9333EA] text-lg font-bold mb-2">🎁 Premios Pendientes</h3>
-                <p className="text-[#888] text-sm mb-6">Metas alcanzadas en los últimos 30 días</p>
-
-                <div className="space-y-6">
-                    {rewardLevels.map((rl) => (
-                        premiosPendientes[rl.key]?.length > 0 && (
-                            <div key={rl.key}>
-                                <div className="flex items-center gap-3 mb-3">
-                                    <span className="text-2xl">{rl.icon}</span>
-                                    <h4 className="text-white font-medium">{rl.title}</h4>
-                                    <span className="bg-[#333] text-white px-2 py-0.5 rounded-full text-xs font-bold">
-                                        {premiosPendientes[rl.key].length}
-                                    </span>
-                                </div>
-                                <div className="flex flex-wrap gap-2">
-                                    {premiosPendientes[rl.key].map((m: any) => {
-                                        const yaEntregado = premiosEntregados.some(p => p.miembro_id === m.id && p.nivel === rl.level);
-                                        return (
-                                            <div
-                                                key={m.id}
-                                                className={`flex items-center gap-3 px-3 py-2 rounded-xl border ${yaEntregado ? 'bg-[#151515] border-[#222]' : 'bg-[#252525] border-[#333]'
-                                                    }`}
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className={`${yaEntregado ? 'text-[#555]' : 'text-white'} text-sm font-medium`}>
-                                                        {m.nombre} {m.apellido}
-                                                    </span>
-                                                    <span className="text-[10px] font-bold" style={{ color: rl.color }}>🔥 {m.racha}</span>
-                                                </div>
-                                                {yaEntregado ? (
-                                                    <span className="text-[#A8D500]">✅</span>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => marcarComoEntregado(m.id, rl.level, `${m.nombre} ${m.apellido}`)}
-                                                        className="text-[10px] uppercase font-bold px-2 py-1 rounded-md transition-all active:scale-95"
-                                                        style={{ backgroundColor: rl.color, color: rl.level === 30 || rl.level === 20 ? '#fff' : '#000' }}
-                                                    >
-                                                        Entregar
-                                                    </button>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )
-                    ))}
-                </div>
-            </div>
+            <MemberRewards
+                premiosPendientes={premiosPendientes}
+                premiosEntregados={premiosEntregados}
+                marcarComoEntregado={marcarComoEntregado}
+            />
 
             {/* Search and Table */}
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
@@ -230,55 +169,10 @@ const MiembrosView = ({
                 )}
             </div>
 
-            {/* Member Profile Modal */}
-            {selectedMember && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedMember(null)}>
-                    <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-                        <div className="p-6 border-b border-[#333] flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 bg-[#252525] rounded-full flex items-center justify-center border-2 border-[#A8D500]">
-                                    {selectedMember.miembros?.foto_url ? (
-                                        <img src={selectedMember.miembros.foto_url} alt="" className="w-full h-full rounded-full object-cover" />
-                                    ) : (
-                                        <User className="text-[#A8D500]" size={24} />
-                                    )}
-                                </div>
-                                <div>
-                                    <h3 className="text-white font-bold text-lg">{selectedMember.miembros?.nombre} {selectedMember.miembros?.apellido}</h3>
-                                    <p className="text-[#888] text-xs">ID: {selectedMember.miembro_id?.slice(0, 8)}...</p>
-                                </div>
-                            </div>
-                            <button onClick={() => setSelectedMember(null)} className="text-[#888] hover:text-white p-2"><X /></button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div className="grid grid-cols-3 gap-3">
-                                <div className="bg-[#222] p-4 rounded-xl text-center">
-                                    <p className="text-2xl font-bold text-[#A8D500]">{selectedMember.racha >= 4 ? '🔥' : ''} {selectedMember.racha}</p>
-                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Racha</p>
-                                </div>
-                                <div className="bg-[#222] p-4 rounded-xl text-center">
-                                    <p className="text-2xl font-bold text-white">{selectedMember.hora_entrada || '-'}</p>
-                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Hora hoy</p>
-                                </div>
-                                <div className="bg-[#222] p-4 rounded-xl text-center">
-                                    <p className="text-2xl font-bold text-white">{selectedMember.horario_reunion}</p>
-                                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Reunión</p>
-                                </div>
-                            </div>
-                            <div className="flex gap-3">
-                                <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${selectedMember.miembros?.es_servidor ? 'bg-[#A8D50020] text-[#A8D500] border border-[#A8D50030]' : 'bg-[#222] text-[#555]'}`}>
-                                    {selectedMember.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
-                                </div>
-                            </div>
-                            {selectedMember.miembros?.created_at && (
-                                <p className="text-[#555] text-xs text-center">
-                                    Miembro desde {new Date(selectedMember.miembros.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
+            <MemberProfileModal
+                member={selectedMember}
+                onClose={() => setSelectedMember(null)}
+            />
         </div>
     );
 };

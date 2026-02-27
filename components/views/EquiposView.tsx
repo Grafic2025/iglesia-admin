@@ -1,8 +1,30 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import { Users2, Calendar, Plus, UserPlus, CheckCircle2, Clock, ShieldAlert, X, User, Search, Trash2 } from 'lucide-react';
+import { Users2, Plus } from 'lucide-react';
 
-const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: { supabase: any, setActiveTab?: (t: string) => void, enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void> }) => {
+// Modular Components
+import TeamCard from './teams/TeamCard';
+import TeamCalendar from './teams/TeamCalendar';
+import TeamScheduleList from './teams/TeamScheduleList';
+import BlockoutsSection from './teams/BlockoutsSection';
+import TeamDetailsModal from './teams/TeamDetailsModal';
+import AssignMemberModal from './teams/AssignMemberModal';
+import NewTeamModal from './teams/NewTeamModal';
+import TeamCompositionModal from './teams/TeamCompositionModal';
+
+const ROLE_CATEGORIES = [
+    { name: "Audio", roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"] },
+    { name: "Banda", roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano", "Teclados", "Guitarra"] },
+    { name: "Medios", roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM", "Proyección"] },
+    { name: "Voces", roles: ["Soprano", "Tenor", "Worship Leader", "Voz", "Vocal 1", "Vocal 2"] },
+    { name: "General", roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"] }
+];
+
+const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
+    supabase: any,
+    setActiveTab?: (t: string) => void,
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>
+}) => {
     const [loading, setLoading] = useState(true);
     const [teams, setTeams] = useState<any[]>([]);
     const [members, setMembers] = useState<any[]>([]);
@@ -20,42 +42,16 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     const [assignRole, setAssignRole] = useState('');
 
     const [blockouts, setBlockouts] = useState<any[]>([]);
-
     const [upcomingSchedules, setUpcomingSchedules] = useState<any[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
     const [selectedDateSchedule, setSelectedDateSchedule] = useState<any>(null);
 
-    const ROLE_CATEGORIES = [
-        {
-            name: "Audio",
-            roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"]
-        },
-        {
-            name: "Banda",
-            roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano", "Teclados", "Guitarra"]
-        },
-        {
-            name: "Medios",
-            roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM", "Proyección"]
-        },
-        {
-            name: "Voces",
-            roles: ["Soprano", "Tenor", "Worship Leader", "Voz", "Vocal 1", "Vocal 2"]
-        },
-        {
-            name: "General",
-            roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"]
-        }
-    ];
-
     const fetchInitialData = async () => {
         setLoading(true);
         try {
-            // Fetch teams
             const { data: teamsData, error: teamsError } = await supabase.from('equipos').select('*');
             if (teamsError) throw teamsError;
 
-            // Get member count for each team
             const teamsWithCounts = await Promise.all((teamsData || []).map(async (t: any) => {
                 const { count } = await supabase.from('miembros_equipos').select('*', { count: 'exact', head: true }).eq('equipo_id', t.id);
                 return { ...t, members: count || 0 };
@@ -63,7 +59,6 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
 
             setTeams(teamsWithCounts);
 
-            // Fetch schedules for the visible month in calendar
             const firstDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).toISOString().split('T')[0];
             const lastDay = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).toISOString().split('T')[0];
 
@@ -76,16 +71,13 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
 
             setUpcomingSchedules(scheds || []);
 
-            // Auto-select next today or closest service if not already selected
             const todayStr = new Date().toISOString().split('T')[0];
             const nextOne = (scheds || []).find((s: any) => s.fecha >= todayStr) || (scheds || [])[0];
-            setSelectedDateSchedule(nextOne);
+            if (!selectedDateSchedule) setSelectedDateSchedule(nextOne);
 
-            // Fetch all "servidores" for assignment
             const { data: membersData } = await supabase.from('miembros').select('*').eq('es_servidor', true);
             setMembers(membersData || []);
 
-            // Fetch blockouts (upcoming)
             const today = new Date().toISOString().split('T')[0];
             const { data: blocksData } = await supabase
                 .from('bloqueos_servidores')
@@ -112,36 +104,24 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     }, [supabase, currentMonth]);
 
     const handleSelectTeam = async (team: any) => {
-        console.log("Seleccionando equipo:", team);
         setSelectedTeam(team);
         setLoading(true);
         try {
             const { data, error } = await supabase
                 .from('miembros_equipos')
-                .select(`
-                    id,
-                    rol,
-                    miembro_id,
-                    miembros (
-                        nombre,
-                        apellido,
-                        foto_url
-                    )
-                `)
+                .select(`id, rol, miembro_id, miembros (nombre, apellido, foto_url)`)
                 .eq('equipo_id', team.id);
 
             if (error) {
                 console.error("Error al cargar miembros del equipo:", error);
-                alert("Error al cargar miembros: " + error.message);
-                // Mesmo com erro, tentamos mostrar o modal vazio
                 setTeamMembers([]);
             } else {
                 setTeamMembers(data || []);
             }
             setShowTeamModal(true);
         } catch (err: any) {
-            console.error("Exceção ao selecionar equipo:", err);
-            setShowTeamModal(true); // Tentar abrir de qualquer jeito
+            console.error("Excepción al seleccionar equipo:", err);
+            setShowTeamModal(true);
         } finally {
             setLoading(false);
         }
@@ -170,7 +150,6 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
             if (error.code === '23505') alert("Este miembro ya está en el equipo.");
             else alert("Error: " + error.message);
         } else {
-            // Notificar al miembro
             if (enviarNotificacionIndividual) {
                 const miembro = members.find(m => m.id === memberId);
                 if (miembro?.token_notificacion) {
@@ -198,10 +177,6 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
         }
     };
 
-    const filteredMembers = members.filter(m =>
-        `${m.nombre} ${m.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
     const toggleTeamBlock = async (team: any, e: React.MouseEvent) => {
         e.stopPropagation();
         const { error } = await supabase.from('equipos').update({ bloqueado: !team.bloqueado }).eq('id', team.id);
@@ -216,6 +191,10 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
         if (error) alert("Error: " + error.message);
         else fetchInitialData();
     };
+
+    const filteredMembers = members.filter(m =>
+        `${m.nombre} ${m.apellido}`.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="space-y-6">
@@ -236,526 +215,80 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {teams.map(team => (
-                    <div
+                    <TeamCard
                         key={team.id}
-                        onClick={() => handleSelectTeam(team)}
-                        className={`bg-[#1E1E1E] p-6 rounded-2xl border ${team.bloqueado ? 'border-red-500/50 grayscale' : 'border-[#333]'} hover:border-[#A8D50050] transition-all cursor-pointer group relative`}
-                    >
-                        <div className="absolute top-4 right-4 flex gap-1">
-                            <button
-                                onClick={(e) => toggleTeamBlock(team, e)}
-                                className={`p-2 rounded-lg transition-all ${team.bloqueado ? 'bg-red-500 text-white' : 'text-[#555] hover:bg-[#333]'}`}
-                                title={team.bloqueado ? "Desbloquear equipo" : "Bloquear equipo (Mantenimiento/Baja)"}
-                            >
-                                <ShieldAlert size={14} />
-                            </button>
-                            <button
-                                onClick={(e) => handleDeleteTeam(team.id, e)}
-                                className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                                title="Eliminar equipo"
-                            >
-                                <Trash2 size={14} />
-                            </button>
-                        </div>
-                        <div className="text-4xl mb-4">{team.icono || '👥'}</div>
-                        <h4 className="text-white font-bold text-lg flex items-center gap-2">
-                            {team.nombre}
-                            {team.bloqueado && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black">BLOQUEADO</span>}
-                        </h4>
-                        <p className="text-[#888] text-sm mb-4">{team.members} Voluntarios</p>
-                        <div className="text-[#A8D500] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {team.bloqueado ? 'EQUIPO EN MANTENIMIENTO' : 'VER VOLUNTARIOS'} <Plus size={12} />
-                        </div>
-                    </div>
+                        team={team}
+                        onSelect={handleSelectTeam}
+                        onToggleBlock={toggleTeamBlock}
+                        onDelete={handleDeleteTeam}
+                    />
                 ))}
             </div>
 
-            {/* Calendario y Próximas Fechas */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Calendario (Columna Izquierda) */}
-                <div className="lg:col-span-1 bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden">
-                    <div className="p-4 bg-[#222] border-b border-[#333] flex items-center justify-between">
-                        <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2">
-                            <Calendar size={16} className="text-[#A8D500]" /> Calendario
-                        </h3>
-                        <div className="flex gap-2">
-                            <button onClick={() => {
-                                const newDate = new Date(currentMonth.setMonth(currentMonth.getMonth() - 1));
-                                setCurrentMonth(new Date(newDate));
-                            }} className="text-[#888] hover:text-white p-1">←</button>
-                            <span className="text-white text-xs font-bold uppercase">
-                                {currentMonth.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
-                            </span>
-                            <button onClick={() => {
-                                const newDate = new Date(currentMonth.setMonth(currentMonth.getMonth() + 1));
-                                setCurrentMonth(new Date(newDate));
-                            }} className="text-[#888] hover:text-white p-1">→</button>
-                        </div>
-                    </div>
-                    <div className="p-4">
-                        <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                            {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map(d => <div key={d} className="text-[#555] text-[10px] font-black">{d}</div>)}
-                        </div>
-                        <div className="grid grid-cols-7 gap-1">
-                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, i) => <div key={i}></div>)}
-                            {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate() }).map((_, i) => {
-                                const day = i + 1;
-                                const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                                const daySchedule = upcomingSchedules.find(s => s.fecha === dateStr);
-                                const isSelected = selectedDateSchedule?.fecha === dateStr;
+                <TeamCalendar
+                    currentMonth={currentMonth}
+                    setCurrentMonth={setCurrentMonth}
+                    upcomingSchedules={upcomingSchedules}
+                    selectedDateSchedule={selectedDateSchedule}
+                    onSelectDate={setSelectedDateSchedule}
+                />
 
-                                return (
-                                    <button
-                                        key={day}
-                                        onClick={() => daySchedule && setSelectedDateSchedule(daySchedule)}
-                                        className={`aspect-square flex items-center justify-center text-[10px] rounded-lg border transition-all ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] z-10' : ''
-                                            } ${daySchedule ? 'bg-[#A8D500] text-black font-bold border-transparent hover:scale-110' : 'text-[#888] border-[#333] hover:border-[#555]'
-                                            }`}
-                                    >
-                                        {day}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Lista de Fechas (Columna Derecha) */}
-                <div className="lg:col-span-2 bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden flex flex-col">
-                    <div className="p-4 bg-[#222] border-b border-[#333] flex justify-between items-center">
-                        <h3 className="text-white font-bold text-sm uppercase tracking-widest">
-                            {selectedDateSchedule ? `Servicio: ${new Date(selectedDateSchedule.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}` : 'Próximos Servicios'}
-                        </h3>
-                        {selectedDateSchedule && (
-                            <button
-                                onClick={() => setSelectedDateSchedule(null)}
-                                className="text-[#A8D500] text-[10px] font-black uppercase hover:underline"
-                            >
-                                Ver todos
-                            </button>
-                        )}
-                    </div>
-                    <div className="p-6 flex-1 overflow-y-auto max-h-[400px] space-y-4">
-                        {(() => {
-                            const todayStr = new Date().toISOString().split('T')[0];
-                            const filteredList = (selectedDateSchedule ? [selectedDateSchedule] : upcomingSchedules.filter(s => s.fecha >= todayStr));
-
-                            if (filteredList.length === 0) {
-                                return (
-                                    <div className="text-center py-10">
-                                        <p className="text-[#555] italic text-sm">No hay servicios próximos para mostrar.</p>
-                                        <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
-                                    </div>
-                                );
-                            }
-
-                            return filteredList.map(s => (
-                                <div key={s.id} className="bg-[#252525] p-5 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all">
-                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="bg-[#111] p-3 rounded-xl border border-[#333] text-center min-w-[70px]">
-                                                <p className="text-[#A8D500] text-[10px] font-black uppercase">
-                                                    {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { month: 'short' })}
-                                                </p>
-                                                <p className="text-white text-xl font-black">
-                                                    {new Date(s.fecha + 'T12:00:00').getDate()}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <p className="text-white font-black text-sm uppercase">
-                                                    {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long' })}
-                                                </p>
-                                                <p className="text-[#888] text-[10px] font-bold">{s.horario}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex-1 px-4">
-                                            <div className="flex -space-x-2 overflow-hidden mb-1">
-                                                {(s.equipo_ids || []).slice(0, 10).map((staff: any, idx: number) => {
-                                                    const memberWithPhoto = members.find(m => m.id === staff.miembro_id);
-                                                    const foto = memberWithPhoto?.foto_url || staff.foto_url;
-
-                                                    return (
-                                                        <div key={idx} className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#333] overflow-hidden flex items-center justify-center text-[10px] text-white border border-[#A8D50030]" title={`${staff.nombre} (${staff.rol})`}>
-                                                            {foto ? (
-                                                                <img src={foto} alt="" className="w-full h-full object-cover" />
-                                                            ) : (
-                                                                staff.nombre?.[0] || '?'
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })}
-                                                {(s.equipo_ids || []).length > 10 && (
-                                                    <div className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#444] flex items-center justify-center text-[10px] text-[#A8D500] font-bold">
-                                                        +{(s.equipo_ids || []).length - 10}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <p className="text-[#AAAAAA] text-[10px] font-bold uppercase mt-1">
-                                                {(s.equipo_ids || []).length > 0 ? (s.equipo_ids || []).map((st: any) => st.nombre).join(', ') : 'Sin personas asignadas'}
-                                            </p>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    setSelectedDateSchedule(s);
-                                                    setShowTeamCompositionModal(true);
-                                                }}
-                                                className="bg-[#252525] text-[#A8D500] border border-[#A8D50030] text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:bg-[#A8D500] hover:text-black active:scale-95"
-                                            >
-                                                VER EQUIPO
-                                            </button>
-                                            <button
-                                                onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Ve a Plan de Culto")}
-                                                className="bg-[#A8D500] text-black text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(168,213,0,0.4)] active:scale-95"
-                                            >
-                                                EDITAR DÍA
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            ));
-                        })()}
-                    </div>
-                </div>
+                <TeamScheduleList
+                    selectedDateSchedule={selectedDateSchedule}
+                    upcomingSchedules={upcomingSchedules}
+                    setSelectedDateSchedule={setSelectedDateSchedule}
+                    setShowTeamCompositionModal={setShowTeamCompositionModal}
+                    setActiveTab={setActiveTab}
+                    members={members}
+                />
             </div>
 
-            {/* Blockouts Section */}
-            <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                    <ShieldAlert size={18} className="text-[#FFB400]" /> BLOQUEOS (Indisponibilidad)
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {blockouts.map(b => (
-                        <div key={b.id} className="flex items-center justify-between p-3 bg-[#252525] rounded-xl border border-red-500/20">
-                            <div>
-                                <p className="text-white font-bold text-sm">{b.name}</p>
-                                <p className="text-red-400 text-[10px] font-bold uppercase">{b.reason}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[#888] text-xs">{b.date}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <BlockoutsSection blockouts={blockouts} />
 
-            {/* MODAL: Team Details */}
-            {showTeamModal && selectedTeam && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#1A1A1A] w-full max-w-2xl rounded-3xl border border-[#333] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-6 border-b border-[#333] flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="text-3xl">{selectedTeam.icono}</div>
-                                <div>
-                                    <h3 className="text-white font-bold text-xl">{selectedTeam.nombre}</h3>
-                                    <p className="text-[#888] text-xs">{teamMembers.length} voluntarios en este equipo</p>
-                                </div>
-                            </div>
-                            <button onClick={() => setShowTeamModal(false)} className="text-[#888] hover:text-white p-2"><X /></button>
-                        </div>
-
-                        <div className="p-6 max-h-[60vh] overflow-y-auto">
-                            <div className="flex justify-between items-center mb-4">
-                                <h4 className="text-white font-bold text-sm uppercase tracking-widest text-[#A8D500]">Lista de Miembros</h4>
-                                <button
-                                    onClick={() => setShowAssignModal(true)}
-                                    className="bg-[#A8D500] text-black text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2"
-                                >
-                                    <UserPlus size={14} /> ASIGNAR MIEMBRO
-                                </button>
-                            </div>
-
-                            <div className="space-y-3">
-                                {teamMembers.length === 0 ? (
-                                    <p className="text-[#555] text-center py-10 italic text-sm">No hay voluntarios asignados aún.</p>
-                                ) : (
-                                    teamMembers.map((tm: any) => (
-                                        <div key={tm.id} className="flex items-center justify-between p-4 bg-[#222] rounded-2xl border border-[#333] group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-[#333] rounded-full overflow-hidden flex items-center justify-center">
-                                                    {tm.miembros.foto_url ? (
-                                                        <img src={tm.miembros.foto_url} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <User className="text-[#555]" size={20} />
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <p className="text-white font-bold text-sm">{tm.miembros.nombre} {tm.miembros.apellido}</p>
-                                                    <p className="text-[#A8D500] text-[10px] font-bold uppercase tracking-wider">{tm.rol}</p>
-                                                </div>
-                                            </div>
-                                            <button
-                                                onClick={() => handleRemoveMember(tm.id)}
-                                                className="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            {/* Modals */}
+            {showTeamModal && (
+                <TeamDetailsModal
+                    selectedTeam={selectedTeam}
+                    teamMembers={teamMembers}
+                    onClose={() => setShowTeamModal(false)}
+                    onAddMember={() => setShowAssignModal(true)}
+                    onRemoveMember={handleRemoveMember}
+                />
             )}
 
-            {/* MODAL: Assign Member */}
             {showAssignModal && (
-                <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] shadow-2xl overflow-hidden">
-                        <div className="p-6 border-b border-[#333] flex items-center justify-between">
-                            <h3 className="text-white font-bold">Asignar a {selectedTeam?.nombre}</h3>
-                            <button onClick={() => setShowAssignModal(false)} className="text-[#888] hover:text-white"><X /></button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div>
-                                <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Rol / Función</label>
-                                <input
-                                    type="text"
-                                    placeholder="Ej: Guitarra, Sonido, Proyección..."
-                                    value={assignRole}
-                                    onChange={(e) => setAssignRole(e.target.value)}
-                                    className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] mb-3"
-                                />
-                                <div className="space-y-4 mb-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar border-b border-[#333] pb-4">
-                                    {ROLE_CATEGORIES.map(cat => (
-                                        <div key={cat.name}>
-                                            <p className="text-[9px] text-[#A8D500] font-black uppercase mb-2 tracking-wider opacity-70">{cat.name}</p>
-                                            <div className="flex flex-wrap gap-1.5 mb-2">
-                                                {cat.roles.map(r => (
-                                                    <button
-                                                        key={r}
-                                                        onClick={() => setAssignRole(r)}
-                                                        className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
-                                                            }`}
-                                                    >{r}</button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Buscar Servidor</label>
-                                <div className="relative mb-4">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" size={18} />
-                                    <input
-                                        type="text"
-                                        placeholder="Nombre del miembro..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-[#222] border border-[#333] rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-[#A8D500]"
-                                    />
-                                </div>
-                                <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
-                                    {filteredMembers.map(m => (
-                                        <button
-                                            key={m.id}
-                                            onClick={() => handleAssignMember(m.id)}
-                                            className="w-full flex items-center gap-3 p-3 bg-[#252525] hover:bg-[#A8D500] hover:text-black rounded-xl transition-all group group"
-                                        >
-                                            <div className="w-8 h-8 bg-[#333] rounded-full overflow-hidden flex items-center justify-center">
-                                                {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover" /> : <User size={14} />}
-                                            </div>
-                                            <span className="font-bold text-sm">{m.nombre} {m.apellido}</span>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <AssignMemberModal
+                    selectedTeam={selectedTeam}
+                    assignRole={assignRole}
+                    setAssignRole={setAssignRole}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    filteredMembers={filteredMembers}
+                    roleCategories={ROLE_CATEGORIES}
+                    onClose={() => setShowAssignModal(false)}
+                    onAssign={handleAssignMember}
+                />
             )}
 
-            {/* MODAL: New Team */}
             {showNewTeamModal && (
-                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#1A1A1A] w-full max-w-sm rounded-3xl border border-[#333] p-6">
-                        <h3 className="text-white font-bold text-xl mb-6">Crear Nuevo Equipo</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="text-[#888] text-xs font-bold mb-2 block">NOMBRE DEL EQUIPO</label>
-                                <input
-                                    type="text"
-                                    value={newTeamName}
-                                    onChange={(e) => setNewTeamName(e.target.value)}
-                                    placeholder="Ej: Staff, Bienvenida..."
-                                    className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500]"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[#888] text-xs font-bold mb-2 block">ICONO (EMOJI)</label>
-                                <div className="grid grid-cols-5 gap-2">
-                                    {['🎸', '🎤', '🎥', '☕', '🎨', '🛡️', '🚌', '🍕', '🙏', '🔌', '💻'].map(emoji => (
-                                        <button
-                                            key={emoji}
-                                            onClick={() => setNewTeamIcon(emoji)}
-                                            className={`p-3 text-2xl rounded-xl border ${newTeamIcon === emoji ? 'bg-[#A8D500] border-[#A8D500]' : 'bg-[#222] border-[#333]'}`}
-                                        >
-                                            {emoji}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex gap-3 mt-6">
-                                <button
-                                    onClick={() => setShowNewTeamModal(false)}
-                                    className="flex-1 bg-[#222] text-white font-bold py-3 rounded-xl border border-[#333]"
-                                >
-                                    CANCELAR
-                                </button>
-                                <button
-                                    onClick={handleCreateTeam}
-                                    className="flex-1 bg-[#A8D500] text-black font-bold py-3 rounded-xl"
-                                >
-                                    CREAR
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <NewTeamModal
+                    newTeamName={newTeamName}
+                    setNewTeamName={setNewTeamName}
+                    newTeamIcon={newTeamIcon}
+                    setNewTeamIcon={setNewTeamIcon}
+                    onClose={() => setShowNewTeamModal(false)}
+                    onCreate={handleCreateTeam}
+                />
             )}
-            {/* MODAL: Team Composition (Grouped by Category) */}
-            {showTeamCompositionModal && selectedDateSchedule && (
-                <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[60] flex items-center justify-center p-4">
-                    <div className="bg-[#151515] w-full max-w-2xl rounded-3xl border border-[#333] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="p-6 border-b border-[#333] flex items-center justify-between bg-[#1A1A1A]">
-                            <div>
-                                <h3 className="text-white font-black text-[14px] uppercase tracking-widest flex items-center gap-3">
-                                    <Users2 className="text-[#A8D500]" size={18} /> Composición del Equipo
-                                </h3>
-                                <p className="text-[#888] text-[10px] font-bold uppercase mt-1">
-                                    {new Date(selectedDateSchedule.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} — {selectedDateSchedule.horario}
-                                </p>
-                            </div>
-                            <button onClick={() => setShowTeamCompositionModal(false)} className="text-[#888] hover:text-white p-2">
-                                <X size={24} />
-                            </button>
-                        </div>
 
-                        <div className="p-8 max-h-[70vh] overflow-y-auto space-y-8 custom-scrollbar">
-                            {(() => {
-                                const getRoleCategory = (rol: string) => {
-                                    for (const cat of ROLE_CATEGORIES) {
-                                        if (cat.roles.some(r => rol.includes(r))) return cat.name.toUpperCase();
-                                    }
-                                    return "GENERAL";
-                                };
-
-                                const categories = ["VOCES", "BANDA", "AUDIO", "MEDIOS", "GENERAL"];
-                                const staff = selectedDateSchedule.equipo_ids || [];
-
-                                if (staff.length === 0) {
-                                    return (
-                                        <div className="text-center py-20">
-                                            <div className="w-20 h-20 bg-[#222] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#333]">
-                                                <ShieldAlert className="text-[#555]" size={32} />
-                                            </div>
-                                            <p className="text-[#555] font-bold italic">No hay personas asignadas para este día.</p>
-                                        </div>
-                                    );
-                                }
-
-                                const stats = {
-                                    confirmados: staff.filter((s: any) => s.estado === 'confirmado').length,
-                                    pendientes: staff.filter((s: any) => s.estado === 'pendiente' || !s.estado).length,
-                                    rechazados: staff.filter((s: any) => s.estado === 'rechazado').length
-                                };
-
-                                return (
-                                    <>
-                                        {/* Barra de Resumen Rápido */}
-                                        <div className="grid grid-cols-3 gap-4 mb-8">
-                                            <div className="bg-green-500/10 border border-green-500/20 p-4 rounded-2xl text-center">
-                                                <p className="text-green-500 text-[10px] font-black uppercase mb-1">Confirmados</p>
-                                                <p className="text-white text-2xl font-black">{stats.confirmados}</p>
-                                            </div>
-                                            <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-2xl text-center">
-                                                <p className="text-yellow-500 text-[10px] font-black uppercase mb-1">Pendientes</p>
-                                                <p className="text-white text-2xl font-black">{stats.pendientes}</p>
-                                            </div>
-                                            <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl text-center">
-                                                <p className="text-red-500 text-[10px] font-black uppercase mb-1">Rechazados</p>
-                                                <p className="text-white text-2xl font-black">{stats.rechazados}</p>
-                                            </div>
-                                        </div>
-
-                                        {categories.map(catName => {
-                                            const membersInCat = staff.reduce((acc: any[], s: any) => {
-                                                const roles = (s.rol || 'Servidor').split(', ').filter(Boolean);
-                                                roles.forEach((r: string) => {
-                                                    if (getRoleCategory(r) === catName) {
-                                                        acc.push({ ...s, specificRol: r });
-                                                    }
-                                                });
-                                                return acc;
-                                            }, []);
-
-                                            if (membersInCat.length === 0) return null;
-
-                                            return (
-                                                <div key={catName} className="space-y-4">
-                                                    <div className="flex items-center gap-4">
-                                                        <h4 className="text-[#A8D500] text-[10px] font-black uppercase tracking-[0.3em]">{catName}</h4>
-                                                        <div className="h-px bg-gradient-to-r from-[#A8D50030] to-transparent flex-1"></div>
-                                                    </div>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                        {membersInCat.map((s: any, idx: number) => (
-                                                            <div key={`${s.miembro_id}-${s.specificRol}-${idx}`} className={`flex flex-col p-4 rounded-2xl border transition-all ${s.estado === 'rechazado' ? 'bg-red-500/10 border-red-500/50' : 'bg-[#1E1E1E] border-[#333]'}`}>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-12 h-12 rounded-full bg-[#111] border border-[#333] overflow-hidden flex items-center justify-center relative">
-                                                                        {(() => {
-                                                                            const m = members.find(mem => mem.id === s.miembro_id);
-                                                                            const foto = m?.foto_url || s.foto_url;
-                                                                            return foto ? (
-                                                                                <img src={foto} className="w-full h-full object-cover" alt="" />
-                                                                            ) : (
-                                                                                <span className="text-xs text-[#555] font-black">{s.nombre?.[0]}</span>
-                                                                            );
-                                                                        })()}
-                                                                        <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#1E1E1E] ${s.estado === 'confirmado' ? 'bg-[#A8D500]' : s.estado === 'rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                                                                    </div>
-                                                                    <div className="flex-1">
-                                                                        <div className="flex items-center justify-between">
-                                                                            <p className="text-white font-black text-sm uppercase">{s.nombre}</p>
-                                                                            {s.estado === 'rechazado' && (
-                                                                                <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse">REEMPLAZO NECESARIO</span>
-                                                                            )}
-                                                                        </div>
-                                                                        <p className="text-[#A8D500] text-[10px] font-black uppercase tracking-wider">{s.specificRol}</p>
-                                                                    </div>
-                                                                </div>
-
-                                                                {s.estado === 'rechazado' && s.motivo && (
-                                                                    <div className="mt-3 bg-red-500/20 p-3 rounded-xl border border-red-500/30">
-                                                                        <p className="text-red-400 text-[9px] font-black uppercase mb-1">Motivo del rechazo:</p>
-                                                                        <p className="text-white text-xs italic font-medium">"{s.motivo}"</p>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </>
-                                );
-                            })()}
-                        </div>
-
-                        <div className="p-6 border-t border-[#333] bg-[#1A1A1A] flex justify-end">
-                            <button
-                                onClick={() => setShowTeamCompositionModal(false)}
-                                className="px-8 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all uppercase tracking-widest text-xs"
-                            >
-                                Entendido
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            {showTeamCompositionModal && (
+                <TeamCompositionModal
+                    selectedDateSchedule={selectedDateSchedule}
+                    roleCategories={ROLE_CATEGORIES}
+                    members={members}
+                    onClose={() => setShowTeamCompositionModal(false)}
+                />
             )}
         </div>
     );
