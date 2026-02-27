@@ -1,0 +1,315 @@
+﻿
+> iglesia-admin@0.1.0 lint
+> eslint
+
+
+C:\iglesia-admin\app\api\cron\route.ts
+   28:13  error    'imagenAEnviar' is never reassigned. Use 'const' instead  prefer-const
+   67:20  warning  'e' is defined but never used                             @typescript-eslint/no-unused-vars
+   93:18  warning  'errorEnvio' is defined but never used                    @typescript-eslint/no-unused-vars
+  107:19  error    Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\app\api\notify\route.ts
+  97:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\app\api\youtube-sync\route.ts
+  51:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\app\page.tsx
+   64:36  warning  'toggleServerStatus' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   70:50  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   71:62  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   74:62  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   75:46  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   76:38  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   77:66  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   78:46  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   79:60  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  229:17  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  347:14  warning  'e' is defined but never used                            @typescript-eslint/no-unused-vars
+  383:32  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  451:31  error    Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+  452:28  warning  'err' is defined but never used                          @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\components\Sidebar.tsx
+  14:5  warning  'Home' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\components\admin\alerts\AlertCard.tsx
+   5:8   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   6:20  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  14:35  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\admin\cancionero\SongEditorModal.tsx
+  5:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\cancionero\SongLyricsModal.tsx
+  5:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\cancionero\SongTable.tsx
+  5:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  7:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\cms\NewsList.tsx
+   5:15  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   7:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  30:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\admin\cms\NewsModal.tsx
+   5:18  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  13:23  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  87:29  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\admin\cms\SidebarSections.tsx
+   5:16  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+   6:12  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  40:78  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  40:90  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\iglesia-admin\components\admin\dashboard\AttendanceChart.tsx
+  6:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\dashboard\DemographicsChart.tsx
+  6:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\dashboard\GrowthChart.tsx
+  6:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\dashboard\ServiceQuickInfo.tsx
+  5:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\members\MemberProfileModal.tsx
+   5:13  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  19:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\admin\members\MemberRewards.tsx
+   4:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   5:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\services\PlanTable.tsx
+  5:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\services\ServiceCard.tsx
+  5:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  8:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\services\ServiceEditorModal.tsx
+   2:13  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+   2:40  warning  'Users2' is defined but never used        @typescript-eslint/no-unused-vars
+   7:23  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  14:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:29  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  17:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:20  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:31  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:17  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\services\SongPickerModal.tsx
+  5:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\services\StaffPickerModal.tsx
+   5:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   6:20  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   9:22  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  49:51  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  49:51  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
+
+C:\iglesia-admin\components\admin\services\StaffSection.tsx
+   5:20   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   6:31   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   7:21   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   8:17   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  35:69   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  35:79   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  54:55   warning  'idx' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+  63:61   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  93:90   error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  93:101  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+C:\iglesia-admin\components\admin\services\TemplatePickerModal.tsx
+  5:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\teams\AssignMemberModal.tsx
+   5:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  10:22  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  11:21  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  83:55  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  83:55  warning  img elements must have an alt prop, either with meaningful text, or an empty string for decorative images                                                                                                                                                                                jsx-a11y/alt-text
+
+C:\iglesia-admin\components\admin\teams\BlockoutsSection.tsx
+  5:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\teams\TeamCalendar.tsx
+  7:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  8:27  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\teams\TeamCard.tsx
+  2:10  warning  'Users2' is defined but never used        @typescript-eslint/no-unused-vars
+  5:11  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:22  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  7:27  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\admin\teams\TeamCompositionModal.tsx
+    5:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+    6:21   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+    7:14   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   48:39   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   49:38   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   50:38   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   88:65   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   88:75   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  107:59   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  115:61   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  136:106  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  136:117  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+
+C:\iglesia-admin\components\admin\teams\TeamDetailsModal.tsx
+   5:19  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   6:18  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  50:50  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  55:49  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\admin\teams\TeamScheduleList.tsx
+   4:27   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   5:24   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   6:34   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   9:14   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  67:88   error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  74:57   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  88:106  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\AgendaConfigView.tsx
+  3:31  warning  'Save' is defined but never used          @typescript-eslint/no-unused-vars
+  6:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  7:26  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\AlertasView.tsx
+  10:15  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  16:46  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  17:52  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  42:8   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  44:31  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\AuditoriaView.tsx
+  6:11  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\CMSView.tsx
+   10:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   13:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   14:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   15:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   25:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   36:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\CancioneroView.tsx
+   10:51  error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   12:40  error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   18:52  error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   49:8   warning  React Hook useEffect has a missing dependency: 'fetchSongs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   51:36  error    Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  114:16  warning  '_' is assigned a value but never used                                                                         @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\components\views\DashboardView.tsx
+  14:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\EquiposView.tsx
+   24:15  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   28:12  warning  'loading' is assigned a value but never used                                                                         @typescript-eslint/no-unused-vars
+   29:40  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   30:44  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   31:54  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   35:52  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   44:48  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   45:64  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   47:70  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   55:87  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   75:53  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   88:46  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  104:8   warning  React Hook useEffect has a missing dependency: 'fetchInitialData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  106:43  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  122:23  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  180:42  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\GenteView.tsx
+    3:96  warning  'Filter' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+    7:15  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   15:32  warning  'hoyArg' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   24:48  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   45:47  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   66:43  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   73:43  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  238:41  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\iglesia-admin\components\views\MiembrosView.tsx
+  14:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:15  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\components\views\NotificacionesView.tsx
+  14:25  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:18  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:15  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  19:11  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:11  warning  'logsError' is defined but never used     @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\components\views\ServiciosView.tsx
+   21:15   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   25:12   warning  'loading' is assigned a value but never used                                                                  @typescript-eslint/no-unused-vars
+   26:48   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   27:62   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   28:46   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   29:12   warning  'allTeams' is assigned a value but never used                                                                 @typescript-eslint/no-unused-vars
+   29:46   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   30:50   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   31:54   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   32:58   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   37:54   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   42:56   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   87:8    warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   89:37   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  123:64   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  151:49   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  174:33   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  176:45   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  194:29   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  200:122  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  216:45   error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\hooks\useAsistencias.ts
+  5:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\hooks\useMiembros.ts
+  5:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\iglesia-admin\hooks\useNoticias.ts
+   5:46  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\hooks\useNotificaciones.ts
+   5:38  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  40:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+C:\iglesia-admin\lib\supabase.ts
+  10:91  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 211 problems (174 errors, 37 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+
