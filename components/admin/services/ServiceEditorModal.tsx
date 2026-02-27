@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Clock, CheckCircle2, Save, Users2, Music } from 'lucide-react';
+import { X, Clock, CheckCircle2, Save, Users2, Music, Plus } from 'lucide-react';
 import PlanTable from './PlanTable';
 import StaffSection from './StaffSection';
 
