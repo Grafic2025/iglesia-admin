@@ -3,14 +3,14 @@ import React, { useState, useEffect } from 'react';
 import { Users2, Plus } from 'lucide-react';
 
 // Modular Components
-import TeamCard from './teams/TeamCard';
-import TeamCalendar from './teams/TeamCalendar';
-import TeamScheduleList from './teams/TeamScheduleList';
-import BlockoutsSection from './teams/BlockoutsSection';
-import TeamDetailsModal from './teams/TeamDetailsModal';
-import AssignMemberModal from './teams/AssignMemberModal';
-import NewTeamModal from './teams/NewTeamModal';
-import TeamCompositionModal from './teams/TeamCompositionModal';
+import TeamCard from '../admin/teams/TeamCard';
+import TeamCalendar from '../admin/teams/TeamCalendar';
+import TeamScheduleList from '../admin/teams/TeamScheduleList';
+import BlockoutsSection from '../admin/teams/BlockoutsSection';
+import TeamDetailsModal from '../admin/teams/TeamDetailsModal';
+import AssignMemberModal from '../admin/teams/AssignMemberModal';
+import NewTeamModal from '../admin/teams/NewTeamModal';
+import TeamCompositionModal from '../admin/teams/TeamCompositionModal';
 
 const ROLE_CATEGORIES = [
     { name: "Audio", roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"] },

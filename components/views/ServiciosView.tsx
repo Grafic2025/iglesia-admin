@@ -3,11 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Plus } from 'lucide-react';
 
 // Modular Components
-import ServiceCard from './services/ServiceCard';
-import ServiceEditorModal from './services/ServiceEditorModal';
-import SongPickerModal from './services/SongPickerModal';
-import StaffPickerModal from './services/StaffPickerModal';
-import TemplatePickerModal from './services/TemplatePickerModal';
+import ServiceCard from '../admin/services/ServiceCard';
+import ServiceEditorModal from '../admin/services/ServiceEditorModal';
+import SongPickerModal from '../admin/services/SongPickerModal';
+import StaffPickerModal from '../admin/services/StaffPickerModal';
+import TemplatePickerModal from '../admin/services/TemplatePickerModal';
 
 const ROLE_CATEGORIES = [
     { name: "Audio", roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"] },

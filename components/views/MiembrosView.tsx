@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { Send, UserCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Modular Components
-import MemberRewards from './members/MemberRewards';
-import MemberProfileModal from './members/MemberProfileModal';
+import MemberRewards from '../admin/members/MemberRewards';
+import MemberProfileModal from '../admin/members/MemberProfileModal';
 
 interface MiembrosViewProps {
     busqueda: string;
