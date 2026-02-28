@@ -332,20 +332,33 @@ export default function AdminDashboard() {
    */
   const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string) => {
     const mensaje = mensajeCustom || prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
-    if (!mensaje) return;
+    if (!mensaje) return false;
+
+    console.log(`Intentando enviar notificación individual a ${nombre} con token ${token.substring(0, 15)}...`);
+
     try {
       const res = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: 'Iglesia del Salvador', message: mensaje, specificToken: token }),
       });
-      if (res.ok) {
+
+      const data = await res.json();
+      console.log(`Respuesta API (/api/notify) para ${nombre}:`, data);
+
+      if (res.ok && data.success) {
         if (!mensajeCustom) alert(`✅ Enviado a ${nombre}`);
         fetchLogs();
+        return true;
+      } else {
+        console.error(`Error en API para ${nombre}:`, data.error || 'Respuesta no exitosa');
+        if (!mensajeCustom) alert(`❌ Error al enviar a ${nombre}: ${data.error || 'Desconocido'}`);
+        return false;
       }
-      else if (!mensajeCustom) alert(`❌ Error`);
-    } catch (e) {
-      if (!mensajeCustom) alert(`❌ Error de red`);
+    } catch (e: any) {
+      console.error(`Error de red al enviar a ${nombre}:`, e.message);
+      if (!mensajeCustom) alert(`❌ Error de red al enviar a ${nombre}`);
+      return false;
     }
   }
 

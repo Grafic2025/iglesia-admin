@@ -15,7 +15,7 @@ interface MiembrosViewProps {
     premiosPendientes: any;
     premiosEntregados: any[];
     marcarComoEntregado: (id: string, nivel: number, nombre: string) => void;
-    enviarNotificacionIndividual: (token: string, nombre: string) => void;
+    enviarNotificacionIndividual: (token: string, nombre: string, mensaje?: string) => Promise<any>;
     hoyArg: string;
     supabase: any;
     fetchAsistencias: () => Promise<void>;

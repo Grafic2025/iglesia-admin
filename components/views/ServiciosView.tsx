@@ -19,7 +19,7 @@ const ROLE_CATEGORIES = [
 
 const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAuditoria }: {
     supabase: any,
-    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>,
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>,
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>
 }) => {
     const [loading, setLoading] = useState(true);
@@ -64,7 +64,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 supabase.from('cronogramas').select('*').gte('fecha', today).order('fecha', { ascending: true }),
                 supabase.from('canciones').select('*').order('titulo', { ascending: true }),
                 supabase.from('equipos').select('*'),
-                supabase.from('miembros').select('*').eq('es_servidor', true),
+                supabase.from('miembros').select('*').eq('es_servidor', true), // Filtro estricto: solo servidores oficiales
                 supabase.from('bloqueos_servidores').select('*'),
                 supabase.from('miembros_equipos').select('*')
             ]);
@@ -114,8 +114,12 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         if (!fecha) return alert("⚠️ Debes seleccionar una fecha para el servicio.");
         if (!horario) return alert("⚠️ Debes indicar el horario del servicio.");
 
-        let finalStaff = [...assignedStaff];
+        // Detectar si hubo cambios importantes para forzar notificación a confirmados
+        const esCambioHorario = selectedSchedule && selectedSchedule.horario !== horario;
+        const esCambioCanciones = selectedSchedule && JSON.stringify(selectedSchedule.orden_canciones || []) !== JSON.stringify(selectedSongIds || []);
+        const esActualizacionCritica = esCambioHorario || esCambioCanciones;
 
+        let finalStaff = [...assignedStaff];
         if (selectedSchedule) {
             const { data: latest } = await supabase.from('cronogramas').select('equipo_ids').eq('id', selectedSchedule.id).single();
             if (latest?.equipo_ids) {
@@ -141,28 +145,42 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
 
         if (res.error) alert("Error: " + res.error.message);
         else {
-            if (notificarAlGuardar) await notificarEquipoManual({ ...payload, id: selectedSchedule?.id }, true);
+            if (notificarAlGuardar) {
+                await notificarEquipoManual({ ...payload, id: selectedSchedule?.id }, true, esActualizacionCritica);
+            }
             setShowModal(false);
             fetchData();
             if (registrarAuditoria) await registrarAuditoria(selectedSchedule ? 'EDITAR CRONOGRAMA' : 'CREAR CRONOGRAMA', `Plan ${fecha} (${horario})`);
         }
     };
 
-    const notificarEquipoManual = async (sched: any, skipConfirm: boolean = false) => {
+    const notificarEquipoManual = async (sched: any, skipConfirm: boolean = false, esUpdate: boolean = false) => {
         if (!sched?.equipo_ids?.length) return alert("No hay equipo asignado.");
-        if (!skipConfirm && !confirm("Se enviarán notificaciones push a los miembros pendientes. ¿Continuar?")) return;
+        if (!skipConfirm && !confirm("Se enviarán notificaciones push a los miembros. ¿Continuar?")) return;
 
-        let enviados = 0;
-        for (const staff of sched.equipo_ids) {
-            if (staff.estado === 'pendiente' || !staff.estado) {
-                const miembro = allMembers.find(m => m.id === staff.miembro_id);
-                if (miembro?.token_notificacion && enviarNotificacionIndividual) {
-                    await enviarNotificacionIndividual(miembro.token_notificacion, miembro.nombre, `🙌 Recordatorio: Has sido seleccionado para ${staff.rol} el día ${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} (${sched.horario}).`);
-                    enviados++;
+        let totalAEnviar = 0;
+        const promesas = (sched.equipo_ids || []).map(async (staff: any) => {
+            // Si ya confirmó y no es un cambio de canciones/horario, no molestamos de nuevo
+            if (!esUpdate && staff.estado === 'confirmado') return null;
+
+            const miembro = allMembers.find(m => m.id === staff.miembro_id);
+            if (miembro?.token_notificacion && enviarNotificacionIndividual) {
+                totalAEnviar++;
+                let msg = `🙌 Estás en el plan de ${staff.rol} para el ${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} (${sched.horario}).`;
+
+                if (esUpdate) {
+                    msg = `⚠️ ACTUALIZACIÓN en el plan de ${staff.rol} (${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })}): Se actualizó el horario o las canciones. Por favor revisalo.`;
                 }
+
+                return enviarNotificacionIndividual(miembro.token_notificacion, miembro.nombre, msg);
             }
-        }
-        if (!skipConfirm) alert(`Se enviaron ${enviados} notificaciones.`);
+            return null;
+        });
+
+        const resultados = await Promise.all(promesas);
+        console.log(`Notificaciones enviadas: ${resultados.filter(r => r === true).length} de ${totalAEnviar} intentos.`);
+
+        if (!skipConfirm) alert(`Se intentó notificar a ${totalAEnviar} miembros. Verifica el historial si algo falló.`);
     };
 
     const deleteSchedule = async (id: string) => {

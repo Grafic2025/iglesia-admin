@@ -23,7 +23,7 @@ const ROLE_CATEGORIES = [
 const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
     supabase: any,
     setActiveTab?: (t: string) => void,
-    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<void>
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>
 }) => {
     const [loading, setLoading] = useState(true);
     const [teams, setTeams] = useState<any[]>([]);

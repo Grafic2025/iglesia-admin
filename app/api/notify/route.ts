@@ -39,30 +39,22 @@ export async function POST(req: Request) {
       tokens = [...new Set(tokens)];
     }
 
-    if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens' }, { status: 400 });
+    if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens válidos' }, { status: 400 });
 
-    // 2. PREPARAR NOTIFICACIONES (Versión de Máxima Compatibilidad)
+    // 2. PREPARAR NOTIFICACIONES
     const notifications = tokens.map(token => ({
       to: token,
       sound: 'default',
       title: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
       body: message,
-
-      // PROPIEDADES DE PRIORIDAD
       channelId: "default",
       priority: 'high',
       mutableContent: true,
-
-      // IMÁGENES (Duplicamos para asegurar que Android e iOS la encuentren)
-      // IMÁGENES
-      image: null,
-      icon: "https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Logo.png", // Icono "avatar" (Grande en Android)
-      attachments: [],
-
       data: {
-        url: null,
-        message: message,
-        picture: null
+        title: title,
+        body: message,
+        horario: horario || 'General',
+        type: 'service_reminder'
       }
     }));
 
@@ -77,25 +69,46 @@ export async function POST(req: Request) {
     });
 
     const expoData = await response.json();
-    console.log("Respuesta Expo:", JSON.stringify(expoData, null, 2));
 
-    // --- GUARDAR EN LOGS PARA EL ADMIN ---
+    // Determinar estado final revisando los tickets de Expo
+    let finalStatus = 'Exitoso';
+    let errorMessage = '';
+
+    if (!response.ok) {
+      finalStatus = 'Error API';
+      errorMessage = `HTTP ${response.status}: ${JSON.stringify(expoData)}`;
+    } else if (expoData.data) {
+      // Expo devuelve un array de tickets, uno por cada notificación
+      const errors = expoData.data.filter((d: any) => d.status === 'error');
+      if (errors.length > 0) {
+        finalStatus = errors.length === tokens.length ? 'Error' : 'Parcial';
+        errorMessage = `Fallas: ${errors.map((e: any) => e.message).join(', ')}`;
+      }
+    }
+
+    // --- GUARDAR EN LOGS ---
     try {
       await supabase.from('notificacion_logs').insert([{
         fecha: new Date().toISOString(),
         titulo: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
-        mensaje: message,
+        mensaje: errorMessage ? `${message} (ERROR: ${errorMessage})` : message,
         destinatarios_count: tokens.length,
-        estado: response.ok ? 'Exitoso' : 'Error'
+        estado: finalStatus
       }]);
     } catch (dbError) {
       console.error("Error guardando log:", dbError);
     }
 
-    return NextResponse.json({ success: true, total: tokens.length, expoResponse: expoData });
+    return NextResponse.json({
+      success: finalStatus === 'Exitoso' || finalStatus === 'Parcial',
+      status: finalStatus,
+      total: tokens.length,
+      error: errorMessage,
+      expoResponse: expoData
+    });
 
   } catch (error: any) {
-    console.error("Error:", error.message);
+    console.error("Error en /api/notify:", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

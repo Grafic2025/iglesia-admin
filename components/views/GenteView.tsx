@@ -7,7 +7,7 @@ interface GenteViewProps {
     miembros: any[];
     hoyArg: string;
     fetchMiembros: () => Promise<void>;
-    enviarNotificacionIndividual: (token: string, nombre: string, mensaje: string) => Promise<void>;
+    enviarNotificacionIndividual: (token: string, nombre: string, mensaje: string) => Promise<any>;
 }
 
 const PAGE_SIZE = 20;
