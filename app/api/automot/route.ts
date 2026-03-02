@@ -2,108 +2,101 @@ import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
 export async function GET(req: Request) {
-  // 1. Verificar un token de seguridad simple para evitar llamadas externas no deseadas
+  // 1. Verificar token de seguridad
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
-
-  // Deberías configurar este token en tus variables de entorno (.env) de Vercel
   const SECRET_CRON_TOKEN = process.env.CRON_SECRET || 'iglesia_admin_cron_2025';
 
-  // Soporta tanto ?token=... en la URL como el header de Authorization (estándar de Vercel)
-  const authHeader = req.headers.get('Authorization');
-  const isAuthorized = token === SECRET_CRON_TOKEN || authHeader === `Bearer ${SECRET_CRON_TOKEN}`;
-
-  if (!isAuthorized) {
-    console.warn(`[CRON] Intento de acceso no autorizado. Token: ${token ? 'presente' : 'faltante'}, Header: ${authHeader ? 'presente' : 'faltante'}`);
+  if (token !== SECRET_CRON_TOKEN) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 
   if (!supabaseAdmin) {
-    return NextResponse.json({ error: 'Servicio administrativo no disponible' }, { status: 500 });
+    return NextResponse.json({ error: 'Supabase Admin not initialized' }, { status: 500 });
   }
 
-  const results: any = { cleanup: null, notifications: null };
+  const results: any = { cleanup: null, chatOpening: null, reminders: null };
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
   try {
-    // --- TAREA 1: LIMPIEZA DE MENSAJES ANTIGUOS ---
-    // Buscamos cronogramas cuya fecha ya pasó (ayer o antes)
-    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-
-    const { data: oldPlans } = await supabaseAdmin
-      .from('cronogramas')
-      .select('id')
-      .lt('fecha', today);
-
+    // --- TAREA 1: LIMPIEZA DE MENSAJES VIEJOS ---
+    const { data: oldPlans } = await supabaseAdmin.from('cronogramas').select('id').lt('fecha', today);
     if (oldPlans && oldPlans.length > 0) {
-      const idsToDelete = oldPlans.map((p: any) => p.id);
-      const { error: deleteError } = await supabaseAdmin
-        .from('mensajes_plan')
-        .delete()
-        .in('cronograma_id', idsToDelete);
-
-      results.cleanup = deleteError ? { error: deleteError.message } : { success: true, count: idsToDelete.length };
-    } else {
-      results.cleanup = { success: true, count: 0 };
+      const ids = oldPlans.map(p => p.id);
+      await supabaseAdmin.from('mensajes_plan').delete().in('cronograma_id', ids);
+      results.cleanup = { success: true, count: ids.length };
     }
 
-    // --- TAREA 2: NOTIFICAR APERTURA (SOLO LOS LUNES) ---
-    const dayOfWeek = new Date().getDay(); // 0: Domingo, 1: Lunes...
+    // --- TAREA 2: APERTURA DE CHATS (LUNES) ---
+    const dayOfWeek = new Date().getDay(); // 1 = Lunes
+    if (dayOfWeek === 1) {
+      const startOfWeek = today;
+      const endOfWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    if (dayOfWeek === 1) { // 1 es Lunes
-      const { data: upcomingPlans } = await supabaseAdmin
+      const { data: upcoming } = await supabaseAdmin
         .from('cronogramas')
-        .select('id, fecha, horario, equipo_ids')
-        .gte('fecha', today)
-        .lte('fecha', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+        .select('id, fecha, equipo_ids')
+        .gte('fecha', startOfWeek)
+        .lte('fecha', endOfWeek);
 
-      if (upcomingPlans && upcomingPlans.length > 0) {
-        let totalNotifications = 0;
-
-        for (const plan of upcomingPlans) {
-          const memberIds = (plan.equipo_ids || []).map((m: any) => m.miembro_id).filter(Boolean);
-
-          if (memberIds.length > 0) {
-            const { data: members } = await supabaseAdmin
-              .from('miembros')
-              .select('token_notificacion, nombre')
-              .in('id', memberIds)
-              .not('token_notificacion', 'is', null);
-
+      if (upcoming && upcoming.length > 0) {
+        let sentCount = 0;
+        for (const p of upcoming) {
+          const mIds = (p.equipo_ids || []).map((m: any) => m.miembro_id).filter(Boolean);
+          if (mIds.length > 0) {
+            const { data: members } = await supabaseAdmin.from('miembros').select('token_notificacion').in('id', mIds).not('token_notificacion', 'is', null);
             if (members && members.length > 0) {
-              const tokens = members
-                .map((m: any) => m.token_notificacion)
-                .filter((t: string) => t && (t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken')));
-
+              const tokens = members.map((m: any) => m.token_notificacion).filter(Boolean);
               if (tokens.length > 0) {
-                // Enviar a Expo
-                const msg = `💬 ¡Chat Abierto! Ya podés coordinar el servicio del ${new Date(plan.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`;
-
-                const notifications = tokens.map((t: string) => ({
-                  to: t,
-                  title: '🙌 Equipo de Servicio',
-                  body: msg,
-                  data: { type: 'plan_chat', planId: plan.id }
-                }));
-
-                await fetch('https://exp.host/--/api/v2/push/send', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(notifications),
-                });
-                totalNotifications += tokens.length;
+                const msg = `💬 ¡Chat Abierto! Ya podés coordinar el servicio del ${new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`;
+                await sendToExpo(tokens, '🙌 Equipo de Servicio', msg, { type: 'plan_chat', planId: p.id });
+                sentCount += tokens.length;
               }
             }
           }
         }
-        results.notifications = { success: true, sent: totalNotifications };
+        results.chatOpening = { success: true, sent: sentCount };
       }
-    } else {
-      results.notifications = { info: 'Hoy no es lunes, no se enviaron notificaciones de apertura.' };
+    }
+
+    // --- TAREA 3: RECORDATORIOS 24HS ANTES ---
+    const { data: tomorrowPlans } = await supabaseAdmin
+      .from('cronogramas')
+      .select('id, fecha, horario, equipo_ids, notas_generales')
+      .eq('fecha', tomorrow);
+
+    if (tomorrowPlans && tomorrowPlans.length > 0) {
+      let reminderCount = 0;
+      for (const p of tomorrowPlans) {
+        // Solo enviamos a los que están "confirmado"
+        const confirmedMembers = (p.equipo_ids || []).filter((m: any) => m.estado === 'confirmado');
+        if (confirmedMembers.length > 0) {
+          for (const cm of confirmedMembers) {
+            const { data: member } = await supabaseAdmin.from('miembros').select('token_notificacion, nombre').eq('id', cm.miembro_id).single();
+            if (member?.token_notificacion) {
+              const hr = p.horario ? ` a las ${p.horario.split(',')[0]}` : '';
+              const msg = `👋 ¡Hola ${member.nombre}! Te recordamos que mañana servís como ${cm.rol}${hr}. ¡Te esperamos!`;
+              await sendToExpo([member.token_notificacion], '⏰ Recordatorio de Servicio', msg, { type: 'servidores', planId: p.id });
+              reminderCount++;
+            }
+          }
+        }
+      }
+      results.reminders = { success: true, sent: reminderCount };
     }
 
     return NextResponse.json({ success: true, results });
-
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
+}
+
+async function sendToExpo(tokens: string[], title: string, body: string, data: any) {
+  const notifications = tokens.map(t => ({ to: t, title, body, data, sound: 'default' }));
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(notifications),
+  });
 }
