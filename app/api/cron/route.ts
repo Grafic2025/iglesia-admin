@@ -1,108 +1,100 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase';
 
-export async function GET() {
+export async function GET(req: Request) {
+  // 1. Verificar un token de seguridad simple para evitar llamadas externas no deseadas
+  const { searchParams } = new URL(req.url);
+  const token = searchParams.get('token');
+
+  // Deberías configurar este token en tus variables de entorno (.env)
+  const SECRET_CRON_TOKEN = process.env.CRON_SECRET || 'iglesia_admin_cron_2025';
+
+  if (token !== SECRET_CRON_TOKEN) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
+
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: 'Servicio administrativo no disponible' }, { status: 500 });
+  }
+
+  const results: any = { cleanup: null, notifications: null };
+
   try {
-    const ahora = new Date();
+    // --- TAREA 1: LIMPIEZA DE MENSAJES ANTIGUOS ---
+    // Buscamos cronogramas cuya fecha ya pasó (ayer o antes)
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
 
-    const horaActual = ahora.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'America/Argentina/Buenos_Aires'
-    });
+    const { data: oldPlans } = await supabaseAdmin
+      .from('cronogramas')
+      .select('id')
+      .lt('fecha', today);
 
-    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-    const diaHoy = dias[ahora.getDay()];
+    if (oldPlans && oldPlans.length > 0) {
+      const idsToDelete = oldPlans.map(p => p.id);
+      const { error: deleteError } = await supabaseAdmin
+        .from('mensajes_plan')
+        .delete()
+        .in('cronograma_id', idsToDelete);
 
-    const { data: tareas, error } = await supabase
-      .from('programaciones')
-      .select('*')
-      .eq('hora', horaActual)
-      .or(`dia_semana.eq.Todos los días,dia_semana.eq.${diaHoy}`);
-
-    if (error) throw error;
-
-    if (tareas && tareas.length > 0) {
-      for (const tarea of tareas) {
-        let mensajeAEnviar = tarea.mensaje;
-        let imagenAEnviar = tarea.url_imagen || null; // Soporte para imagen programada en la tabla
-
-        // --- LÓGICA DE VERSÍCULO ---
-        if (tarea.mensaje.toUpperCase() === 'VERSICULO') {
-          try {
-            const res = await fetch('https://bible-api.com/?random=verse&translation=bbe');
-            const data = await res.json();
-
-            const resT = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(data.text)}&langpair=en|es`);
-            const dataT = await resT.json();
-            const textoEspanol = dataT.responseData.translatedText;
-
-            let referencia = data.reference;
-            const libros: { [key: string]: string } = {
-              'Genesis': 'Génesis', 'Exodus': 'Éxodo', 'Leviticus': 'Levítico', 'Numbers': 'Números', 'Deuteronomy': 'Deuteronomio',
-              'Joshua': 'Josué', 'Judges': 'Jueces', 'Ruth': 'Rut', '1 Samuel': '1 Samuel', '2 Samuel': '2 Samuel',
-              '1 Kings': '1 Reyes', '2 Kings': '2 Reyes', '1 Chronicles': '1 Crónicas', '2 Chronicles': '2 Crónicas',
-              'Ezra': 'Esdras', 'Nehemiah': 'Nehemías', 'Esther': 'Ester', 'Job': 'Job', 'Psalms': 'Salmos', 'Psalm': 'Salmo',
-              'Proverbs': 'Proverbios', 'Ecclesiastes': 'Eclesiastés', 'Song of Solomon': 'Cantares', 'Song of Songs': 'Cantares',
-              'Isaiah': 'Isaías', 'Jeremiah': 'Jeremías', 'Lamentations': 'Lamentaciones', 'Ezekiel': 'Ezequiel', 'Daniel': 'Daniel',
-              'Hosea': 'Oseas', 'Joel': 'Joel', 'Amos': 'Amós', 'Obadiah': 'Abdías', 'Jonah': 'Jonás', 'Micah': 'Miqueas', 'Nahum': 'Nahúm',
-              'Habakkuk': 'Habacuc', 'Zephaniah': 'Sofonías', 'Haggai': 'Hageo', 'Zechariah': 'Zacarías', 'Malachi': 'Malaquías',
-              'Matthew': 'Mateo', 'Mark': 'Marcos', 'Luke': 'Lucas', 'John': 'Juan', 'Acts': 'Hechos', 'Romans': 'Romanos',
-              '1 Corinthians': '1 Corintios', '2 Corinthians': '2 Corintios', 'Galatians': 'Gálatas', 'Ephesians': 'Efesios',
-              'Philippians': 'Filipenses', 'Colossians': 'Colosenses', '1 Thessalonians': '1 Tesalonicenses', '2 Thessalonians': '2 Tesalonicenses',
-              '1 Timothy': '1 Timoteo', '2 Timothy': '2 Timoteo', 'Titus': 'Tito', 'Philemon': 'Filemón', 'Hebrews': 'Hebreos',
-              'James': 'Santiago', '1 Peter': '1 Pedro', '2 Peter': '2 Pedro', '1 John': '1 Juan', '2 John': '2 Juan',
-              '3 John': '3 Juan', 'Jude': 'Judas', 'Revelation': 'Apocalipsis'
-            };
-
-            Object.keys(libros).forEach(eng => {
-              referencia = referencia.replace(eng, libros[eng]);
-            });
-
-            mensajeAEnviar = `📖 ${textoEspanol} (${referencia})`;
-
-            // Opcional: Si quieres una imagen por defecto para los versículos, descomenta la línea de abajo
-            // if (!imagenAEnviar) imagenAEnviar = "URL_DE_UNA_IMAGEN_DE_BIBLIA";
-
-          } catch (e) {
-            mensajeAEnviar = "¡Que tengas un bendecido día!";
-          }
-        }
-
-        // --- ENVÍO REAL A LA API DE NOTIFICACIONES ---
-        try {
-          const respuestaEnvio = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/notify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              title: tarea.mensaje.toUpperCase() === 'VERSICULO' ? 'Versículo del Día' : 'Iglesia del Salvador',
-              message: mensajeAEnviar,
-              horario: 'Todas',
-              image: imagenAEnviar // Enviamos la imagen para que aparezca en la miniatura
-            }),
-          });
-
-          await supabase
-            .from('programaciones')
-            .update({
-              ultimo_estado: respuestaEnvio.ok ? 'Exitoso' : 'Error',
-              ultima_ejecucion: new Date().toISOString()
-            })
-            .eq('id', tarea.id);
-
-        } catch (errorEnvio) {
-          await supabase
-            .from('programaciones')
-            .update({
-              ultimo_estado: 'Error de conexión',
-              ultima_ejecucion: new Date().toISOString()
-            })
-            .eq('id', tarea.id);
-        }
-      }
+      results.cleanup = deleteError ? { error: deleteError.message } : { success: true, count: idsToDelete.length };
+    } else {
+      results.cleanup = { success: true, count: 0 };
     }
 
-    return NextResponse.json({ ok: true, horaBuscada: horaActual, encontrados: tareas?.length || 0 });
+    // --- TAREA 2: NOTIFICAR APERTURA (SOLO LOS LUNES) ---
+    const dayOfWeek = new Date().getDay(); // 0: Domingo, 1: Lunes...
+
+    if (dayOfWeek === 1) { // 1 es Lunes
+      const { data: upcomingPlans } = await supabaseAdmin
+        .from('cronogramas')
+        .select('id, fecha, horario, equipo_ids')
+        .gte('fecha', today)
+        .lte('fecha', new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+
+      if (upcomingPlans && upcomingPlans.length > 0) {
+        let totalNotifications = 0;
+
+        for (const plan of upcomingPlans) {
+          const memberIds = (plan.equipo_ids || []).map((m: any) => m.miembro_id).filter(Boolean);
+
+          if (memberIds.length > 0) {
+            const { data: members } = await supabaseAdmin
+              .from('miembros')
+              .select('token_notificacion, nombre')
+              .in('id', memberIds)
+              .is.not('token_notificacion', null);
+
+            if (members && members.length > 0) {
+              const tokens = members.map(m => m.token_notificacion).filter(t => t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken'));
+
+              if (tokens.length > 0) {
+                // Enviar a Expo
+                const msg = `💬 ¡Chat Abierto! Ya podés coordinar el servicio del ${new Date(plan.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`;
+
+                const notifications = tokens.map(t => ({
+                  to: t,
+                  title: '🙌 Equipo de Servicio',
+                  body: msg,
+                  data: { type: 'plan_chat', planId: plan.id }
+                }));
+
+                await fetch('https://exp.host/--/api/v2/push/send', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(notifications),
+                });
+                totalNotifications += tokens.length;
+              }
+            }
+          }
+        }
+        results.notifications = { success: true, sent: totalNotifications };
+      }
+    } else {
+      results.notifications = { info: 'Hoy no es lunes, no se enviaron notificaciones de apertura.' };
+    }
+
+    return NextResponse.json({ success: true, results });
 
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
