@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     // --- TAREA 1: LIMPIEZA DE MENSAJES VIEJOS ---
     const { data: oldPlans } = await supabaseAdmin.from('cronogramas').select('id').lt('fecha', today);
     if (oldPlans && oldPlans.length > 0) {
-      const ids = oldPlans.map(p => p.id);
+      const ids = oldPlans.map((p: any) => p.id);
       await supabaseAdmin.from('mensajes_plan').delete().in('cronograma_id', ids);
       results.cleanup = { success: true, count: ids.length };
     }
@@ -93,7 +93,7 @@ export async function GET(req: Request) {
 }
 
 async function sendToExpo(tokens: string[], title: string, body: string, data: any) {
-  const notifications = tokens.map(t => ({ to: t, title, body, data, sound: 'default' }));
+  const notifications = tokens.map((t: string) => ({ to: t, title, body, data, sound: 'default' }));
   await fetch('https://exp.host/--/api/v2/push/send', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
