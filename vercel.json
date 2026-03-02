@@ -1,1 +1,8 @@
-{}
+{
+    "crons": [
+        {
+            "path": "/api/automot",
+            "schedule": "0 9 * * 1"
+        }
+    ]
+}

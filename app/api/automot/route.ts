@@ -6,10 +6,15 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
 
-  // Deberías configurar este token en tus variables de entorno (.env)
+  // Deberías configurar este token en tus variables de entorno (.env) de Vercel
   const SECRET_CRON_TOKEN = process.env.CRON_SECRET || 'iglesia_admin_cron_2025';
 
-  if (token !== SECRET_CRON_TOKEN) {
+  // Soporta tanto ?token=... en la URL como el header de Authorization (estándar de Vercel)
+  const authHeader = req.headers.get('Authorization');
+  const isAuthorized = token === SECRET_CRON_TOKEN || authHeader === `Bearer ${SECRET_CRON_TOKEN}`;
+
+  if (!isAuthorized) {
+    console.warn(`[CRON] Intento de acceso no autorizado. Token: ${token ? 'presente' : 'faltante'}, Header: ${authHeader ? 'presente' : 'faltante'}`);
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 
@@ -62,7 +67,7 @@ export async function GET(req: Request) {
               .from('miembros')
               .select('token_notificacion, nombre')
               .in('id', memberIds)
-              .is.not('token_notificacion', null);
+              .not('token_notificacion', 'is', null);
 
             if (members && members.length > 0) {
               const tokens = members
