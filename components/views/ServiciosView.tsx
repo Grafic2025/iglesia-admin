@@ -189,6 +189,36 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         fetchData();
     };
 
+    const toggleChat = async (sched: any) => {
+        const nuevoEstado = !sched.chat_activo;
+        const { error } = await supabase.from('cronogramas').update({ chat_activo: nuevoEstado }).eq('id', sched.id);
+
+        if (error) {
+            alert("Error al cambiar estado del chat: " + error.message);
+        } else {
+            if (nuevoEstado) {
+                // Notificar que el chat está abierto
+                const totalAEnviar = (sched.equipo_ids || []).filter((s: any) => s.estado === 'confirmado').length;
+                if (totalAEnviar > 0 && confirm(`El chat está activo. ¿Deseas notificar a los ${totalAEnviar} miembros confirmados?`)) {
+                    const promesas = (sched.equipo_ids || []).map(async (staff: any) => {
+                        if (staff.estado !== 'confirmado') return null;
+                        const miembro = allMembers.find(m => m.id === staff.miembro_id);
+                        if (miembro?.token_notificacion && enviarNotificacionIndividual) {
+                            return enviarNotificacionIndividual(
+                                miembro.token_notificacion,
+                                miembro.nombre,
+                                `💬 ¡Chat Abierto! Ya podés coordinar con tu equipo para el plan del ${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`
+                            );
+                        }
+                    });
+                    await Promise.all(promesas);
+                }
+            }
+            fetchData();
+            if (registrarAuditoria) await registrarAuditoria(nuevoEstado ? 'ABRIR CHAT' : 'CERRAR CHAT', `Plan ${sched.fecha}`);
+        }
+    };
+
     const exportarCSV = (sched: any) => {
         let content = "TIEMPO;ACTIVIDAD;RESPONSABLE\n";
         sched.plan_detallado?.forEach((row: any) => content += `${row.tiempo};${row.actividad};${row.responsable}\n`);
@@ -261,6 +291,7 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                         onEdit={handleOpenModal}
                         onDelete={deleteSchedule}
                         onNotify={notificarEquipoManual}
+                        onToggleChat={toggleChat}
                         onExport={exportarCSV}
                     />
                 ))}

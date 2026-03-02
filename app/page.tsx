@@ -340,7 +340,12 @@ export default function AdminDashboard() {
       const res = await fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: 'Iglesia del Salvador', message: mensaje, specificToken: token }),
+        body: JSON.stringify({
+          title: 'Iglesia del Salvador',
+          message: mensaje,
+          specificToken: token,
+          type: 'service_reminder'
+        }),
       });
 
       const data = await res.json();

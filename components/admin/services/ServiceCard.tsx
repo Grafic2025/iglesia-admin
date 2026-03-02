@@ -1,15 +1,16 @@
 import React from 'react';
-import { Calendar, Trash2, Music, Users2, Plus, Save } from 'lucide-react';
+import { Calendar, Trash2, Music, Users2, Plus, Save, MessageSquare } from 'lucide-react';
 
 interface ServiceCardProps {
     service: any;
     onEdit: (service: any) => void;
     onDelete: (id: string) => void;
     onNotify: (service: any) => void;
+    onToggleChat: (service: any) => void;
     onExport: (service: any) => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ service, onEdit, onDelete, onNotify, onExport }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, onEdit, onDelete, onNotify, onToggleChat, onExport }) => {
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all group relative text-left">
             <div className="flex justify-between items-start mb-4">
@@ -47,6 +48,13 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service, onEdit, onDelete, on
                     title="Notificar Equipo"
                 >
                     <Users2 size={14} />
+                </button>
+                <button
+                    onClick={() => onToggleChat(service)}
+                    className={`p-2 rounded-lg border transition-all ${service.chat_activo ? 'bg-[#A8D500] text-black border-[#A8D500]' : 'bg-transparent text-[#888] border-[#333] hover:border-[#A8D500] hover:text-[#A8D500]'}`}
+                    title={service.chat_activo ? "Cerrar Chat" : "Abrir Chat"}
+                >
+                    <MessageSquare size={14} />
                 </button>
                 <button
                     onClick={() => onExport(service)}

@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, message, horario, specificToken } = body;
+    const { title, message, horario, specificToken, type } = body;
 
     console.log("=== NUEVA NOTIFICACIÓN ===");
     console.log("Título:", title);
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         title: title,
         body: message,
         horario: horario || 'General',
-        type: 'service_reminder'
+        type: type || 'service_reminder' // Fundamental para que la app sepa a dónde ir
       }
     }));
 
