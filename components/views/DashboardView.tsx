@@ -71,27 +71,6 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
 
     return (
         <div className="space-y-6">
-            <ServiceQuickInfo
-                lastServiceDate={lastServiceDate}
-                nextSunday={nextSunday}
-            />
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <AttendanceChart data={asistencias7dias} />
-
-                <GrowthChart
-                    data={filteredGrowth}
-                    growthRange={growthRange}
-                    setGrowthRange={setGrowthRange}
-                    GROWTH_RANGES={GROWTH_RANGES}
-                />
-            </div>
-
-            <DemographicsChart
-                data={demographicData.ageChart}
-                COLORS={COLORS}
-            />
-
             <ActivitySummary
                 oracionesActivas={oracionesActivas}
                 nuevosMes={nuevosMes}
@@ -126,6 +105,27 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                 <StatCard label="Oraciones" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
                 <StatCard label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>
+
+            <ServiceQuickInfo
+                lastServiceDate={lastServiceDate}
+                nextSunday={nextSunday}
+            />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AttendanceChart data={asistencias7dias} />
+
+                <GrowthChart
+                    data={filteredGrowth}
+                    growthRange={growthRange}
+                    setGrowthRange={setGrowthRange}
+                    GROWTH_RANGES={GROWTH_RANGES}
+                />
+            </div>
+
+            <DemographicsChart
+                data={demographicData.ageChart}
+                COLORS={COLORS}
+            />
         </div>
     );
 };
