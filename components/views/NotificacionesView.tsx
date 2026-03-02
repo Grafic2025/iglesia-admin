@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Bell, AlertCircle, Trash2, Clock, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface NotificacionesViewProps {
@@ -19,6 +19,7 @@ interface NotificacionesViewProps {
     logs: any[];
     logsError: string | null;
     horariosDisponibles?: string[];
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
 const LOGS_PER_PAGE = 20;
@@ -27,7 +28,8 @@ const NotificacionesView = ({
     tituloPush, setTituloPush, mensajePush, setMensajePush, filtroHorario, setFiltroHorario,
     enviarNotificacion, enviando, notificacionStatus,
     cronogramas, eliminarProgramacion, fetchProgramaciones, supabase,
-    logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00']
+    logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00'],
+    registrarAuditoria
 }: NotificacionesViewProps) => {
     const [logSearch, setLogSearch] = useState('');
     const [logPage, setLogPage] = useState(1);
@@ -192,6 +194,7 @@ const NotificacionesView = ({
                                     const { error } = await supabase.from('cronogramas').insert([{ mensaje: nMensaje, dia_semana: nDia, hora: nHora, activo: true, ultimo_estado: 'Pendiente' }]);
                                     if (error) alert('Error: ' + error.message);
                                     else {
+                                        if (registrarAuditoria) await registrarAuditoria('PROGRAMAR MENSAJE', nMensaje);
                                         setNMensaje('');
                                         setNHora('');
                                         fetchProgramaciones();

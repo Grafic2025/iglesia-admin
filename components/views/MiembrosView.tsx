@@ -21,6 +21,7 @@ interface MiembrosViewProps {
     fetchAsistencias: () => Promise<void>;
     fetchMiembros: () => Promise<void>;
     horariosDisponibles: any[];
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
 const PAGE_SIZE = 25;
@@ -29,7 +30,7 @@ const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
     marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase,
-    fetchAsistencias, fetchMiembros, horariosDisponibles
+    fetchAsistencias, fetchMiembros, horariosDisponibles, registrarAuditoria
 }: MiembrosViewProps) => {
 
     const [page, setPage] = useState(1);
@@ -127,6 +128,7 @@ const MiembrosView = ({
                                                         if (!error) {
                                                             await fetchAsistencias();
                                                             await fetchMiembros();
+                                                            if (registrarAuditoria) await registrarAuditoria(newVal ? 'DAR ACCESO SERVIDOR' : 'QUITAR ACCESO SERVIDOR', `${a.miembros.nombre} ${a.miembros.apellido}`);
                                                         } else {
                                                             alert("Error: " + error.message);
                                                         }

@@ -8,11 +8,12 @@ interface GenteViewProps {
     hoyArg: string;
     fetchMiembros: () => Promise<void>;
     enviarNotificacionIndividual: (token: string, nombre: string, mensaje: string) => Promise<any>;
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
 const PAGE_SIZE = 20;
 
-const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividual }: GenteViewProps) => {
+const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividual, registrarAuditoria }: GenteViewProps) => {
     const [search, setSearch] = useState('');
     const [page, setPage] = useState(1);
     const [timeFilter, setTimeFilter] = useState('Todos');
@@ -38,6 +39,7 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                     `¡Hola ${miembro.nombre}! 🎉 Has sido habilitado como SERVIDOR en Iglesia del Salvador. ¡Gracias por sumarte al equipo! 🙌`
                 );
             }
+            if (registrarAuditoria) await registrarAuditoria(nuevoEstado ? 'DAR ACCESO SERVIDOR' : 'QUITAR ACCESO SERVIDOR', `${miembro.nombre} ${miembro.apellido}`);
             await fetchMiembros();
         }
     };
@@ -59,6 +61,7 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                     `¡Hola ${miembro.nombre}! 🛡️ Has sido designado como ADMINISTRADOR en Iglesia del Salvador. Ahora podés ver todos los planes de culto desde tu app.`
                 );
             }
+            if (registrarAuditoria) await registrarAuditoria(nuevoEstado ? 'DAR ACCESO ADMIN' : 'QUITAR ACCESO ADMIN', `${miembro.nombre} ${miembro.apellido}`);
             await fetchMiembros();
         }
     };
@@ -67,13 +70,19 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
         if (!confirm(`¿Archivar a ${miembro.nombre} ${miembro.apellido}? Ya no aparecerá en la lista principal.`)) return;
         const { error } = await supabase.from('miembros').update({ activo: false }).eq('id', miembro.id);
         if (error) alert("Error: " + error.message);
-        else await fetchMiembros();
+        else {
+            if (registrarAuditoria) await registrarAuditoria('ARCHIVAR MIEMBRO', `${miembro.nombre} ${miembro.apellido}`);
+            await fetchMiembros();
+        }
     };
 
     const handleRestore = async (miembro: any) => {
         const { error } = await supabase.from('miembros').update({ activo: true }).eq('id', miembro.id);
         if (error) alert("Error: " + error.message);
-        else await fetchMiembros();
+        else {
+            if (registrarAuditoria) await registrarAuditoria('RESTAURAR MIEMBRO', `${miembro.nombre} ${miembro.apellido}`);
+            await fetchMiembros();
+        }
     };
 
     const handleCreateMember = async () => {
@@ -92,6 +101,7 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
         if (error) {
             alert("Error al crear miembro: " + error.message);
         } else {
+            if (registrarAuditoria) await registrarAuditoria('CREAR MIEMBRO', `${newMember.nombre} ${newMember.apellido}`);
             setShowCreateModal(false);
             setNewMember({ nombre: '', apellido: '', celular: '' });
             await fetchMiembros();

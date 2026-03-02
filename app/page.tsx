@@ -264,7 +264,12 @@ export default function AdminDashboard() {
     if (!confirm(`¿Marcar como entregado el premio de nivel ${nivel} para ${nombreCompleto}?`)) return;
     const { error } = await supabase.from('premios_entregados').insert({ miembro_id: miembroId, nivel, entregado_por: 'Admin', notas: '' });
     if (error) alert('Error: ' + error.message);
-    else { alert('✅ Premio entregado'); cargarPremiosEntregados(); fetchAsistencias(); }
+    else {
+      alert('✅ Premio entregado');
+      cargarPremiosEntregados();
+      fetchAsistencias();
+      if (registrarAuditoria) await registrarAuditoria('ENTREGA PREMIO', `Nivel ${nivel} entregado a ${nombreCompleto}`);
+    }
   }
 
   /**
@@ -316,6 +321,7 @@ export default function AdminDashboard() {
     if (result.success) {
       setNotificacionStatus({ show: true, message: '✅ Notificación enviada', error: false });
       setMensajePush('');
+      if (registrarAuditoria) await registrarAuditoria('NOTIFICACION GENERAL', `Dirigida a: ${filtroHorario}. Mensaje: ${mensajePush.substring(0, 50)}...`);
     } else {
       setNotificacionStatus({ show: true, message: '❌ Error: ' + result.error, error: true });
     }
@@ -530,6 +536,7 @@ export default function AdminDashboard() {
               fetchAsistencias={fetchAsistencias}
               fetchMiembros={fetchMiembros}
               horariosDisponibles={horariosDisponibles}
+              registrarAuditoria={registrarAuditoria}
             />
           )}
 
@@ -559,6 +566,7 @@ export default function AdminDashboard() {
               logs={logs}
               logsError={logsError}
               horariosDisponibles={horariosDisponibles}
+              registrarAuditoria={registrarAuditoria}
             />
           )}
 

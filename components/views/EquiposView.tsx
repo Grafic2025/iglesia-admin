@@ -20,10 +20,11 @@ const ROLE_CATEGORIES = [
     { name: "General", roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"] }
 ];
 
-const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
+const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual, registrarAuditoria }: {
     supabase: any,
     setActiveTab?: (t: string) => void,
-    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>,
+    registrarAuditoria?: (accion: string, detalle: string) => Promise<void>
 }) => {
     const [loading, setLoading] = useState(true);
     const [teams, setTeams] = useState<any[]>([]);
@@ -132,6 +133,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
         const { error } = await supabase.from('equipos').insert([{ nombre: newTeamName, icono: newTeamIcon }]);
         if (error) alert("Error: " + error.message);
         else {
+            if (registrarAuditoria) await registrarAuditoria('CREAR EQUIPO', newTeamName);
             setShowNewTeamModal(false);
             setNewTeamName('');
             fetchInitialData();
@@ -181,7 +183,10 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
         e.stopPropagation();
         const { error } = await supabase.from('equipos').update({ bloqueado: !team.bloqueado }).eq('id', team.id);
         if (error) alert("Error: " + error.message);
-        else fetchInitialData();
+        else {
+            if (registrarAuditoria) await registrarAuditoria(team.bloqueado ? 'DESBLOQUEAR EQUIPO' : 'BLOQUEAR EQUIPO', team.nombre);
+            fetchInitialData();
+        }
     };
 
     const handleDeleteTeam = async (id: string, e: React.MouseEvent) => {
@@ -189,7 +194,10 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual }: {
         if (!confirm("¿Eliminar este equipo y todas sus asignaciones?")) return;
         const { error } = await supabase.from('equipos').delete().eq('id', id);
         if (error) alert("Error: " + error.message);
-        else fetchInitialData();
+        else {
+            if (registrarAuditoria) await registrarAuditoria('ELIMINAR EQUIPO', `ID: ${id}`);
+            fetchInitialData();
+        }
     };
 
     const filteredMembers = members.filter(m =>
