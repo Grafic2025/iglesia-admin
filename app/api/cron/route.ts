@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       .lt('fecha', today);
 
     if (oldPlans && oldPlans.length > 0) {
-      const idsToDelete = oldPlans.map(p => p.id);
+      const idsToDelete = oldPlans.map((p: any) => p.id);
       const { error: deleteError } = await supabaseAdmin
         .from('mensajes_plan')
         .delete()
@@ -65,13 +65,15 @@ export async function GET(req: Request) {
               .is.not('token_notificacion', null);
 
             if (members && members.length > 0) {
-              const tokens = members.map(m => m.token_notificacion).filter(t => t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken'));
+              const tokens = members
+                .map((m: any) => m.token_notificacion)
+                .filter((t: string) => t && (t.startsWith('ExponentPushToken') || t.startsWith('ExpoPushToken')));
 
               if (tokens.length > 0) {
                 // Enviar a Expo
                 const msg = `💬 ¡Chat Abierto! Ya podés coordinar el servicio del ${new Date(plan.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`;
 
-                const notifications = tokens.map(t => ({
+                const notifications = tokens.map((t: string) => ({
                   to: t,
                   title: '🙌 Equipo de Servicio',
                   body: msg,
