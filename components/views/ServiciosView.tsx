@@ -52,7 +52,12 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
     const fetchData = async () => {
         setLoading(true);
         try {
-            const today = new Date().toISOString().split('T')[0];
+            // Obtenemos la fecha de ayer para que los lunes todavía se vea el plan del domingo que pasó
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const dateStr = yesterday.toISOString().split('T')[0];
+
+            // Ejecutamos las consultas de forma segura (si una falla, las otras siguen)
             const [
                 { data: scheds },
                 { data: songs },
@@ -61,22 +66,26 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 { data: blocks },
                 { data: memberTeams }
             ] = await Promise.all([
-                supabase.from('cronogramas').select('*').gte('fecha', today).order('fecha', { ascending: true }),
+                supabase.from('cronogramas').select('*').gte('fecha', dateStr).order('fecha', { ascending: true }),
                 supabase.from('canciones').select('*').order('titulo', { ascending: true }),
                 supabase.from('equipos').select('*'),
-                supabase.from('miembros').select('*').eq('es_servidor', true), // Filtro estricto: solo servidores oficiales
+                supabase.from('miembros').select('*').eq('es_servidor', true),
                 supabase.from('bloqueos_servidores').select('*'),
                 supabase.from('miembros_equipos').select('*')
-            ]);
+            ]).catch(err => {
+                console.warn("Alguna tabla podría faltar:", err);
+                return [{}, {}, {}, {}, {}, {}] as any;
+            });
 
-            setSchedules(scheds || []);
-            setAllSongs(songs || []);
-            setAllTeams(teams || []);
-            setAllMembers(members || []);
-            setAllBlockouts(blocks || []);
-            setAllMemberTeams(memberTeams || []);
+            if (scheds) setSchedules(scheds);
+            if (songs) setAllSongs(songs);
+            if (teams) setAllTeams(teams);
+            if (members) setAllMembers(members);
+            if (blocks) setAllBlockouts(blocks);
+            if (memberTeams) setAllMemberTeams(memberTeams);
+
         } catch (error) {
-            console.error(error);
+            console.error("Error crítico en fetchData:", error);
         } finally {
             setLoading(false);
         }
