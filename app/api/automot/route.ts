@@ -73,12 +73,39 @@ export async function GET(req: Request) {
         const confirmedMembers = (p.equipo_ids || []).filter((m: any) => m.estado === 'confirmado');
         if (confirmedMembers.length > 0) {
           for (const cm of confirmedMembers) {
+            // Verificar si ya se envió el recordatorio para este miembro y esta fecha de plan hoy
+            const identifier = `REMINDER-${p.id}-${cm.miembro_id}-${p.fecha}`;
+            const { data: existingLog } = await supabaseAdmin
+              .from('notificacion_logs')
+              .select('id')
+              .eq('titulo', '⏰ Recordatorio de Servicio')
+              .ilike('mensaje', `%[ID:${identifier}]%`)
+              .maybeSingle();
+
+            if (existingLog) {
+              console.log(`Recordatorio ya enviado para ${identifier}`);
+              continue;
+            }
+
             const { data: member } = await supabaseAdmin.from('miembros').select('token_notificacion, nombre').eq('id', cm.miembro_id).single();
             if (member?.token_notificacion) {
-              const hr = p.horario ? ` a las ${p.horario.split(',')[0]}` : '';
+              const hr = p.horario ? ` a las ${p.horario.split(',')[0]} HS` : '';
               const msg = `👋 ¡Hola ${member.nombre}! Te recordamos que mañana servís como ${cm.rol}${hr}. ¡Te esperamos!`;
-              await sendToExpo([member.token_notificacion], '⏰ Recordatorio de Servicio', msg, { type: 'servidores', planId: p.id });
-              reminderCount++;
+              const finalMsg = `${msg} [ID:${identifier}]`; // Marcador oculto/visible para evitar reenvíos
+
+              const success = await sendToExpo([member.token_notificacion], '⏰ Recordatorio de Servicio', finalMsg, { type: 'servidores', planId: p.id });
+
+              if (success) {
+                // Registrar en logs para evitar duplicados en la próxima ejecución
+                await supabaseAdmin.from('notificacion_logs').insert([{
+                  fecha: new Date().toISOString(),
+                  titulo: '⏰ Recordatorio de Servicio',
+                  mensaje: finalMsg,
+                  destinatarios_count: 1,
+                  estado: 'Exitoso'
+                }]);
+                reminderCount++;
+              }
             }
           }
         }
@@ -88,15 +115,22 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ success: true, results });
   } catch (e: any) {
+    console.error("Error en automot:", e.message);
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
 
 async function sendToExpo(tokens: string[], title: string, body: string, data: any) {
-  const notifications = tokens.map((t: string) => ({ to: t, title, body, data, sound: 'default' }));
-  await fetch('https://exp.host/--/api/v2/push/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(notifications),
-  });
+  try {
+    const notifications = tokens.map((t: string) => ({ to: t, title, body, data, sound: 'default' }));
+    const response = await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(notifications),
+    });
+    return response.ok;
+  } catch (e) {
+    console.error("Error sending to Expo:", e);
+    return false;
+  }
 }
