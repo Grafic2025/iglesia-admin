@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import NewsList from '../admin/cms/NewsList';
 import NewsModal from '../admin/cms/NewsModal';
 import SidebarSections from '../admin/cms/SidebarSections';
+import ActionsManager from '../admin/cms/ActionsManager';
 
 interface CMSViewProps {
     noticias: any[];
@@ -109,22 +110,47 @@ const CMSView = ({
         }
     };
 
+    const [activeSection, setActiveSection] = useState<'noticias' | 'acciones'>('noticias');
+
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <NewsList
-                    noticias={noticias}
-                    syncYouTube={syncYouTube}
-                    onEdit={openEdit}
-                    onDelete={eliminarNoticia}
-                    onAdd={openAdd}
-                />
-
-                <SidebarSections
-                    bautismos={bautismos}
-                    ayuda={ayuda}
-                />
+            {/* TABS SELECTOR */}
+            <div className="flex gap-4 border-b border-[#333] mb-6">
+                <button
+                    onClick={() => setActiveSection('noticias')}
+                    className={`pb-4 px-2 text-sm font-bold transition-all ${activeSection === 'noticias' ? 'text-[#A8D500] border-b-2 border-[#A8D500]' : 'text-[#888] hover:text-white'}`}
+                >
+                    Noticias y Novedades
+                </button>
+                <button
+                    onClick={() => setActiveSection('acciones')}
+                    className={`pb-4 px-2 text-sm font-bold transition-all ${activeSection === 'acciones' ? 'text-[#A8D500] border-b-2 border-[#A8D500]' : 'text-[#888] hover:text-white'}`}
+                >
+                    Accesos Inicio (App)
+                </button>
             </div>
+
+            {activeSection === 'noticias' ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <NewsList
+                        noticias={noticias}
+                        syncYouTube={syncYouTube}
+                        onEdit={openEdit}
+                        onDelete={eliminarNoticia}
+                        onAdd={openAdd}
+                    />
+
+                    <SidebarSections
+                        bautismos={bautismos}
+                        ayuda={ayuda}
+                    />
+                </div>
+            ) : (
+                <ActionsManager
+                    supabase={supabase}
+                    registrarAuditoria={registrarAuditoria}
+                />
+            )}
 
             {showModal && (
                 <NewsModal
