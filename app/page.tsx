@@ -54,6 +54,7 @@ export default function AdminDashboard() {
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
   const [imageUrlPush, setImageUrlPush] = useState('')
+  const [typePush, setTypePush] = useState('General')
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
   const [loginAttempts, setLoginAttempts] = useState(0)
@@ -320,7 +321,8 @@ export default function AdminDashboard() {
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
-    const result = await enviarPushGeneral(tituloPush, mensajePush, imageUrlPush);
+    const finalType = typePush === 'General' ? 'service_reminder' : typePush.toLowerCase();
+    const result = await enviarPushGeneral(tituloPush, mensajePush, imageUrlPush, finalType);
     if (result.success) {
       setNotificacionStatus({ show: true, message: '✅ Notificación enviada', error: false });
       setMensajePush('');
@@ -340,11 +342,9 @@ export default function AdminDashboard() {
    * @param nombre Nombre del usuario (para la UI).
    * @param mensajeCustom Opcional: El mensaje a enviar; si no se provee, se solicita mediante un prompt.
    */
-  const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string) => {
+  const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string, type: string = 'service_reminder', extraData: any = {}) => {
     const mensaje = mensajeCustom || prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
     if (!mensaje) return false;
-
-    console.log(`Intentando enviar notificación individual a ${nombre} con token ${token.substring(0, 15)}...`);
 
     try {
       const res = await fetch('/api/notify', {
@@ -354,7 +354,8 @@ export default function AdminDashboard() {
           title: 'Iglesia del Salvador',
           message: mensaje,
           specificToken: token,
-          type: 'service_reminder'
+          type: type,
+          ...extraData
         }),
       });
 
@@ -572,6 +573,8 @@ export default function AdminDashboard() {
               logsError={logsError}
               horariosDisponibles={horariosDisponibles}
               registrarAuditoria={registrarAuditoria}
+              typePush={typePush}
+              setTypePush={setTypePush}
             />
           )}
 

@@ -9,6 +9,8 @@ interface NotificacionesViewProps {
     setMensajePush: (v: string) => void;
     imageUrlPush: string;
     setImageUrlPush: (v: string) => void;
+    typePush: string;
+    setTypePush: (v: string) => void;
     filtroHorario: string;
     setFiltroHorario: (v: string) => void;
     enviarNotificacion: () => void;
@@ -31,7 +33,8 @@ const NotificacionesView = ({
     enviarNotificacion, enviando, notificacionStatus,
     cronogramas, eliminarProgramacion, fetchProgramaciones, supabase,
     logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00'],
-    registrarAuditoria, imageUrlPush, setImageUrlPush
+    registrarAuditoria, imageUrlPush, setImageUrlPush,
+    typePush, setTypePush
 }: NotificacionesViewProps) => {
     const [logSearch, setLogSearch] = useState('');
     const [logPage, setLogPage] = useState(1);
@@ -83,14 +86,29 @@ const NotificacionesView = ({
                                 className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-4 text-white outline-none focus:border-[#A8D500] h-32 resize-none"
                             />
                         </div>
-                        <div>
-                            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">URL Imagen (Opcional)</label>
-                            <input
-                                placeholder="https://ejemplo.com/imagen.jpg"
-                                value={imageUrlPush}
-                                onChange={(e) => setImageUrlPush(e.target.value)}
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="text-[#888] text-xs font-bold uppercase mb-1 block">URL Imagen (Opcional)</label>
+                                <input
+                                    placeholder="https://ejemplo.com/imagen.jpg"
+                                    value={imageUrlPush}
+                                    onChange={(e) => setImageUrlPush(e.target.value)}
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Abrir al tocar</label>
+                                <select
+                                    value={typePush}
+                                    onChange={(e) => setTypePush(e.target.value)}
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                >
+                                    <option value="General">Buzón de Mensajes</option>
+                                    <option value="News">Noticias</option>
+                                    <option value="Video">Videos / YouTube</option>
+                                    <option value="Prayer">Muro de Oración</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Segmento / Destinatarios</label>

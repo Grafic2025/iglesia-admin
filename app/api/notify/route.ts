@@ -52,11 +52,8 @@ export async function POST(req: Request) {
         priority: 'high',
         mutableContent: true,
         data: {
-          title: title,
-          body: message,
-          horario: horario || 'General',
-          type: type || 'service_reminder',
-          image: imageUrl // Para Android
+          ...body, // Pasamos el body completo (contiene title, message, type, imageUrl, IDs, etc)
+          image: imageUrl // Alias para Android
         }
       };
 

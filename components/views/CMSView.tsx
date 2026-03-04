@@ -8,12 +8,12 @@ import ActionsManager from '../admin/cms/ActionsManager';
 
 interface CMSViewProps {
     noticias: any[];
-    syncYouTube: (alert: boolean) => void;
+    syncYouTube: (alert: boolean) => Promise<any>;
     eliminarNoticia: (id: string) => void;
     supabase: any;
     fetchNoticias: () => Promise<void>;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
-    enviarPushGeneral?: (title: string, message: string, imageUrl?: string) => Promise<any>;
+    enviarPushGeneral?: (title: string, message: string, imageUrl?: string, type?: string, extraData?: any) => Promise<any>;
 }
 
 const CMSView = ({
@@ -76,19 +76,27 @@ const CMSView = ({
             screen: screen || null
         };
         let error;
+        let insertedData = null;
         if (currentNews?.id) {
             const { error: err } = await supabase.from('noticias').update(payload).eq('id', currentNews.id);
             error = err;
         } else {
-            const { error: err } = await supabase.from('noticias').insert([payload]);
+            const { data, error: err } = await supabase.from('noticias').insert([payload]).select().single();
             error = err;
+            insertedData = data;
         }
 
         if (error) alert("Error al guardar: " + error.message);
         else {
             // Si es noticia nueva y el checkbox está marcado, notificar
-            if (!currentNews?.id && notificar && enviarPushGeneral) {
-                enviarPushGeneral(titulo, descripcion || 'Iglesia del Salvador: Nueva noticia', imagenUrl);
+            if (!currentNews?.id && notificar && enviarPushGeneral && insertedData) {
+                enviarPushGeneral(
+                    titulo,
+                    descripcion || 'Iglesia del Salvador: Nueva noticia',
+                    imagenUrl,
+                    'news',
+                    { newsId: insertedData.id, news: insertedData }
+                );
             }
             setShowModal(false);
             setNotificar(false);
@@ -121,6 +129,29 @@ const CMSView = ({
             alert('Error subiendo imagen: ' + error.message);
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const handleSyncYouTube = async (showAlert: boolean) => {
+        const res = await syncYouTube(showAlert);
+        if (res.success && showAlert) {
+            // Buscar la noticia de YouTube recién actualizada (ID fijo 1)
+            const ytNews = noticias.find(n => n.id === '00000000-0000-0000-0000-000000000001');
+            if (ytNews && confirm(`Sincronización exitosa: "${ytNews.titulo}". ¿Deseas enviar una notificación push a toda la iglesia?`)) {
+                if (enviarPushGeneral) {
+                    enviarPushGeneral(
+                        ytNews.titulo,
+                        "📺 Ya está disponible el mensaje de hoy. ¡Miralo ahora!",
+                        ytNews.imagen_url,
+                        'news',
+                        { newsId: ytNews.id, news: ytNews }
+                    );
+                }
+            } else {
+                alert("Sincronización completada.");
+            }
+        } else if (!res.success) {
+            alert("Error al sincronizar: " + res.error);
         }
     };
 
@@ -164,7 +195,7 @@ const CMSView = ({
                 <div className="space-y-6">
                     <NewsList
                         noticias={noticias}
-                        syncYouTube={syncYouTube}
+                        syncYouTube={handleSyncYouTube}
                         onEdit={openEdit}
                         onDelete={eliminarNoticia}
                         onAdd={openAdd}
