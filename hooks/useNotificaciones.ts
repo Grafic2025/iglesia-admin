@@ -24,12 +24,12 @@ export const useNotificaciones = () => {
         }
     }, []);
 
-    const enviarPushGeneral = useCallback(async (title: string, message: string) => {
+    const enviarPushGeneral = useCallback(async (title: string, message: string, imageUrl?: string) => {
         try {
             const res = await fetch('/api/notify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, message })
+                body: JSON.stringify({ title, message, imageUrl })
             });
             const data = await res.json();
             if (data.success) {

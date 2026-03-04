@@ -7,6 +7,8 @@ interface NotificacionesViewProps {
     setTituloPush: (v: string) => void;
     mensajePush: string;
     setMensajePush: (v: string) => void;
+    imageUrlPush: string;
+    setImageUrlPush: (v: string) => void;
     filtroHorario: string;
     setFiltroHorario: (v: string) => void;
     enviarNotificacion: () => void;
@@ -29,7 +31,7 @@ const NotificacionesView = ({
     enviarNotificacion, enviando, notificacionStatus,
     cronogramas, eliminarProgramacion, fetchProgramaciones, supabase,
     logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00'],
-    registrarAuditoria
+    registrarAuditoria, imageUrlPush, setImageUrlPush
 }: NotificacionesViewProps) => {
     const [logSearch, setLogSearch] = useState('');
     const [logPage, setLogPage] = useState(1);
@@ -79,6 +81,15 @@ const NotificacionesView = ({
                                 value={mensajePush}
                                 onChange={(e) => setMensajePush(e.target.value)}
                                 className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-4 text-white outline-none focus:border-[#A8D500] h-32 resize-none"
+                            />
+                        </div>
+                        <div>
+                            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">URL Imagen (Opcional)</label>
+                            <input
+                                placeholder="https://ejemplo.com/imagen.jpg"
+                                value={imageUrlPush}
+                                onChange={(e) => setImageUrlPush(e.target.value)}
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
                             />
                         </div>
                         <div>
@@ -144,7 +155,10 @@ const NotificacionesView = ({
                                 <span className="text-[10px] text-gray-500 ml-auto">ahora</span>
                             </div>
                             <p className="text-sm font-bold text-black mb-1">{tituloPush || 'Iglesia del Salvador'}</p>
-                            <p className="text-xs text-black leading-tight line-clamp-3 overflow-hidden">{mensajePush || 'Tu mensaje aparecerá aquí...'}</p>
+                            <p className="text-xs text-black leading-tight line-clamp-3 overflow-hidden mb-2">{mensajePush || 'Tu mensaje aparecerá aquí...'}</p>
+                            {imageUrlPush && (
+                                <img src={imageUrlPush} alt="preview" className="w-full h-24 object-cover rounded-xl border border-[#eee]" />
+                            )}
                         </div>
 
                         {/* Time/Date on phone */}

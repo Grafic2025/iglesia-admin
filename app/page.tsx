@@ -53,6 +53,7 @@ export default function AdminDashboard() {
   const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
   const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
   const [mensajePush, setMensajePush] = useState('')
+  const [imageUrlPush, setImageUrlPush] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
   const [loginAttempts, setLoginAttempts] = useState(0)
@@ -319,10 +320,11 @@ export default function AdminDashboard() {
   const enviarNotificacion = async () => {
     if (!mensajePush) return;
     setEnviando(true);
-    const result = await enviarPushGeneral(tituloPush, mensajePush);
+    const result = await enviarPushGeneral(tituloPush, mensajePush, imageUrlPush);
     if (result.success) {
       setNotificacionStatus({ show: true, message: '✅ Notificación enviada', error: false });
       setMensajePush('');
+      setImageUrlPush('');
       if (registrarAuditoria) await registrarAuditoria('NOTIFICACION GENERAL', `Dirigida a: ${filtroHorario}. Mensaje: ${mensajePush.substring(0, 50)}...`);
     } else {
       setNotificacionStatus({ show: true, message: '❌ Error: ' + result.error, error: true });
@@ -555,6 +557,7 @@ export default function AdminDashboard() {
             <NotificacionesView
               tituloPush={tituloPush} setTituloPush={setTituloPush}
               mensajePush={mensajePush} setMensajePush={setMensajePush}
+              imageUrlPush={imageUrlPush} setImageUrlPush={setImageUrlPush}
               filtroHorario={filtroHorario} setFiltroHorario={setFiltroHorario}
               enviarNotificacion={enviarNotificacion}
               enviando={enviando}
@@ -587,6 +590,7 @@ export default function AdminDashboard() {
               supabase={supabase}
               fetchNoticias={fetchNoticias}
               registrarAuditoria={registrarAuditoria}
+              enviarPushGeneral={enviarPushGeneral}
             />
           )}
 

@@ -13,11 +13,13 @@ interface CMSViewProps {
     supabase: any;
     fetchNoticias: () => Promise<void>;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
+    enviarPushGeneral?: (title: string, message: string, imageUrl?: string) => Promise<any>;
 }
 
 const CMSView = ({
     noticias, syncYouTube, eliminarNoticia,
-    supabase, fetchNoticias, registrarAuditoria
+    supabase, fetchNoticias, registrarAuditoria,
+    enviarPushGeneral
 }: CMSViewProps) => {
     const [showModal, setShowModal] = useState(false);
     const [currentNews, setCurrentNews] = useState<any>(null);
@@ -32,6 +34,7 @@ const CMSView = ({
     const [venceEl, setVenceEl] = useState('');
     const [url, setUrl] = useState('');
     const [screen, setScreen] = useState('');
+    const [notificar, setNotificar] = useState(false);
 
     const openEdit = (n: any) => {
         setCurrentNews(n);
@@ -56,6 +59,7 @@ const CMSView = ({
         setVenceEl('');
         setUrl('');
         setScreen('');
+        setNotificar(true); // Default to true for new news
         setShowModal(true);
     };
 
@@ -82,7 +86,12 @@ const CMSView = ({
 
         if (error) alert("Error al guardar: " + error.message);
         else {
+            // Si es noticia nueva y el checkbox está marcado, notificar
+            if (!currentNews?.id && notificar && enviarPushGeneral) {
+                enviarPushGeneral(titulo, descripcion || 'Iglesia del Salvador: Nueva noticia', imagenUrl);
+            }
             setShowModal(false);
+            setNotificar(false);
             if (fetchNoticias) await fetchNoticias();
             if (registrarAuditoria) await registrarAuditoria(currentNews ? 'EDITAR NOTICIA' : 'CREAR NOTICIA', titulo);
         }
@@ -194,6 +203,8 @@ const CMSView = ({
                     venceEl={venceEl} setVenceEl={setVenceEl}
                     url={url} setUrl={setUrl}
                     screen={screen} setScreen={setScreen}
+                    notificar={notificar} setNotificar={setNotificar}
+                    isNew={!currentNews}
                     isUploading={isUploading}
                     handleUpload={handleUpload}
                     onSave={handleSave}

@@ -11,6 +11,8 @@ interface NewsModalProps {
     venceEl: string; setVenceEl: (v: string) => void;
     url: string; setUrl: (v: string) => void;
     screen: string; setScreen: (v: string) => void;
+    notificar?: boolean; setNotificar?: (v: boolean) => void;
+    isNew?: boolean;
     isUploading: boolean;
     handleUpload: (e: any) => void;
     onSave: () => void;
@@ -20,7 +22,9 @@ interface NewsModalProps {
 const NewsModal: React.FC<NewsModalProps> = ({
     currentNews, titulo, setTitulo, descripcion, setDescripcion,
     imagenUrl, setImagenUrl, categoria, setCategoria, activa, setActiva,
-    venceEl, setVenceEl, url, setUrl, screen, setScreen, isUploading, handleUpload, onSave, onClose
+    venceEl, setVenceEl, url, setUrl, screen, setScreen,
+    notificar, setNotificar, isNew,
+    isUploading, handleUpload, onSave, onClose
 }) => {
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -70,6 +74,12 @@ const NewsModal: React.FC<NewsModalProps> = ({
                             <input type="checkbox" checked={activa} onChange={e => setActiva(e.target.checked)} className="accent-[#A8D500] w-4 h-4" />
                             <span className="text-white text-xs font-bold">Activa</span>
                         </div>
+                        {isNew && setNotificar && (
+                            <div className="flex items-center gap-2 ml-4 bg-[#A8D50010] px-3 py-1.5 rounded-lg border border-[#A8D50030]">
+                                <input type="checkbox" checked={notificar} onChange={e => setNotificar(e.target.checked)} className="accent-[#A8D500] w-4 h-4" />
+                                <span className="text-[#A8D500] text-xs font-bold uppercase tracking-tight">Notificar a la Iglesia</span>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Imagen</label>

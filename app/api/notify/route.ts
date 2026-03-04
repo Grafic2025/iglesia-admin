@@ -4,11 +4,11 @@ import { supabase } from '@/lib/supabase';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, message, horario, specificToken, type } = body;
+    const { title, message, horario, specificToken, type, imageUrl } = body;
 
     console.log("=== NUEVA NOTIFICACIÓN ===");
     console.log("Título:", title);
-
+    if (imageUrl) console.log("Imagen:", imageUrl);
 
     let tokens: string[] = [];
 
@@ -42,21 +42,30 @@ export async function POST(req: Request) {
     if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens válidos' }, { status: 400 });
 
     // 2. PREPARAR NOTIFICACIONES
-    const notifications = tokens.map(token => ({
-      to: token,
-      sound: 'default',
-      title: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
-      body: message,
-      channelId: "default",
-      priority: 'high',
-      mutableContent: true,
-      data: {
-        title: title,
+    const notifications = tokens.map(token => {
+      const notification: any = {
+        to: token,
+        sound: 'default',
+        title: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
         body: message,
-        horario: horario || 'General',
-        type: type || 'service_reminder' // Fundamental para que la app sepa a dónde ir
+        channelId: "default",
+        priority: 'high',
+        mutableContent: true,
+        data: {
+          title: title,
+          body: message,
+          horario: horario || 'General',
+          type: type || 'service_reminder',
+          image: imageUrl // Para Android
+        }
+      };
+
+      if (imageUrl) {
+        notification.attachments = [{ url: imageUrl }]; // Para iOS
       }
-    }));
+
+      return notification;
+    });
 
     // --- ENVÍO A EXPO ---
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
