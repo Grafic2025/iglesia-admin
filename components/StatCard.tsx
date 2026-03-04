@@ -25,7 +25,7 @@ const StatCard = ({ label, value, color = '#A8D500', icon, isActive, trend }: St
                 <span className="text-2xl font-bold" style={{ color: isActive ? color : '#fff' }}>
                     {value}
                 </span>
-                {isActive && !trend && <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }}></div>}
+
             </div>
             {trend !== undefined && trend !== null && (
                 <div className="flex items-center gap-1 mt-2">

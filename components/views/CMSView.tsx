@@ -144,32 +144,43 @@ const CMSView = ({
     };
 
     return (
-        <div className="space-y-6">
-            <div className="space-y-8 max-w-5xl">
-                <NewsList
-                    noticias={noticias}
-                    syncYouTube={syncYouTube}
-                    onEdit={openEdit}
-                    onDelete={eliminarNoticia}
-                    onAdd={openAdd}
-                    onMove={handleMove}
-                />
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <div>
+                <h2 className="text-2xl font-bold text-white mb-2">Gestión de Contenido</h2>
+                <p className="text-[#888] text-sm">Administra las noticias del carrusel y los accesos directos de la App desde un solo lugar.</p>
+            </div>
 
-                <ActionsManager
-                    supabase={supabase}
-                    registrarAuditoria={registrarAuditoria}
-                    onPromote={(action) => {
-                        setCurrentNews(null);
-                        setTitulo(action.titulo);
-                        setDescripcion('¡Novedad!');
-                        setImagenUrl(action.imagen_url || '');
-                        setScreen(action.pantalla);
-                        setUrl('');
-                        setCategoria('Aviso');
-                        setActiva(true);
-                        setShowModal(true);
-                    }}
-                />
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full">
+                {/* COLUMNA 1: NOTICIAS */}
+                <div className="space-y-6">
+                    <NewsList
+                        noticias={noticias}
+                        syncYouTube={syncYouTube}
+                        onEdit={openEdit}
+                        onDelete={eliminarNoticia}
+                        onAdd={openAdd}
+                        onMove={handleMove}
+                    />
+                </div>
+
+                {/* COLUMNA 2: TARJETAS DE INICIO */}
+                <div className="space-y-6">
+                    <ActionsManager
+                        supabase={supabase}
+                        registrarAuditoria={registrarAuditoria}
+                        onPromote={(action) => {
+                            setCurrentNews(null);
+                            setTitulo(action.titulo);
+                            setDescripcion('¡Novedad!');
+                            setImagenUrl(action.imagen_url || '');
+                            setScreen(action.pantalla);
+                            setUrl('');
+                            setCategoria('Aviso');
+                            setActiva(true);
+                            setShowModal(true);
+                        }}
+                    />
+                </div>
             </div>
 
             {showModal && (
