@@ -134,6 +134,17 @@ const CMSView = ({
                     <ActionsManager
                         supabase={supabase}
                         registrarAuditoria={registrarAuditoria}
+                        onPromote={(action) => {
+                            setCurrentNews(null);
+                            setTitulo(action.titulo);
+                            setDescripcion('¡Novedad!');
+                            setImagenUrl(action.imagen_url || '');
+                            setScreen(action.pantalla);
+                            setUrl('');
+                            setCategoria('Aviso');
+                            setActiva(true);
+                            setShowModal(true);
+                        }}
                     />
                 </div>
 

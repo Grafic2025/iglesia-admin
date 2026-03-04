@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon, RefreshCw, Megaphone } from 'lucide-react';
 
 interface HomeAction {
     id: string;
@@ -14,6 +14,7 @@ interface HomeAction {
 interface ActionsManagerProps {
     supabase: any;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
+    onPromote?: (action: HomeAction) => void;
 }
 
 const DEFAULT_ACTIONS: HomeAction[] = [
@@ -29,7 +30,7 @@ const DEFAULT_ACTIONS: HomeAction[] = [
     { id: '10', titulo: 'Reunión en Vivo', icono: 'youtube-play', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Vivo.jpg', pantalla: 'https://youtube.com/@iglesiadelsalvador', es_mci: false, activa: true },
 ];
 
-const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAuditoria }) => {
+const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAuditoria, onPromote }) => {
     const [acciones, setAcciones] = useState<HomeAction[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -69,8 +70,7 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
         setSaving(true);
         const { error } = await supabase.from('configuracion').upsert({
             clave: 'home_actions',
-            valor: updatedList,
-            updated_at: new Date().toISOString()
+            valor: updatedList
         }, { onConflict: 'clave' });
 
         if (error) {
@@ -190,6 +190,15 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
                             <p className="text-[#555] text-[10px] uppercase font-bold tracking-wider">{a.pantalla}</p>
                         </div>
                         <div className="flex gap-1">
+                            {onPromote && (
+                                <button
+                                    onClick={() => onPromote(a)}
+                                    title="Promocionar a Noticia (Carrusel)"
+                                    className="p-2 text-[#A8D500] hover:bg-[#A8D50010] rounded-lg"
+                                >
+                                    <Megaphone size={16} />
+                                </button>
+                            )}
                             <button onClick={() => move(index, 'up')} disabled={index === 0} className="p-2 text-[#555] hover:text-white disabled:opacity-0"><GripVertical size={16} className="rotate-90" /></button>
                             <button onClick={() => move(index, 'down')} disabled={index === acciones.length - 1} className="p-2 text-[#555] hover:text-white disabled:opacity-0"><GripVertical size={16} className="-rotate-90" /></button>
                             <button onClick={() => openEdit(index)} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg"><Edit2 size={16} /></button>
