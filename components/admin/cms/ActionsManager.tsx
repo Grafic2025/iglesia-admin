@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon, RefreshCw } from 'lucide-react';
 
 interface HomeAction {
     id: string;
@@ -15,6 +15,19 @@ interface ActionsManagerProps {
     supabase: any;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
+
+const DEFAULT_ACTIONS: HomeAction[] = [
+    { id: '1', titulo: 'Agenda', icono: 'calendar', imagen_url: 'https://images.unsplash.com/photo-1506784365847-bbad939e9335?w=400', pantalla: 'Agenda', es_mci: false, activa: true },
+    { id: '2', titulo: 'Biblia', icono: 'book', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Biblia.jpg', pantalla: 'https://www.bible.com/es', es_mci: false, activa: true },
+    { id: '3', titulo: 'Quiero Ayudar', icono: 'heart', imagen_url: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400', pantalla: 'Quiero Ayudar', es_mci: false, activa: true },
+    { id: '4', titulo: 'Necesito Ayuda', icono: 'hand-heart', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Ayuda.jpg', pantalla: 'Necesito Ayuda', es_mci: true, activa: true },
+    { id: '5', titulo: 'Quiero Bautizarme', icono: 'tint', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Bautismos.jpg', pantalla: 'Quiero Bautizarme', es_mci: false, activa: true },
+    { id: '6', titulo: 'Quiero Capacitarme', icono: 'graduation-cap', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Capacitarme.jpg', pantalla: 'Quiero Capacitarme', es_mci: false, activa: true },
+    { id: '7', titulo: 'Soy Nuevo', icono: 'account-plus', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Nuevo.jpg', pantalla: 'Soy Nuevo', es_mci: true, activa: true },
+    { id: '8', titulo: 'Necesito Oración', icono: 'hands-pray', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Oracion.jpg', pantalla: 'Necesito Oración', es_mci: true, activa: true },
+    { id: '9', titulo: 'Sumarme a un Grupo', icono: 'users', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Grupos.jpg', pantalla: 'Sumarme a un Grupo', es_mci: false, activa: true },
+    { id: '10', titulo: 'Reunión en Vivo', icono: 'youtube-play', imagen_url: 'https://acvxjhecpgmauqqzmjik.supabase.co/storage/v1/object/public/imagenes-iglesia/Vivo.jpg', pantalla: 'https://youtube.com/@iglesiadelsalvador', es_mci: false, activa: true },
+];
 
 const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAuditoria }) => {
     const [acciones, setAcciones] = useState<HomeAction[]>([]);
@@ -40,10 +53,16 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
         if (data && data.valor) {
             setAcciones(data.valor);
         } else {
-            // Default initial actions if table row doesn't exist
+            // Important: Let's NOT populate automatically so the DB stays clean,
+            // but we'll show a button to "Load App Defaults"
             setAcciones([]);
         }
         setLoading(false);
+    };
+
+    const restoreDefaults = async () => {
+        if (!confirm('Esto reemplazará tus tarjetas actuales con las 10 tarjetas originales de la App. ¿Continuar?')) return;
+        handleSaveList(DEFAULT_ACTIONS);
     };
 
     const handleSaveList = async (updatedList: HomeAction[]) => {
@@ -131,18 +150,27 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
                     </h3>
                     <p className="text-[#888] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
                 </div>
-                <button
-                    onClick={openAdd}
-                    className="bg-[#A8D500] text-black px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-[#b0f000] transition-all"
-                >
-                    <Plus size={16} /> AGREGAR TARJETA
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={restoreDefaults}
+                        className="bg-[#333] text-[#A8D500] px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-[#444] transition-all border border-[#A8D500]/20"
+                    >
+                        <RefreshCw size={16} /> TRAER TARJETAS ACTUALES
+                    </button>
+                    <button
+                        onClick={openAdd}
+                        className="bg-[#A8D500] text-black px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-[#b0f000] transition-all"
+                    >
+                        <Plus size={16} /> AGREGAR NUEVA
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {acciones.length === 0 && (
                     <div className="col-span-full py-10 text-center border-2 border-dashed border-[#333] rounded-2xl">
-                        <p className="text-[#555] italic">No hay accesos configurados. Los usuarios verán los valores por defecto.</p>
+                        <p className="text-[#555] italic mb-4">No hay tarjetas personalizadas aún.</p>
+                        <button onClick={restoreDefaults} className="text-[#A8D500] text-xs font-bold underline decoration-dotted">Toca aquí para cargar las 10 tarjetas que vienen por defecto en la App</button>
                     </div>
                 )}
                 {acciones.map((a, index) => (

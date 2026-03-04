@@ -9,6 +9,8 @@ interface NewsModalProps {
     categoria: string; setCategoria: (v: string) => void;
     activa: boolean; setActiva: (v: boolean) => void;
     venceEl: string; setVenceEl: (v: string) => void;
+    url: string; setUrl: (v: string) => void;
+    screen: string; setScreen: (v: string) => void;
     isUploading: boolean;
     handleUpload: (e: any) => void;
     onSave: () => void;
@@ -18,7 +20,7 @@ interface NewsModalProps {
 const NewsModal: React.FC<NewsModalProps> = ({
     currentNews, titulo, setTitulo, descripcion, setDescripcion,
     imagenUrl, setImagenUrl, categoria, setCategoria, activa, setActiva,
-    venceEl, setVenceEl, isUploading, handleUpload, onSave, onClose
+    venceEl, setVenceEl, url, setUrl, screen, setScreen, isUploading, handleUpload, onSave, onClose
 }) => {
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -51,6 +53,16 @@ const NewsModal: React.FC<NewsModalProps> = ({
                         <div>
                             <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Vence el: (Opcional)</label>
                             <input type="date" value={venceEl} onChange={e => setVenceEl(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Link Externo (URL)</label>
+                            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500]" />
+                        </div>
+                        <div>
+                            <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Pantalla App (Ej: Sumarme a un Grupo)</label>
+                            <input value={screen} onChange={e => setScreen(e.target.value)} placeholder="Nombre de la pantalla" className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[#A8D500]" />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

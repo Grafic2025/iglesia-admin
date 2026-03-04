@@ -33,6 +33,8 @@ const CMSView = ({
     const [categoria, setCategoria] = useState('Aviso');
     const [activa, setActiva] = useState(true);
     const [venceEl, setVenceEl] = useState('');
+    const [url, setUrl] = useState('');
+    const [screen, setScreen] = useState('');
 
     const openEdit = (n: any) => {
         setCurrentNews(n);
@@ -42,6 +44,8 @@ const CMSView = ({
         setCategoria(n.categoria || 'Aviso');
         setActiva(n.activa);
         setVenceEl(n.vence_el || '');
+        setUrl(n.url || '');
+        setScreen(n.screen || '');
         setShowModal(true);
     };
 
@@ -53,6 +57,8 @@ const CMSView = ({
         setCategoria('Aviso');
         setActiva(true);
         setVenceEl('');
+        setUrl('');
+        setScreen('');
         setShowModal(true);
     };
 
@@ -64,7 +70,9 @@ const CMSView = ({
             categoria,
             activa,
             es_youtube: currentNews?.es_youtube || false,
-            vence_el: venceEl || null
+            vence_el: venceEl || null,
+            url: url || null,
+            screen: screen || null
         };
         let error;
         if (currentNews?.id) {
@@ -110,28 +118,11 @@ const CMSView = ({
         }
     };
 
-    const [activeSection, setActiveSection] = useState<'noticias' | 'acciones'>('noticias');
-
     return (
         <div className="space-y-6">
-            {/* TABS SELECTOR */}
-            <div className="flex gap-4 border-b border-[#333] mb-6">
-                <button
-                    onClick={() => setActiveSection('noticias')}
-                    className={`pb-4 px-2 text-sm font-bold transition-all ${activeSection === 'noticias' ? 'text-[#A8D500] border-b-2 border-[#A8D500]' : 'text-[#888] hover:text-white'}`}
-                >
-                    Noticias y Novedades
-                </button>
-                <button
-                    onClick={() => setActiveSection('acciones')}
-                    className={`pb-4 px-2 text-sm font-bold transition-all ${activeSection === 'acciones' ? 'text-[#A8D500] border-b-2 border-[#A8D500]' : 'text-[#888] hover:text-white'}`}
-                >
-                    Accesos Inicio (App)
-                </button>
-            </div>
-
-            {activeSection === 'noticias' ? (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* ÁREA PRINCIPAL: Noticias y Tarjetas */}
+                <div className="lg:col-span-3 space-y-8">
                     <NewsList
                         noticias={noticias}
                         syncYouTube={syncYouTube}
@@ -140,17 +131,20 @@ const CMSView = ({
                         onAdd={openAdd}
                     />
 
+                    <ActionsManager
+                        supabase={supabase}
+                        registrarAuditoria={registrarAuditoria}
+                    />
+                </div>
+
+                {/* ÁREA LATERAL: Solicitudes (Bautismos/Ayuda) */}
+                <div className="lg:col-span-1">
                     <SidebarSections
                         bautismos={bautismos}
                         ayuda={ayuda}
                     />
                 </div>
-            ) : (
-                <ActionsManager
-                    supabase={supabase}
-                    registrarAuditoria={registrarAuditoria}
-                />
-            )}
+            </div>
 
             {showModal && (
                 <NewsModal
@@ -161,6 +155,8 @@ const CMSView = ({
                     categoria={categoria} setCategoria={setCategoria}
                     activa={activa} setActiva={setActiva}
                     venceEl={venceEl} setVenceEl={setVenceEl}
+                    url={url} setUrl={setUrl}
+                    screen={screen} setScreen={setScreen}
                     isUploading={isUploading}
                     handleUpload={handleUpload}
                     onSave={handleSave}
