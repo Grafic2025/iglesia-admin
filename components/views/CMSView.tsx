@@ -4,15 +4,12 @@ import React, { useState } from 'react';
 // Modular Components
 import NewsList from '../admin/cms/NewsList';
 import NewsModal from '../admin/cms/NewsModal';
-import SidebarSections from '../admin/cms/SidebarSections';
 import ActionsManager from '../admin/cms/ActionsManager';
 
 interface CMSViewProps {
     noticias: any[];
     syncYouTube: (alert: boolean) => void;
     eliminarNoticia: (id: string) => void;
-    bautismos: any[];
-    ayuda: any[];
     supabase: any;
     fetchNoticias: () => Promise<void>;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
@@ -20,7 +17,7 @@ interface CMSViewProps {
 
 const CMSView = ({
     noticias, syncYouTube, eliminarNoticia,
-    bautismos, ayuda, supabase, fetchNoticias, registrarAuditoria
+    supabase, fetchNoticias, registrarAuditoria
 }: CMSViewProps) => {
     const [showModal, setShowModal] = useState(false);
     const [currentNews, setCurrentNews] = useState<any>(null);
@@ -118,43 +115,61 @@ const CMSView = ({
         }
     };
 
+    const handleMove = async (id: string, direction: 'up' | 'down') => {
+        const sortedNoticias = [...noticias].sort((a, b) => (a.orden || 0) - (b.orden || 0));
+        const index = sortedNoticias.findIndex(n => n.id === id);
+        if (index === -1) return;
+
+        const newIndex = direction === 'up' ? index - 1 : index + 1;
+        if (newIndex < 0 || newIndex >= sortedNoticias.length) return;
+
+        // Swap order values
+        const currentItem = sortedNoticias[index];
+        const adjacentItem = sortedNoticias[newIndex];
+
+        const oldOrder = currentItem.orden || 0;
+        const newOrder = adjacentItem.orden || 0;
+
+        // If both are 0 (never moved), we need to initialize them based on current position
+        const updates = [
+            { id: currentItem.id, orden: newOrder === oldOrder ? newIndex : newOrder },
+            { id: adjacentItem.id, orden: newOrder === oldOrder ? index : oldOrder }
+        ];
+
+        for (const update of updates) {
+            await supabase.from('noticias').update({ orden: update.orden }).eq('id', update.id);
+        }
+
+        if (fetchNoticias) fetchNoticias();
+    };
+
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* ÁREA PRINCIPAL: Noticias y Tarjetas */}
-                <div className="lg:col-span-3 space-y-8">
-                    <NewsList
-                        noticias={noticias}
-                        syncYouTube={syncYouTube}
-                        onEdit={openEdit}
-                        onDelete={eliminarNoticia}
-                        onAdd={openAdd}
-                    />
+            <div className="space-y-8 max-w-5xl">
+                <NewsList
+                    noticias={noticias}
+                    syncYouTube={syncYouTube}
+                    onEdit={openEdit}
+                    onDelete={eliminarNoticia}
+                    onAdd={openAdd}
+                    onMove={handleMove}
+                />
 
-                    <ActionsManager
-                        supabase={supabase}
-                        registrarAuditoria={registrarAuditoria}
-                        onPromote={(action) => {
-                            setCurrentNews(null);
-                            setTitulo(action.titulo);
-                            setDescripcion('¡Novedad!');
-                            setImagenUrl(action.imagen_url || '');
-                            setScreen(action.pantalla);
-                            setUrl('');
-                            setCategoria('Aviso');
-                            setActiva(true);
-                            setShowModal(true);
-                        }}
-                    />
-                </div>
-
-                {/* ÁREA LATERAL: Solicitudes (Bautismos/Ayuda) */}
-                <div className="lg:col-span-1">
-                    <SidebarSections
-                        bautismos={bautismos}
-                        ayuda={ayuda}
-                    />
-                </div>
+                <ActionsManager
+                    supabase={supabase}
+                    registrarAuditoria={registrarAuditoria}
+                    onPromote={(action) => {
+                        setCurrentNews(null);
+                        setTitulo(action.titulo);
+                        setDescripcion('¡Novedad!');
+                        setImagenUrl(action.imagen_url || '');
+                        setScreen(action.pantalla);
+                        setUrl('');
+                        setCategoria('Aviso');
+                        setActiva(true);
+                        setShowModal(true);
+                    }}
+                />
             </div>
 
             {showModal && (

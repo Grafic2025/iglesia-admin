@@ -14,7 +14,8 @@ import {
     Home,
     Clock,
     History,
-    ShieldAlert
+    ShieldAlert,
+    ClipboardList
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -29,6 +30,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
         { id: 'miembros', label: 'Asistencias', icon: Users },
         { id: 'gente', label: 'Gente', icon: UserCircle },
         { id: 'notificaciones', label: 'Mensajería', icon: Bell },
+        { id: 'solicitudes', label: 'Solicitudes', icon: ClipboardList },
         { id: 'alertas', label: 'Retención (Alertas)', icon: ShieldAlert },
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
         { id: 'servicios', label: 'Plan de Culto', icon: Calendar },

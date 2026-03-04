@@ -11,7 +11,7 @@ export const useNoticias = () => {
             const { data, error } = await supabase
                 .from('noticias')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('orden', { ascending: true });
             if (error) throw error;
             setNoticias(data || []);
         } catch (error) {

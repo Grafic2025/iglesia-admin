@@ -1,5 +1,5 @@
 import React from 'react';
-import { ImageIcon, RefreshCw, Trash2, Edit, PlusCircle } from 'lucide-react';
+import { ImageIcon, RefreshCw, Trash2, Edit, PlusCircle, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface NewsListProps {
     noticias: any[];
@@ -7,9 +7,10 @@ interface NewsListProps {
     onEdit: (n: any) => void;
     onDelete: (id: string) => void;
     onAdd: () => void;
+    onMove?: (id: string, direction: 'up' | 'down') => void;
 }
 
-const NewsList: React.FC<NewsListProps> = ({ noticias, syncYouTube, onEdit, onDelete, onAdd }) => {
+const NewsList: React.FC<NewsListProps> = ({ noticias, syncYouTube, onEdit, onDelete, onAdd, onMove }) => {
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
             <div className="flex items-center justify-between mb-6">
@@ -39,6 +40,22 @@ const NewsList: React.FC<NewsListProps> = ({ noticias, syncYouTube, onEdit, onDe
                             </div>
                         </div>
                         <div className="flex gap-2">
+                            {onMove && (
+                                <div className="flex flex-col gap-1">
+                                    <button
+                                        onClick={() => onMove(n.id, 'up')}
+                                        className="p-1 text-[#888] hover:text-[#A8D500] transition-colors"
+                                    >
+                                        <ChevronUp size={14} />
+                                    </button>
+                                    <button
+                                        onClick={() => onMove(n.id, 'down')}
+                                        className="p-1 text-[#888] hover:text-[#A8D500] transition-colors"
+                                    >
+                                        <ChevronDown size={14} />
+                                    </button>
+                                </div>
+                            )}
                             <button onClick={() => onEdit(n)} className="p-2 text-[#FFB400] hover:bg-[#FFB40010] rounded-lg">
                                 <Edit size={16} />
                             </button>

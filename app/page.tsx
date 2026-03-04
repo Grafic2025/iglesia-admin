@@ -13,6 +13,7 @@ import CancioneroView from '../components/views/CancioneroView'
 import AgendaConfigView from '../components/views/AgendaConfigView'
 import AuditoriaView from '../components/views/AuditoriaView'
 import AlertasView from '../components/views/AlertasView'
+import SolicitudesView from '../components/views/SolicitudesView'
 import { LogOut, ShieldAlert } from 'lucide-react'
 
 // Custom Hooks
@@ -26,6 +27,7 @@ const TAB_LABELS: Record<string, string> = {
   miembros: 'Asistencias',
   gente: 'Gente',
   notificaciones: 'Mensajería',
+  solicitudes: 'Solicitudes',
   cms: 'Contenido',
   servicios: 'Plan de Culto',
   equipos: 'Equipos / Servir',
@@ -570,13 +572,18 @@ export default function AdminDashboard() {
             />
           )}
 
+          {activeTab === 'solicitudes' && (
+            <SolicitudesView
+              bautismos={bautismos}
+              ayuda={ayuda}
+            />
+          )}
+
           {activeTab === 'cms' && (
             <CMSView
               noticias={noticias}
               syncYouTube={syncYouTube}
               eliminarNoticia={eliminarNoticia}
-              bautismos={bautismos}
-              ayuda={ayuda}
               supabase={supabase}
               fetchNoticias={fetchNoticias}
               registrarAuditoria={registrarAuditoria}
