@@ -167,7 +167,7 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
                 {acciones.length === 0 && (
                     <div className="col-span-full py-16 text-center border-2 border-dashed border-[#222] rounded-3xl bg-[#1a1a1a]/50">
                         <p className="text-[#444] italic mb-4 text-sm font-medium">No hay tarjetas personalizadas aún.</p>
@@ -187,11 +187,11 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
                                     <span className="text-[#A8D500] font-black text-[9px] uppercase tracking-tighter">{a.icono}</span>
                                 </div>
                             </div>
-                            <div className="min-w-0">
-                                <h4 className="text-white font-bold text-xs truncate uppercase tracking-wide group-hover:text-[#A8D500] transition-colors">{a.titulo}</h4>
-                                <div className="flex items-center gap-1.5 opacity-60">
-                                    <LinkIcon size={10} className="text-[#888]" />
-                                    <p className="text-[#888] text-[9px] font-bold truncate tracking-widest uppercase">{a.pantalla.length > 25 ? a.pantalla.substring(0, 25) + "..." : a.pantalla}</p>
+                            <div className="flex-1 min-w-0 pr-2">
+                                <h4 className="text-white font-bold text-sm uppercase tracking-wide group-hover:text-[#A8D500] transition-colors leading-tight">{a.titulo}</h4>
+                                <div className="flex items-center gap-1.5 opacity-60 mt-0.5">
+                                    <LinkIcon size={10} className="text-[#888] shrink-0" />
+                                    <p className="text-[#888] text-[10px] font-bold tracking-widest uppercase truncate">{a.pantalla}</p>
                                 </div>
                             </div>
                         </div>
