@@ -14,6 +14,7 @@ import AgendaConfigView from '../components/views/AgendaConfigView'
 import AuditoriaView from '../components/views/AuditoriaView'
 import AlertasView from '../components/views/AlertasView'
 import SolicitudesView from '../components/views/SolicitudesView'
+import BotView from '../components/views/BotView'
 import { LogOut, ShieldAlert } from 'lucide-react'
 
 // Custom Hooks
@@ -35,6 +36,7 @@ const TAB_LABELS: Record<string, string> = {
   agenda_config: 'Configuración de Agenda',
   auditoria: 'Auditoría',
   alertas: 'Retención (Alertas)',
+  bot: 'IDS BOT',
 };
 
 /**
@@ -576,6 +578,10 @@ export default function AdminDashboard() {
               typePush={typePush}
               setTypePush={setTypePush}
             />
+          )}
+
+          {activeTab === 'bot' && (
+            <BotView supabase={supabase} registrarAuditoria={registrarAuditoria} />
           )}
 
           {activeTab === 'solicitudes' && (
