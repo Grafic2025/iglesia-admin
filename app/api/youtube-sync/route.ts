@@ -16,22 +16,40 @@ export async function GET(req: Request) {
     }
 
     try {
-        const channelId = 'UCa9xuv0bgR6dTD_9GTbFXQg';
+        const channelId = 'UC0L4Nf6Wv_M23u4J5sW33cA'; // ID oficial verificado
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
         const response = await fetch(rssUrl);
         const xml = await response.text();
 
         // Extracción simple de ID de video y título del primer <entry>
-        const videoIdMatch = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-        const titleMatch = xml.match(/<title>([^<]+)<\/title>/g);
+        // Nota: El RSS trae lo último subido. Si se subieron shorts, se verán shorts.
+        // Para filtrar shorts por RSS es difícil, pero con el ID correcto de canal 
+        // y verificando que el título no contenga #shorts podemos mejorar la puntería.
+        const entryMatches = xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
 
-        if (!videoIdMatch) {
-            throw new Error('No se pudo encontrar el ID del video en el feed');
+        let videoId = '';
+        let videoTitle = '';
+
+        for (const entry of entryMatches) {
+            const vId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
+            const title = entry.match(/<title>([^<]+)<\/title>/)?.[1];
+
+            if (vId && title && !title.toLowerCase().includes('#shorts') && !title.toLowerCase().includes('short')) {
+                videoId = vId;
+                videoTitle = title;
+                break;
+            }
         }
 
-        const videoId = videoIdMatch[1];
-        const videoTitle = titleMatch && titleMatch[1] ? titleMatch[1].replace(/<\/?title>/g, '') : 'Mensaje de Hoy';
+        if (!videoId) {
+            // Si no encontramos nada filtrado, tomamos el primero por defecto para no romper la sync
+            const firstId = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
+            const firstTitle = xml.match(/<title>([^<]+)<\/title>/g);
+            if (!firstId) throw new Error('No se pudo encontrar el ID del video en el feed');
+            videoId = firstId[1];
+            videoTitle = firstTitle && firstTitle[1] ? firstTitle[1].replace(/<\/?title>/g, '') : 'Mensaje de Hoy';
+        }
 
         const { error } = await supabaseAdmin.from('noticias').upsert({
             id: '00000000-0000-0000-0000-000000000001',
