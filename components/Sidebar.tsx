@@ -47,7 +47,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
                 <p className="text-[#888] text-xs">Panel de Administración</p>
             </div>
 
-            <nav className="flex-1 px-4 space-y-2 py-4">
+            <nav className="flex-1 px-4 space-y-1 py-4 overflow-y-auto custom-scrollbar shadow-inner pb-10">
                 {menuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
@@ -55,16 +55,16 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
                         <button
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
-                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
+                            className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 group ${isActive
+                                ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)] font-bold'
                                 : 'text-[#aaa] hover:bg-[#252525] hover:text-white'
                                 }`}
                         >
                             <div className="flex items-center gap-3">
-                                <Icon size={20} className={isActive ? 'text-black' : 'group-hover:text-[#A8D500]'} />
-                                <span className="font-medium text-sm">{item.label}</span>
+                                <Icon size={18} className={isActive ? 'text-black' : 'group-hover:text-[#A8D500]'} />
+                                <span className="text-sm">{item.label}</span>
                             </div>
-                            {isActive && <ChevronRight size={16} />}
+                            {isActive && <ChevronRight size={14} />}
                         </button>
                     );
                 })}
