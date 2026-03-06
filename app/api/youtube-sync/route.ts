@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic'; // Evitar caché forzado por Next.js
+
 export async function GET(req: Request) {
     // 1. Verificar token de seguridad
     const { searchParams } = new URL(req.url);
@@ -19,7 +21,7 @@ export async function GET(req: Request) {
         const channelId = 'UCa9xuv0bgR6dTD_9GTbFXQg'; // ID verificado que funciona
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
-        const response = await fetch(rssUrl);
+        const response = await fetch(rssUrl, { cache: 'no-store' });
         const xml = await response.text();
 
         // Extracción simple de ID de video y título del primer <entry>
