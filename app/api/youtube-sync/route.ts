@@ -16,7 +16,7 @@ export async function GET(req: Request) {
     }
 
     try {
-        const channelId = 'UC0L4Nf6Wv_M23u4J5sW33cA'; // ID oficial verificado
+        const channelId = 'UCa9xuv0bgR6dTD_9GTbFXQg'; // ID verificado que funciona
         const rssUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
 
         const response = await fetch(rssUrl);
