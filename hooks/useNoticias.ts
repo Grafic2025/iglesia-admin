@@ -23,7 +23,7 @@ export const useNoticias = () => {
 
     const syncYouTube = useCallback(async () => {
         try {
-            const res = await fetch('/api/youtube-sync');
+            const res = await fetch('/api/youtube-sync?token=iglesia_admin_cron_2025');
             const data = await res.json();
             if (data.success) {
                 await fetchNoticias();
