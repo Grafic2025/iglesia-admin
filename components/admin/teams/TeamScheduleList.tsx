@@ -35,7 +35,7 @@ const TeamScheduleList: React.FC<TeamScheduleListProps> = ({
                     </button>
                 )}
             </div>
-            <div className="p-6 flex-1 overflow-y-auto max-h-[400px] space-y-4">
+            <div className="p-6 space-y-4">
                 {filteredList.length === 0 ? (
                     <div className="text-center py-10">
                         <p className="text-[#555] italic text-sm">No hay servicios próximos para mostrar.</p>

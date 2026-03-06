@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon, RefreshCw, Megaphone } from 'lucide-react';
+import { Plus, Trash2, Edit2, GripVertical, Save, Info, Link as LinkIcon, Image as ImageIcon, RefreshCw, Megaphone, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface HomeAction {
     id: string;
@@ -142,76 +142,89 @@ const ActionsManager: React.FC<ActionsManagerProps> = ({ supabase, registrarAudi
     if (loading) return <div className="text-[#888] animate-pulse p-10">Cargando configuración...</div>;
 
     return (
-        <div className="bg-[#1E1E1E] p-6 rounded-3xl border border-[#333] space-y-6 text-left">
-            <div className="flex justify-between items-center">
+        <div className="bg-[#151515] p-6 rounded-3xl border border-[#222] space-y-6 text-left shadow-xl">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                        <GripVertical className="text-[#A8D500]" /> Accesos Directos (Menú App)
+                    <h3 className="text-white font-black text-xl flex items-center gap-2 tracking-tight">
+                        <GripVertical className="text-[#A8D500]" /> Accesos Directos
+                        <span className="text-[#555] font-medium text-sm">(Menú App)</span>
                     </h3>
-                    <p className="text-[#888] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
+                    <p className="text-[#666] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 w-full sm:w-auto">
                     <button
                         onClick={restoreDefaults}
-                        className="bg-[#333] text-[#A8D500] px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-[#444] transition-all border border-[#A8D500]/20"
+                        className="flex-1 sm:flex-none bg-[#222] text-[#A8D500] px-3 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#2a2a2a] transition-all border border-[#A8D500]/10"
                     >
-                        <RefreshCw size={16} /> TRAER TARJETAS ACTUALES
+                        <RefreshCw size={14} /> TRAER TARJETAS ACTUALES
                     </button>
                     <button
                         onClick={openAdd}
-                        className="bg-[#A8D500] text-black px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2 hover:bg-[#b0f000] transition-all"
+                        className="flex-1 sm:flex-none bg-[#A8D500] text-black px-4 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#b0f000] transition-all shadow-lg shadow-[#A8D50020]"
                     >
                         <Plus size={16} /> AGREGAR NUEVA
                     </button>
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3">
                 {acciones.length === 0 && (
-                    <div className="col-span-full py-10 text-center border-2 border-dashed border-[#333] rounded-2xl">
-                        <p className="text-[#555] italic mb-4">No hay tarjetas personalizadas aún.</p>
-                        <button onClick={restoreDefaults} className="text-[#A8D500] text-xs font-bold underline decoration-dotted">Toca aquí para cargar las 10 tarjetas que vienen por defecto en la App</button>
+                    <div className="col-span-full py-16 text-center border-2 border-dashed border-[#222] rounded-3xl bg-[#1a1a1a]/50">
+                        <p className="text-[#444] italic mb-4 text-sm font-medium">No hay tarjetas personalizadas aún.</p>
+                        <button onClick={restoreDefaults} className="bg-[#A8D500] text-black px-4 py-2 rounded-lg text-[10px] font-black hover:scale-105 transition-transform">CARGAR VALORES POR DEFECTO</button>
                     </div>
                 )}
                 {acciones.map((a, index) => (
-                    <div key={a.id} className="bg-[#252525] p-4 rounded-2xl border border-[#333] flex items-center gap-4 group">
-                        <div className="w-12 h-12 rounded-xl bg-[#1a1a1a] border border-[#333] overflow-hidden flex items-center justify-center relative">
-                            {a.imagen_url ? (
-                                <img src={a.imagen_url} className="w-full h-full object-cover opacity-50" alt="" />
-                            ) : (
-                                <ImageIcon size={20} className="text-[#333]" />
-                            )}
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-[#A8D500] font-bold text-xs">{a.icono}</span>
+                    <div key={a.id} className="bg-[#1e1e1e] p-3 rounded-2xl border border-[#2a2a2a] flex items-center justify-between group hover:border-[#A8D50050] hover:bg-[#252525] transition-all shadow-sm">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="w-10 h-10 shrink-0 rounded-xl bg-[#151515] border border-[#2a2a2a] overflow-hidden flex items-center justify-center relative shadow-inner">
+                                {a.imagen_url ? (
+                                    <img src={a.imagen_url} className="w-full h-full object-cover opacity-60" alt="" />
+                                ) : (
+                                    <ImageIcon size={18} className="text-[#333]" />
+                                )}
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <span className="text-[#A8D500] font-black text-[9px] uppercase tracking-tighter">{a.icono}</span>
+                                </div>
+                            </div>
+                            <div className="min-w-0">
+                                <h4 className="text-white font-bold text-xs truncate uppercase tracking-wide group-hover:text-[#A8D500] transition-colors">{a.titulo}</h4>
+                                <div className="flex items-center gap-1.5 opacity-60">
+                                    <LinkIcon size={10} className="text-[#888]" />
+                                    <p className="text-[#888] text-[9px] font-bold truncate tracking-widest uppercase">{a.pantalla.length > 25 ? a.pantalla.substring(0, 25) + "..." : a.pantalla}</p>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex-1">
-                            <h4 className="text-white font-bold text-sm">{a.titulo}</h4>
-                            <p className="text-[#555] text-[10px] uppercase font-bold tracking-wider">{a.pantalla}</p>
-                        </div>
-                        <div className="flex gap-1">
-                            {onPromote && (
-                                <button
-                                    onClick={() => onPromote(a)}
-                                    title="Promocionar a Noticia (Carrusel)"
-                                    className="p-2 text-[#A8D500] hover:bg-[#A8D50010] rounded-lg"
-                                >
-                                    <Megaphone size={16} />
-                                </button>
-                            )}
-                            <button onClick={() => move(index, 'up')} disabled={index === 0} className="p-2 text-[#555] hover:text-white disabled:opacity-0"><GripVertical size={16} className="rotate-90" /></button>
-                            <button onClick={() => move(index, 'down')} disabled={index === acciones.length - 1} className="p-2 text-[#555] hover:text-white disabled:opacity-0"><GripVertical size={16} className="-rotate-90" /></button>
-                            <button onClick={() => openEdit(index)} className="p-2 text-blue-400 hover:bg-blue-400/10 rounded-lg"><Edit2 size={16} /></button>
-                            <button onClick={() => deleteAction(index)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg"><Trash2 size={16} /></button>
+
+                        <div className="flex items-center shrink-0 ml-2">
+                            <div className="flex items-center gap-0.5 opacity-30 group-hover:opacity-100 transition-all bg-[#151515] p-1 rounded-xl border border-white/5">
+                                {onPromote && (
+                                    <button
+                                        onClick={() => onPromote(a)}
+                                        title="Promocionar a Noticia"
+                                        className="p-1.5 text-[#A8D500] hover:bg-[#A8D50015] rounded-lg transition-colors"
+                                    >
+                                        <Megaphone size={14} />
+                                    </button>
+                                )}
+                                <div className="w-px h-4 bg-[#333] mx-1" />
+                                <button onClick={() => move(index, 'up')} disabled={index === 0} className="p-1.5 text-[#888] hover:text-white disabled:opacity-0 transition-colors"><ChevronUp size={16} /></button>
+                                <button onClick={() => move(index, 'down')} disabled={index === acciones.length - 1} className="p-1.5 text-[#888] hover:text-white disabled:opacity-0 transition-colors"><ChevronDown size={16} /></button>
+                                <div className="w-px h-4 bg-[#333] mx-1" />
+                                <button onClick={() => openEdit(index)} className="p-1.5 text-blue-400 hover:bg-blue-400/15 rounded-lg transition-colors"><Edit2 size={14} /></button>
+                                <button onClick={() => deleteAction(index)} className="p-1.5 text-red-500 hover:bg-red-500/15 rounded-lg transition-colors"><Trash2 size={14} /></button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="bg-[#A8D500]/5 p-4 rounded-2xl border border-[#A8D500]/20 flex gap-3">
-                <Info className="text-[#A8D500] shrink-0" size={20} />
-                <p className="text-[11px] text-[#aaa] leading-relaxed">
-                    <strong>Tip:</strong> Estos botones se muestran de a dos en la App. Asegúrate de que las pantallas coincidan exactamente con el nombre de la vista en la App (ej: "Agenda", "Necesito Oración", "Quiero Ayudar").
+            <div className="bg-[#A8D50010] p-4 rounded-3xl border border-[#A8D50020] flex gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#A8D50020] flex items-center justify-center shrink-0">
+                    <Info className="text-[#A8D500]" size={16} />
+                </div>
+                <p className="text-[10px] text-[#888] leading-normal font-medium">
+                    <strong className="text-white">Tip Estético:</strong> Estos botones se muestran de a dos en la App. Mantén los títulos cortos y las URLs de imagen de buena calidad (Unsplash recomendado) para que el inicio de tu App luzca increíble.
                 </p>
             </div>
 

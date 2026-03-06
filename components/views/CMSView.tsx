@@ -184,15 +184,17 @@ const CMSView = ({
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div>
-                <h2 className="text-2xl font-bold text-white mb-2">Gestión de Contenido</h2>
-                <p className="text-[#888] text-sm">Administra las noticias del carrusel y los accesos directos de la App desde un solo lugar.</p>
+        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 max-w-[1600px] mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 px-2">
+                <div>
+                    <h2 className="text-3xl font-black text-white tracking-tighter">Gestión de Contenido</h2>
+                    <p className="text-[#666] text-sm font-medium">Administra las noticias del carrusel y los accesos directos de la App.</p>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 w-full">
-                {/* COLUMNA 1: NOTICIAS */}
-                <div className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* COLUMNA 1: NOTICIAS (40%) */}
+                <div className="lg:col-span-5 space-y-6">
                     <NewsList
                         noticias={noticias}
                         syncYouTube={handleSyncYouTube}
@@ -203,8 +205,8 @@ const CMSView = ({
                     />
                 </div>
 
-                {/* COLUMNA 2: TARJETAS DE INICIO */}
-                <div className="space-y-6">
+                {/* COLUMNA 2: TARJETAS DE INICIO (60%) */}
+                <div className="lg:col-span-7 space-y-6">
                     <ActionsManager
                         supabase={supabase}
                         registrarAuditoria={registrarAuditoria}

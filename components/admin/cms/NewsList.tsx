@@ -12,54 +12,56 @@ interface NewsListProps {
 
 const NewsList: React.FC<NewsListProps> = ({ noticias, syncYouTube, onEdit, onDelete, onAdd, onMove }) => {
     return (
-        <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-            <div className="flex items-center justify-between mb-6">
-                <h3 className="text-[#FFB400] text-lg font-bold flex items-center gap-2">
-                    <ImageIcon size={20} /> CMS: Noticias y Banners
+        <div className="bg-[#151515] p-6 rounded-3xl border border-[#222] shadow-xl space-y-6">
+            <div className="flex items-center justify-between">
+                <h3 className="text-[#FFB400] text-xl font-black flex items-center gap-2 tracking-tight">
+                    <ImageIcon size={22} /> CMS: Noticias
+                    <span className="text-[#555] font-medium text-sm">(Carrusel)</span>
                 </h3>
                 <button
                     onClick={() => syncYouTube(true)}
-                    className="flex items-center gap-2 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-red-700 transition-all"
+                    className="flex items-center gap-2 bg-red-600 text-white text-[10px] font-black px-3 py-2 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-900/20"
                 >
-                    <RefreshCw size={14} /> Sync YouTube
+                    <RefreshCw size={14} /> SYNC YOUTUBE
                 </button>
             </div>
 
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3">
                 {noticias.map((n) => (
-                    <div key={n.id} className="bg-[#252525] p-3 rounded-xl border border-[#333] flex items-center gap-4">
-                        <img src={n.imagen_url} className="w-12 h-12 rounded-lg object-cover bg-[#333]" alt="" />
+                    <div key={n.id} className="bg-[#1e1e1e] p-3 rounded-2xl border border-[#2a2a2a] flex items-center gap-4 group hover:border-[#FFB40050] transition-all">
+                        <div className="relative shrink-0">
+                            <img src={n.imagen_url} className="w-12 h-12 rounded-xl object-cover bg-[#151515] border border-[#2a2a2a] shadow-inner" alt="" />
+                            {n.activa && <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#A8D500] border-2 border-[#1e1e1e] shadow-sm" />}
+                        </div>
                         <div className="flex-1 min-w-0 text-left">
-                            <div className="flex items-center gap-2">
-                                <div className="text-white text-sm font-bold truncate">{n.titulo}</div>
-                                {n.activa && <div className="w-1.5 h-1.5 rounded-full bg-[#A8D500]" />}
-                            </div>
-                            <div className="text-[10px] text-[#888] flex gap-2">
-                                <span>{n.es_youtube ? '🔴 YouTube' : '📰 Noticia'}</span>
-                                {n.categoria && <span className="text-[#A8D500] font-bold"># {n.categoria}</span>}
+                            <div className="text-white text-sm font-bold truncate group-hover:text-[#FFB400] transition-colors uppercase tracking-wide">{n.titulo}</div>
+                            <div className="text-[10px] text-[#555] flex items-center gap-2 font-bold mt-1">
+                                <span className="bg-[#151515] px-2 py-0.5 rounded-md border border-white/5">{n.es_youtube ? '🔴 YOUTUBE' : '📰 NOTICIA'}</span>
+                                {n.categoria && <span className="text-[#FFB400] tracking-widest"># {n.categoria.toUpperCase()}</span>}
                             </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex items-center gap-1 opacity-40 group-hover:opacity-100 transition-opacity bg-[#151515] p-1 rounded-xl border border-white/5">
                             {onMove && (
-                                <div className="flex flex-col gap-1">
+                                <div className="flex flex-col">
                                     <button
                                         onClick={() => onMove(n.id, 'up')}
-                                        className="p-1 text-[#888] hover:text-[#A8D500] transition-colors"
+                                        className="p-1 text-[#555] hover:text-[#FFB400] transition-colors"
                                     >
                                         <ChevronUp size={14} />
                                     </button>
                                     <button
                                         onClick={() => onMove(n.id, 'down')}
-                                        className="p-1 text-[#888] hover:text-[#A8D500] transition-colors"
+                                        className="p-1 text-[#555] hover:text-[#FFB400] transition-colors"
                                     >
                                         <ChevronDown size={14} />
                                     </button>
                                 </div>
                             )}
-                            <button onClick={() => onEdit(n)} className="p-2 text-[#FFB400] hover:bg-[#FFB40010] rounded-lg">
+                            <div className="w-px h-6 bg-[#2a2a2a] mx-1" />
+                            <button onClick={() => onEdit(n)} className="p-2 text-[#FFB400] hover:bg-[#FFB40015] rounded-lg transition-colors">
                                 <Edit size={16} />
                             </button>
-                            <button onClick={() => onDelete(n.id)} className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg">
+                            <button onClick={() => onDelete(n.id)} className="p-2 text-red-500 hover:bg-red-500/15 rounded-lg transition-colors">
                                 <Trash2 size={16} />
                             </button>
                         </div>
@@ -67,9 +69,9 @@ const NewsList: React.FC<NewsListProps> = ({ noticias, syncYouTube, onEdit, onDe
                 ))}
                 <button
                     onClick={onAdd}
-                    className="w-full py-4 border-2 border-dashed border-[#333] text-[#888] rounded-xl flex items-center justify-center gap-2 hover:border-[#A8D500] hover:text-[#A8D500] transition-all"
+                    className="w-full py-6 border-2 border-dashed border-[#222] text-[#555] rounded-3xl flex items-center justify-center gap-2 hover:border-[#FFB40050] hover:text-[#FFB400] hover:bg-[#FFB40005] transition-all font-black text-xs tracking-widest"
                 >
-                    <PlusCircle size={20} /> Agregar Contenido Manual
+                    <PlusCircle size={20} /> AGREGAR CONTENIDO MANUAL
                 </button>
             </div>
         </div>
