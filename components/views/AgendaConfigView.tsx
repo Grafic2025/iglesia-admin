@@ -45,7 +45,7 @@ const AgendaConfigView = ({ supabase, horariosDisponibles, fetchHorarios, regist
     };
 
     return (
-        <div className="max-w-2xl space-y-6">
+        <div className="w-full space-y-6 min-h-full pb-32">
             <div className="bg-[#1E1E1E] p-8 rounded-3xl border border-[#333]">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="p-3 bg-[#A8D50015] rounded-2xl">

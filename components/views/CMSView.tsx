@@ -184,7 +184,7 @@ const CMSView = ({
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 max-w-[1600px] mx-auto">
+        <div className="space-y-6 animate-in fade-in zoom-in-95 duration-500 w-full min-h-full pb-20">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 px-2">
                 <div>
                     <h2 className="text-3xl font-black text-white tracking-tighter">Gestión de Contenido</h2>

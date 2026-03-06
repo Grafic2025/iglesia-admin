@@ -9,7 +9,7 @@ interface SolicitudesViewProps {
 
 const SolicitudesView: React.FC<SolicitudesViewProps> = ({ bautismos, ayuda }) => {
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 w-full min-h-full pb-32">
             <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Centro de Solicitudes</h2>
                 <p className="text-[#888] text-sm">Gestiona los pedidos de bautismo y ayuda recibidos desde la App.</p>
@@ -27,7 +27,7 @@ const SolicitudesView: React.FC<SolicitudesViewProps> = ({ bautismos, ayuda }) =
                         </span>
                     </div>
 
-                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-4">
                         {bautismos.length === 0 ? (
                             <div className="py-20 text-center border-2 border-dashed border-[#333] rounded-2xl">
                                 <p className="text-[#555] italic">No hay solicitudes nuevas de bautismo</p>
@@ -77,7 +77,7 @@ const SolicitudesView: React.FC<SolicitudesViewProps> = ({ bautismos, ayuda }) =
                         </span>
                     </div>
 
-                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className="space-y-4">
                         {ayuda.length === 0 ? (
                             <div className="py-20 text-center border-2 border-dashed border-[#333] rounded-2xl">
                                 <p className="text-[#555] italic">Todo en orden, no hay pedidos de ayuda</p>

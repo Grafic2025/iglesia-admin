@@ -239,7 +239,7 @@ const NotificacionesView = ({
                         </div>
                     </div>
 
-                    <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2">
+                    <div className="space-y-3">
                         {cronogramas.map((p) => (
                             <div key={p.id} className="bg-[#252525] p-3 rounded-xl border border-[#333] flex items-center justify-between">
                                 <div className="flex items-center gap-3">

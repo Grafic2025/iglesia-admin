@@ -455,14 +455,14 @@ export default function AdminDashboard() {
   )
 
   return (
-    <div className="flex bg-[#121212] min-h-screen text-white font-sans overflow-hidden">
+    <div className="flex bg-[#121212] h-screen text-white font-sans overflow-hidden">
       <Sidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
       />
 
-      <main className="flex-1 overflow-y-auto h-screen p-8">
+      <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-8 pb-32 custom-scrollbar relative">
         <header className="flex justify-between items-center mb-10">
           <div>
             <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
