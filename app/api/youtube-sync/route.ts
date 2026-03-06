@@ -35,7 +35,19 @@ export async function GET(req: Request) {
             const vId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
             const title = entry.match(/<title>([^<]+)<\/title>/)?.[1];
 
-            if (vId && title && !title.toLowerCase().includes('#shorts') && !title.toLowerCase().includes('short')) {
+            if (!vId || !title) continue;
+
+            const isKnownShortPattern =
+                title.toLowerCase().includes('#shorts') ||
+                title.toLowerCase().includes('short') ||
+                title.length < 25; // Los shorts suelen tener títulos muy cortos
+
+            const isSermonPattern =
+                title.toLowerCase().includes('|') ||
+                title.toLowerCase().includes('esenciales') ||
+                title.toLowerCase().includes('culto');
+
+            if (!isKnownShortPattern && isSermonPattern) {
                 videoId = vId;
                 videoTitle = title;
                 break;
@@ -43,13 +55,19 @@ export async function GET(req: Request) {
         }
 
         if (!videoId) {
-            // Si no encontramos nada filtrado, tomamos el primero por defecto para no romper la sync
-            const firstId = xml.match(/<yt:videoId>([^<]+)<\/yt:videoId>/);
-            const firstTitle = xml.match(/<title>([^<]+)<\/title>/g);
-            if (!firstId) throw new Error('No se pudo encontrar el ID del video en el feed');
-            videoId = firstId[1];
-            videoTitle = firstTitle && firstTitle[1] ? firstTitle[1].replace(/<\/?title>/g, '') : 'Mensaje de Hoy';
+            // Si el filtro anterior falló, buscamos cualquier cosa que no tenga la palabra 'short' explícita
+            for (const entry of entryMatches) {
+                const vId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
+                const title = entry.match(/<title>([^<]+)<\/title>/)?.[1];
+                if (vId && title && !title.toLowerCase().includes('short')) {
+                    videoId = vId;
+                    videoTitle = title;
+                    break;
+                }
+            }
         }
+
+        if (!videoId) throw new Error('No se pudo encontrar un mensaje adecuado (prédica) en el feed');
 
         const { error } = await supabaseAdmin.from('noticias').upsert({
             id: '00000000-0000-0000-0000-000000000001',
