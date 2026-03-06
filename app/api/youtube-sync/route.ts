@@ -40,10 +40,10 @@ export async function GET(req: Request) {
             const isKnownShortPattern =
                 title.toLowerCase().includes('#shorts') ||
                 title.toLowerCase().includes('short') ||
-                title.length < 25; // Los shorts suelen tener títulos muy cortos
+                title.toLowerCase().includes('episodio'); // los podcasts no van acá
 
             const isSermonPattern =
-                title.toLowerCase().includes('|') ||
+                title.includes('|') ||
                 title.toLowerCase().includes('esenciales') ||
                 title.toLowerCase().includes('culto');
 
