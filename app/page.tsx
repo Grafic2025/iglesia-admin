@@ -22,6 +22,7 @@ import { useMiembros } from '../hooks/useMiembros'
 import { useAsistencias } from '../hooks/useAsistencias'
 import { useNoticias } from '../hooks/useNoticias'
 import { useNotificaciones } from '../hooks/useNotificaciones'
+import { useExportCSV } from '../hooks/useExportCSV'
 
 const TAB_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -62,15 +63,13 @@ export default function AdminDashboard() {
   const [loginAttempts, setLoginAttempts] = useState(0)
   const [loginLocked, setLoginLocked] = useState(false)
   const [lockTimer, setLockTimer] = useState(0)
-  const [exportStart, setExportStart] = useState('')
-  const [exportEnd, setExportEnd] = useState('')
-  const [showExportModal, setShowExportModal] = useState(false)
 
   // Custom Hooks Data
   const { miembros, fetchMiembros, toggleServerStatus } = useMiembros();
   const { asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias } = useAsistencias(fechaSeleccionada);
   const { noticias, fetchNoticias, syncYouTube, eliminarNoticia } = useNoticias();
   const { logs, fetchLogs, enviarPushGeneral, error: logsError } = useNotificaciones();
+  const { exportStart, setExportStart, exportEnd, setExportEnd, showExportModal, setShowExportModal, exportarCSVGlobal, exportarCSVRango } = useExportCSV();
 
   // Other complex states (to be refactored eventually)
   const [cronogramas, setCronogramas] = useState<any[]>([])
@@ -282,33 +281,47 @@ export default function AdminDashboard() {
    * Valida la contraseña del administrador contra la variable de entorno configurada.
    * Implementa un bloqueo temporal tras 5 intentos fallidos.
    */
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (loginLocked) return;
-    if (password === process.env.NEXT_PUBLIC_ADMIN_PASSWORD) {
-      setAuthorized(true); localStorage.setItem('admin_auth', 'true');
-      setLoginAttempts(0);
-    } else {
-      const newAttempts = loginAttempts + 1;
-      setLoginAttempts(newAttempts);
-      if (newAttempts >= 5) {
-        setLoginLocked(true);
-        let seconds = 30;
-        setLockTimer(seconds);
-        const interval = setInterval(() => {
-          seconds--;
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setAuthorized(true);
+        localStorage.setItem('admin_auth', 'true');
+        setLoginAttempts(0);
+      } else {
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        if (newAttempts >= 5) {
+          setLoginLocked(true);
+          let seconds = 30;
           setLockTimer(seconds);
-          if (seconds <= 0) {
-            clearInterval(interval);
-            setLoginLocked(false);
-            setLoginAttempts(0);
-          }
-        }, 1000);
-        return;
+          const interval = setInterval(() => {
+            seconds--;
+            setLockTimer(seconds);
+            if (seconds <= 0) {
+              clearInterval(interval);
+              setLoginLocked(false);
+              setLoginAttempts(0);
+            }
+          }, 1000);
+          return;
+        }
+        alert(`Contraseña incorrecta (${newAttempts}/5 intentos)`);
       }
-      alert(`Contraseña incorrecta (${newAttempts}/5 intentos)`);
+    } catch (e) {
+      alert('Error conectando al servidor.');
     }
-  }
+  };
 
   /**
    * Finaliza la sesión del administrador y limpia el estado local.
@@ -383,45 +396,7 @@ export default function AdminDashboard() {
   /**
    * Genera y descarga un archivo CSV con las asistencias registradas en la fecha seleccionada actualmente.
    */
-  const exportarCSV = () => {
-    const encabezados = "ID,Nombre,Apellido,DNI/ID_Miembro,Reunion,Hora Ingreso,Fecha,Racha Actual\n";
-    const filas = asistencias.map(a => `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha},${a.racha}`).join("\n");
-    const bom = "\uFEFF";
-    const blob = new Blob([bom + encabezados + filas], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Reporte_IDS_${fechaSeleccionada}.csv`;
-    link.click();
-  }
-
-  /**
-   * Obtiene asistencias de un rango de fechas y las exporta a un archivo CSV.
-   */
-  const exportarCSVRango = async () => {
-    const desde = exportStart || fechaSeleccionada;
-    const hasta = exportEnd || fechaSeleccionada;
-
-    const { data, error } = await supabase
-      .from('asistencias')
-      .select('id, miembro_id, horario_reunion, hora_entrada, fecha, miembros(nombre, apellido)')
-      .gte('fecha', desde)
-      .lte('fecha', hasta)
-      .order('fecha', { ascending: true });
-
-    if (error || !data) { alert('Error al obtener datos'); return; }
-
-    const encabezados = "ID,Nombre,Apellido,ID_Miembro,Horario,Hora Entrada,Fecha\n";
-    const filas = data.map((a: any) =>
-      `${a.id},${a.miembros?.nombre || ''},${a.miembros?.apellido || ''},${a.miembro_id},${a.horario_reunion},${a.hora_entrada},${a.fecha}`
-    ).join("\n");
-    const bom = "\uFEFF";
-    const blob = new Blob([bom + encabezados + filas], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `Reporte_IDS_${desde}_al_${hasta}.csv`;
-    link.click();
-    setShowExportModal(false);
-  }
+  const exportarCSV = () => exportarCSVGlobal(fechaSeleccionada, asistencias);
 
   const datosFiltrados = useMemo(() => (asistencias || []).filter(a => {
     const nombre = `${a.miembros?.nombre || ''} ${a.miembros?.apellido || ''}`.toLowerCase();
@@ -688,7 +663,7 @@ export default function AdminDashboard() {
                 className="flex-1 py-3 bg-[#222] text-white font-bold rounded-xl border border-[#333]"
               >CANCELAR</button>
               <button
-                onClick={exportarCSVRango}
+                onClick={() => exportarCSVRango(fechaSeleccionada)}
                 disabled={!exportStart || !exportEnd}
                 className="flex-1 py-3 bg-[#A8D500] text-black font-black rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >📥 DESCARGAR CSV</button>
