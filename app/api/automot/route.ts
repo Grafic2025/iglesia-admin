@@ -5,9 +5,9 @@ export async function GET(req: Request) {
   // 1. Verificar token de seguridad
   const { searchParams } = new URL(req.url);
   const token = searchParams.get('token');
-  const SECRET_CRON_TOKEN = process.env.CRON_SECRET || 'iglesia_admin_cron_2025';
+  const SECRET_CRON_TOKEN = process.env.CRON_SECRET;
 
-  if (token !== SECRET_CRON_TOKEN) {
+  if (!SECRET_CRON_TOKEN || token !== SECRET_CRON_TOKEN) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
   }
 
