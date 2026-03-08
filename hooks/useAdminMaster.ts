@@ -13,10 +13,10 @@ export const useAdminMaster = () => {
     const [fechaInternal, setFechaInternal] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }));
 
     const auth = useAdminAuth();
-    const { miembros, fetchMiembros } = useMiembros();
-    const { asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias } = useAsistencias(fechaInternal);
+    const { miembros, fetchMiembros, loading: miembrosLoading } = useMiembros();
+    const { asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias, loading: asistenciasLoading } = useAsistencias(fechaInternal);
     const { noticias, fetchNoticias, syncYouTube, eliminarNoticia } = useNoticias();
-    const { logs, fetchLogs, enviarPushGeneral, error: logsError } = useNotificaciones();
+    const { logs, fetchLogs, enviarPushGeneral, error: logsError, loading: logsLoading } = useNotificaciones();
     const {
         exportStart, setExportStart,
         exportEnd, setExportEnd,
@@ -128,10 +128,10 @@ export const useAdminMaster = () => {
 
     return {
         // Source hooks
-        miembros, fetchMiembros,
-        asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias,
+        miembros, fetchMiembros, miembrosLoading,
+        asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias, asistenciasLoading,
         noticias, fetchNoticias, syncYouTube, eliminarNoticia,
-        logs, fetchLogs, enviarPushGeneral, logsError,
+        logs, fetchLogs, enviarPushGeneral, logsError, logsLoading,
         exportStart, setExportStart, exportEnd, setExportEnd, showExportModal, setShowExportModal, exportarCSVGlobal, exportarCSVRango,
 
         // Orchestrated logic

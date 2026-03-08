@@ -22,6 +22,7 @@ interface MiembrosViewProps {
     fetchMiembros: () => Promise<void>;
     horariosDisponibles: any[];
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
+    loading?: boolean;
 }
 
 import { useMiembrosView } from '../../hooks/useMiembrosView';
@@ -33,7 +34,7 @@ const MiembrosView = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
     datosFiltrados, premiosPendientes, premiosEntregados,
     marcarComoEntregado, enviarNotificacionIndividual, hoyArg, supabase,
-    fetchAsistencias, fetchMiembros, horariosDisponibles, registrarAuditoria
+    fetchAsistencias, fetchMiembros, horariosDisponibles, registrarAuditoria, loading
 }: MiembrosViewProps) => {
 
     const {
@@ -72,27 +73,43 @@ const MiembrosView = ({
             />
 
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
-                <MemberTable
-                    paginatedData={paginatedData}
-                    hoyArg={hoyArg}
-                    setSelectedMember={setSelectedMember}
-                    enviarNotificacionIndividual={enviarNotificacionIndividual}
-                    toggleServerStatus={toggleServerStatus}
-                />
+                {loading ? (
+                    <div className="p-6 space-y-4 animate-pulse">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="flex gap-4">
+                                <div className="w-12 h-12 bg-[#2a2a2a] rounded-full"></div>
+                                <div className="flex-1 space-y-2 py-1">
+                                    <div className="h-4 bg-[#2a2a2a] rounded w-1/4"></div>
+                                    <div className="h-3 bg-[#2a2a2a] rounded w-1/3"></div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <MemberTable
+                        paginatedData={paginatedData}
+                        hoyArg={hoyArg}
+                        setSelectedMember={setSelectedMember}
+                        enviarNotificacionIndividual={enviarNotificacionIndividual}
+                        toggleServerStatus={toggleServerStatus}
+                    />
+                )}
 
-                <MemberPagination
-                    page={page}
-                    totalPages={totalPages}
-                    setPage={setPage}
-                    registrosCount={datosFiltrados.length}
-                />
+                {!loading && (
+                    <MemberPagination
+                        page={page}
+                        totalPages={totalPages}
+                        setPage={setPage}
+                        registrosCount={datosFiltrados.length}
+                    />
+                )}
             </div>
 
             <MemberProfileModal
                 member={selectedMember}
                 onClose={() => setSelectedMember(null)}
             />
-        </div>
+        </div >
     );
 };
 

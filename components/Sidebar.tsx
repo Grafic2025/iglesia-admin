@@ -19,13 +19,15 @@ import {
     ClipboardList
 } from 'lucide-react';
 
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+
 interface SidebarProps {
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
     onLogout: () => void;
 }
 
-const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
+const Sidebar = ({ onLogout }: SidebarProps) => {
+    const pathname = usePathname();
     const menuItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'miembros', label: 'Asistencias', icon: Users },
@@ -52,11 +54,12 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
             <nav className="flex-1 px-4 space-y-2 py-4 overflow-y-auto no-scrollbar">
                 {menuItems.map((item) => {
                     const Icon = item.icon;
-                    const isActive = activeTab === item.id;
+                    // match precise route, or start with /route but also handle / as dashboard
+                    const isActive = pathname === `/${item.id}` || (pathname === '/' && item.id === 'dashboard');
                     return (
-                        <button
+                        <Link
                             key={item.id}
-                            onClick={() => setActiveTab(item.id)}
+                            href={item.id === 'dashboard' ? '/' : `/${item.id}`}
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
                                 ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
                                 : 'text-[#aaa] hover:bg-[#252525] hover:text-white'
@@ -67,7 +70,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }: SidebarProps) => {
                                 <span className="font-medium text-sm">{item.label}</span>
                             </div>
                             {isActive && <ChevronRight size={16} />}
-                        </button>
+                        </Link>
                     );
                 })}
             </nav>

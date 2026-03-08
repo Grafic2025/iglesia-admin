@@ -17,6 +17,32 @@ export function useAdminAuth() {
         }
     }, []);
 
+    // Idle Lock System (5 mins)
+    useEffect(() => {
+        if (!authorized) return;
+
+        let idleTimer: NodeJS.Timeout;
+        const resetIdleTimer = () => {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                // Bloqueo por inactividad
+                handleLogout();
+                alert('Sesión bloqueada por inactividad de 5 minutos.');
+            }, 5 * 60 * 1000); // 5 minutos
+        };
+
+        const events = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];
+        events.forEach(e => window.addEventListener(e, resetIdleTimer));
+
+        resetIdleTimer();
+
+        return () => {
+            clearTimeout(idleTimer);
+            events.forEach(e => window.removeEventListener(e, resetIdleTimer));
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [authorized]);
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (loginLocked) return;
@@ -59,7 +85,10 @@ export function useAdminAuth() {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+        } catch (e) { }
         localStorage.removeItem('admin_auth');
         setAuthorized(false);
         setPassword('');

@@ -3,27 +3,22 @@ import React from 'react';
 import { LogOut } from 'lucide-react';
 import { TAB_LABELS } from '../../app/constants';
 
-interface AdminHeaderProps {
-    activeTab: string;
-    fechaSeleccionada: string;
-    setFechaSeleccionada: (v: string) => void;
-    exportarCSV: () => void;
-    setExportStart: (v: string) => void;
-    setExportEnd: (v: string) => void;
-    setShowExportModal: (v: boolean) => void;
-    handleLogout: () => void;
-}
+import { usePathname } from 'next/navigation';
+import { useAdminContext } from '../../context/AdminContext';
 
-const AdminHeader: React.FC<AdminHeaderProps> = ({
-    activeTab,
-    fechaSeleccionada,
-    setFechaSeleccionada,
-    exportarCSV,
-    setExportStart,
-    setExportEnd,
-    setShowExportModal,
-    handleLogout
-}) => {
+const AdminHeader: React.FC = () => {
+    const {
+        fechaSeleccionada,
+        setFechaSeleccionada,
+        exportarCSV,
+        setExportStart,
+        setExportEnd,
+        setShowExportModal,
+        handleLogout
+    } = useAdminContext();
+
+    const pathname = usePathname();
+    const activeTab = pathname === '/' ? 'dashboard' : pathname.replace('/', '');
     return (
         <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-10 shrink-0">
             <div className="flex items-center gap-4">

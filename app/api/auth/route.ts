@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
     try {
@@ -9,6 +10,14 @@ export async function POST(request: Request) {
         const adminPassword = process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
         if (password === adminPassword) {
+            // Set rigorous HTTP-only cookie for middleware validation
+            const cookieStore = await cookies();
+            cookieStore.set('admin_auth_token', 'verified', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24 * 7 // 1 week
+            });
             return NextResponse.json({ success: true });
         } else {
             return NextResponse.json({ success: false, error: 'Contraseña incorrecta' }, { status: 401 });

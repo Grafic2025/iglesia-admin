@@ -24,6 +24,7 @@ interface NotificacionesViewProps {
     logsError: string | null;
     horariosDisponibles?: string[];
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
+    loading?: boolean;
 }
 
 import { useNotificacionesAdmin } from '../../hooks/useNotificacionesAdmin';
@@ -36,7 +37,7 @@ const NotificacionesView = ({
     cronogramas, eliminarProgramacion, fetchProgramaciones, supabase,
     logs, logsError, horariosDisponibles = ['09:00', '11:00', '20:00'],
     registrarAuditoria, imageUrlPush, setImageUrlPush,
-    typePush, setTypePush
+    typePush, setTypePush, loading
 }: NotificacionesViewProps) => {
     const {
         logSearch, setLogSearch,
@@ -280,7 +281,17 @@ const NotificacionesView = ({
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-[#252525]">
-                            {paginatedLogs.length === 0 ? (
+                            {loading ? (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="px-4 py-4"><div className="h-4 bg-[#2a2a2a] rounded w-20"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-[#2a2a2a] rounded w-32"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-[#2a2a2a] rounded w-48"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-[#2a2a2a] rounded w-16"></div></td>
+                                        <td className="px-4 py-4"><div className="h-4 bg-[#2a2a2a] rounded w-12"></div></td>
+                                    </tr>
+                                ))
+                            ) : paginatedLogs.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-4 py-10 text-center text-[#555] italic">
                                         {logSearch ? 'No se encontraron resultados para tu búsqueda.' : 'Sin registros de envío.'}

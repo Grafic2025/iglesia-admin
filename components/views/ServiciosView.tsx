@@ -1,6 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react';
-import { Calendar, Plus } from 'lucide-react';
+import React, { useState } from 'react';
+import { Calendar, Plus, Search } from 'lucide-react';
 
 // Modular Components
 import ServiceCard from '../admin/services/ServiceCard';
@@ -54,6 +54,26 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
         handleSelectTemplate
     } = useServicios({ supabase, enviarNotificacionIndividual, registrarAuditoria });
 
+    const [musicianSearch, setMusicianSearch] = useState('');
+
+    const filteredSchedules = schedules.filter((s: any) => {
+        if (!musicianSearch) return true;
+
+        const searchLower = musicianSearch.toLowerCase();
+
+        // Check in `equipo_ids`
+        if (s.equipo_ids?.some((m: any) => (m.nombre && m.nombre.toLowerCase().includes(searchLower)) || (m.rol && m.rol.toLowerCase().includes(searchLower)))) {
+            return true;
+        }
+
+        // Check in `plan_detallado` responsables
+        if (s.plan_detallado?.some((r: any) => r.responsable && r.responsable.toLowerCase().includes(searchLower))) {
+            return true;
+        }
+
+        return false;
+    });
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -71,8 +91,19 @@ const ServiciosView = ({ supabase, enviarNotificacionIndividual, registrarAudito
                 </button>
             </div>
 
+            <div className="relative w-full">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <input
+                    type="text"
+                    placeholder="Buscar para ver asignar a: Músico, Vocalista, Sonido, Audiovisuales..."
+                    value={musicianSearch}
+                    onChange={(e) => setMusicianSearch(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-[#1e1e1e] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#A8D500] transition-all font-medium"
+                />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {schedules.map(s => (
+                {filteredSchedules.map((s: any) => (
                     <ServiceCard
                         key={s.id}
                         service={s}

@@ -18,6 +18,8 @@ interface DashboardViewProps {
     crecimientoAnual: any[];
     horariosReunion: any[]; // Renombrado de horariosDisponibles
     miembros: any[];       // Hecho obligatorio
+    bautismos: any[];
+    ayuda: any[];
 }
 
 import { useDashboard } from '../../hooks/useDashboard';
@@ -29,7 +31,9 @@ const DashboardView = ({
     nuevosMes,
     crecimientoAnual,
     horariosReunion,
-    miembros
+    miembros,
+    bautismos,
+    ayuda
 }: DashboardViewProps) => {
     const {
         growthRange,
@@ -78,6 +82,8 @@ const DashboardView = ({
                     isActive={(asistencias || []).filter(a => a.horario_reunion === 'Extraoficial').length > 0}
                 />
                 <StatCard label="Oraciones" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
+                <StatCard label="Bautismos" value={bautismos?.length || 0} color="#3B82F6" isActive={(bautismos?.length || 0) > 0} icon="💧" />
+                <StatCard label="Acompañamiento" value={ayuda?.length || 0} color="#EF4444" isActive={(ayuda?.length || 0) > 0} icon="🤝" />
                 <StatCard label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>
 

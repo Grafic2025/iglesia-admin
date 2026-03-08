@@ -9,6 +9,7 @@ interface GenteViewProps {
     fetchMiembros: () => Promise<void>;
     enviarNotificacionIndividual: (token: string, nombre: string, mensaje: string) => Promise<any>;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
+    loading?: boolean;
 }
 
 import { MemberCreateModal } from '../members/MemberCreateModal';
@@ -19,7 +20,7 @@ import { useGente } from '../../hooks/useGente';
 
 const PAGE_SIZE = 20;
 
-const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividual, registrarAuditoria }: GenteViewProps) => {
+const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividual, registrarAuditoria, loading }: GenteViewProps) => {
     const {
         search, setSearch,
         page, setPage,
@@ -81,23 +82,39 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
             />
 
             <div className="grid grid-cols-1 gap-4">
-                {paginatedList.length === 0 && (
-                    <div className="bg-[#1E1E1E] p-10 rounded-2xl border border-[#333] text-center">
-                        <span className="text-[#555] italic">{showArchived ? 'No hay miembros archivados.' : 'No se encontraron miembros con esos filtros.'}</span>
+                {loading ? (
+                    <div className="space-y-4 animate-pulse">
+                        {[...Array(5)].map((_, i) => (
+                            <div key={i} className="flex gap-4 p-4 bg-[#1E1E1E] border border-[#333] rounded-2xl">
+                                <div className="w-12 h-12 bg-[#2a2a2a] rounded-full"></div>
+                                <div className="flex-1 space-y-2 py-1">
+                                    <div className="h-4 bg-[#2a2a2a] rounded w-1/4"></div>
+                                    <div className="h-3 bg-[#2a2a2a] rounded w-1/3"></div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                )}
+                ) : (
+                    <>
+                        {paginatedList.length === 0 && (
+                            <div className="bg-[#1E1E1E] p-10 rounded-2xl border border-[#333] text-center">
+                                <span className="text-[#555] italic">{showArchived ? 'No hay miembros archivados.' : 'No se encontraron miembros con esos filtros.'}</span>
+                            </div>
+                        )}
 
-                {paginatedList.map((m) => (
-                    <MemberListItem
-                        key={m.id}
-                        member={m}
-                        showArchived={showArchived}
-                        toggleServerStatus={toggleServerStatus}
-                        toggleAdminStatus={toggleAdminStatus}
-                        handleArchive={handleArchive}
-                        handleRestore={handleRestore}
-                    />
-                ))}
+                        {paginatedList.map((m) => (
+                            <MemberListItem
+                                key={m.id}
+                                member={m}
+                                showArchived={showArchived}
+                                toggleServerStatus={toggleServerStatus}
+                                toggleAdminStatus={toggleAdminStatus}
+                                handleArchive={handleArchive}
+                                handleRestore={handleRestore}
+                            />
+                        ))}
+                    </>
+                )}
             </div>
 
             {/* Pagination Section */}
