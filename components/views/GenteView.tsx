@@ -11,6 +11,10 @@ interface GenteViewProps {
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
+import { MemberCreateModal } from '../members/MemberCreateModal';
+import { MemberFilters } from '../members/MemberFilters';
+import { MemberListItem } from '../members/MemberListItem';
+import { MemberStats } from '../members/MemberStats';
 import { useGente } from '../../hooks/useGente';
 
 const PAGE_SIZE = 20;
@@ -35,8 +39,6 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
 
     const totalPages = Math.max(1, Math.ceil((filteredMiembros || []).length / PAGE_SIZE));
     const paginatedList = (filteredMiembros || []).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    const { totalActivos, totalServidores, nuevosHoy, nuevosSemana } = stats;
 
     return (
         <div className="space-y-6">
@@ -65,54 +67,18 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                 </div>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">
-                    <p className="text-2xl font-bold text-white">{totalActivos}</p>
-                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Miembros Activos</p>
-                </div>
-                <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">
-                    <p className="text-2xl font-bold text-[#A8D500]">{totalServidores}</p>
-                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Servidores</p>
-                </div>
-                <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">
-                    <p className="text-2xl font-bold text-[#00D9FF]">{nuevosHoy}</p>
-                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Nuevos Hoy</p>
-                </div>
-                <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">
-                    <p className="text-2xl font-bold text-[#FFB400]">{nuevosSemana}</p>
-                    <p className="text-[#555] text-[10px] font-bold uppercase mt-1">Nuevos Semana</p>
-                </div>
-            </div>
+            {/* Quick Stats Section */}
+            <MemberStats stats={stats} />
 
-            {/* Search Bar + Filters */}
-            <div className="flex flex-col md:flex-row gap-3">
-                <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
-                    <input
-                        type="text"
-                        placeholder="Buscar por nombre o apellido..."
-                        value={search}
-                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full bg-[#1E1E1E] border border-[#333] rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-[#00D9FF] transition-all"
-                    />
-                </div>
-                <div className="flex gap-1 bg-[#1E1E1E] rounded-2xl p-1 border border-[#333]">
-                    {['Todos', 'Hoy', 'Semana', 'Mes'].map(f => (
-                        <button
-                            key={f}
-                            onClick={() => { setTimeFilter(f); setPage(1); }}
-                            className={`px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all ${timeFilter === f ? 'bg-[#00D9FF] text-black' : 'text-[#555] hover:text-white'}`}
-                        >
-                            {f === 'Todos' ? 'Todos' : f === 'Hoy' ? '📅 Hoy' : f === 'Semana' ? '📆 7 días' : '🗓️ 30 días'}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="text-[#555] text-xs font-bold">
-                {filteredMiembros.length} miembro{filteredMiembros.length !== 1 ? 's' : ''} encontrado{filteredMiembros.length !== 1 ? 's' : ''}
-            </div>
+            {/* Search Bar + Filters Section */}
+            <MemberFilters
+                search={search}
+                setSearch={setSearch}
+                timeFilter={timeFilter}
+                setTimeFilter={setTimeFilter}
+                setPage={setPage}
+                filteredCount={filteredMiembros.length}
+            />
 
             <div className="grid grid-cols-1 gap-4">
                 {paginatedList.length === 0 && (
@@ -121,92 +87,20 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                     </div>
                 )}
 
-                {paginatedList.map((m) => {
-                    const sieteDiasAgo = new Date();
-                    sieteDiasAgo.setDate(sieteDiasAgo.getDate() - 7);
-                    const esNuevo = new Date(m.created_at) > sieteDiasAgo;
-
-                    return (
-                        <div key={m.id} className={`bg-[#1E1E1E] p-5 rounded-2xl border border-[#333] flex items-center justify-between hover:border-[#00D9FF50] transition-all group ${showArchived ? 'opacity-60' : ''}`}>
-                            <div className="flex items-center gap-4">
-                                <div className={`w-12 h-12 ${m.es_servidor ? 'bg-[#A8D50020] text-[#A8D500]' : 'bg-[#00D9FF15] text-[#00D9FF]'} rounded-full flex items-center justify-center font-bold text-xl overflow-hidden`}>
-                                    {m.foto_url ? (
-                                        <img src={m.foto_url} alt="" className="w-full h-full object-cover" />
-                                    ) : (
-                                        m.nombre[0]
-                                    )}
-                                </div>
-                                <div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="text-white font-bold text-lg">{m.nombre} {m.apellido}</div>
-                                        {m.es_servidor && (
-                                            <span title="Servidor Activo">
-                                                <ShieldCheck size={16} className="text-[#A8D500]" />
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className="flex items-center gap-3 text-xs text-[#888] mt-1">
-                                        <span className="flex items-center gap-1">📍 Se unió el {new Date(m.created_at).toLocaleDateString()}</span>
-                                        {esNuevo && <span className="bg-[#00D9FF20] px-2 py-0.5 rounded text-[#00D9FF] font-bold">NUEVO</span>}
-                                        {m.es_servidor && <span className="bg-[#A8D50020] px-2 py-0.5 rounded text-[#A8D500] font-bold">SERVIDOR</span>}
-                                        {m.es_admin && <span className="bg-[#FFB40020] px-2 py-0.5 rounded text-[#FFB400] font-bold">ADMIN</span>}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex gap-2">
-                                {m.celular && (
-                                    <button
-                                        onClick={() => window.open(`https://wa.me/${m.celular.replace(/\D/g, '')}`, '_blank')}
-                                        className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-xl font-bold text-sm hover:scale-105 transition-all"
-                                    >
-                                        <Phone size={16} /> WHATSAPP
-                                    </button>
-                                )}
-                                <button
-                                    onClick={() => toggleServerStatus(m)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${m.es_servidor
-                                        ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
-                                        : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'
-                                        }`}
-                                >
-                                    <UserCircle size={16} />
-                                    {m.es_servidor ? 'ES SERVIDOR' : 'HACER SERVIDOR'}
-                                </button>
-                                <button
-                                    onClick={() => toggleAdminStatus(m)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${m.es_admin
-                                        ? 'bg-[#FFB400] text-black shadow-[0_0_15px_rgba(255,180,0,0.3)]'
-                                        : 'bg-[#333] text-[#888] hover:bg-[#444] hover:text-white'
-                                        }`}
-                                >
-                                    <ShieldCheck size={16} />
-                                    {m.es_admin ? 'ES ADMIN' : 'HACER ADMIN'}
-                                </button>
-                                {showArchived ? (
-                                    <button
-                                        onClick={() => handleRestore(m)}
-                                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#00D9FF] text-black font-bold text-sm transition-all hover:scale-105"
-                                        title="Restaurar miembro"
-                                    >
-                                        <UserPlus size={14} /> RESTAURAR
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() => handleArchive(m)}
-                                        className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#222] text-[#555] hover:text-red-400 hover:bg-red-500/10 font-bold text-sm transition-all opacity-0 group-hover:opacity-100"
-                                        title="Archivar miembro"
-                                    >
-                                        <Archive size={14} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    );
-                })}
+                {paginatedList.map((m) => (
+                    <MemberListItem
+                        key={m.id}
+                        member={m}
+                        showArchived={showArchived}
+                        toggleServerStatus={toggleServerStatus}
+                        toggleAdminStatus={toggleAdminStatus}
+                        handleArchive={handleArchive}
+                        handleRestore={handleRestore}
+                    />
+                ))}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination Section */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-2">
                     <span className="text-[#555] text-xs font-bold">Página {page} de {totalPages}</span>
@@ -229,73 +123,15 @@ const GenteView = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndividu
                 </div>
             )}
 
-            {/* Modal para Nuevo Miembro */}
-            {showCreateModal && (
-                <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-                    <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] p-8 shadow-2xl animate-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-white font-bold text-xl uppercase tracking-widest flex items-center gap-2">
-                                <UserPlus className="text-[#00D9FF]" size={24} />
-                                Nuevo Miembro
-                            </h3>
-                            <button onClick={() => setShowCreateModal(false)} className="text-[#555] hover:text-white transition-colors">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        <div className="space-y-4 mb-8">
-                            <div>
-                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Nombre</label>
-                                <input
-                                    type="text"
-                                    value={newMember.nombre}
-                                    onChange={e => setNewMember({ ...newMember, nombre: e.target.value })}
-                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
-                                    placeholder="Ej: Juan"
-                                    autoFocus
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Apellido</label>
-                                <input
-                                    type="text"
-                                    value={newMember.apellido}
-                                    onChange={e => setNewMember({ ...newMember, apellido: e.target.value })}
-                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
-                                    placeholder="Ej: Pérez"
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Celular / WhatsApp</label>
-                                <input
-                                    type="text"
-                                    value={newMember.celular}
-                                    onChange={e => setNewMember({ ...newMember, celular: e.target.value })}
-                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-3 text-white outline-none focus:border-[#00D9FF] transition-all"
-                                    placeholder="Ej: 5493751000000"
-                                />
-                                <p className="text-[9px] text-[#444] mt-1 pr-1 italic text-right">Incluir código de área sin el +</p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowCreateModal(false)}
-                                className="flex-1 py-4 bg-[#222] text-[#888] font-bold rounded-2xl border border-[#333] hover:text-white transition-all text-xs"
-                            >
-                                CANCELAR
-                            </button>
-                            <button
-                                onClick={handleCreateMember}
-                                disabled={saving}
-                                className="flex-1 py-4 bg-[#00D9FF] text-black font-black rounded-2xl hover:bg-[#00c4e6] disabled:opacity-50 transition-all text-xs uppercase tracking-widest shadow-[0_10px_20px_rgba(0,217,255,0.2)]"
-                            >
-                                {saving ? 'GUARDANDO...' : 'CREAR'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Create Member Modal */}
+            <MemberCreateModal
+                visible={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                member={newMember}
+                setMember={setNewMember}
+                onSave={handleCreateMember}
+                saving={saving}
+            />
         </div>
     );
 };
