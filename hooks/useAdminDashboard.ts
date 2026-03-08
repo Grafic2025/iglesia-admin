@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface UseAdminDashboardProps {
@@ -13,7 +13,7 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     // UI States
     const [filtroHorario, setFiltroHorario] = useState('Todas');
     const [busqueda, setBusqueda] = useState('');
-    const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }));
+    const [fechaSeleccionada, setFechaSeleccionada] = useState('');
     const [tituloPush, setTituloPush] = useState('Iglesia del Salvador');
     const [mensajePush, setMensajePush] = useState('');
     const [imageUrlPush, setImageUrlPush] = useState('');
@@ -32,8 +32,14 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     const [horariosDisponibles, setHorariosDisponibles] = useState<any[]>([]);
     const [auditLogs, setAuditLogs] = useState<any[]>([]);
     const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([]);
+    const [hoyArg, setHoyArg] = useState('');
 
-    const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+    // Hydration safe init
+    useEffect(() => {
+        const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+        setFechaSeleccionada(today);
+        setHoyArg(today);
+    }, []);
 
     // 2. Data Fetching Logic
     const fetchCronogramas = useCallback(async () => {
@@ -60,12 +66,12 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     }, []);
 
     const fetchBautismos = useCallback(async () => {
-        const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
+        const { data } = await supabase.from('solicitudes_bautismo').select('*').order('created_at', { ascending: false });
         if (data) setBautismos(data);
     }, []);
 
     const fetchAyuda = useCallback(async () => {
-        const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
+        const { data } = await supabase.from('consultas_ayuda').select('*').order('created_at', { ascending: false });
         if (data) setAyuda(data);
     }, []);
 

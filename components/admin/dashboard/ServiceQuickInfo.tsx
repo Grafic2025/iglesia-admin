@@ -3,10 +3,10 @@ import { CalendarDays, Clock } from 'lucide-react';
 
 interface ServiceQuickInfoProps {
     lastServiceDate: any;
-    nextSunday: Date;
+    nextSundayString: string;
 }
 
-const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, nextSunday }) => {
+const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, nextSundayString }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-[#1E1E1E] p-5 rounded-2xl border border-[#333] flex items-center gap-4">
@@ -30,8 +30,8 @@ const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, ne
                 </div>
                 <div>
                     <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest">Próximo Domingo</p>
-                    <p className="text-white font-bold text-lg">
-                        {nextSunday.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    <p className="text-white font-bold text-lg min-h-[28px]">
+                        {nextSundayString}
                     </p>
                 </div>
             </div>

@@ -9,6 +9,7 @@ export default function SolicitudesPage() {
         <SolicitudesView
             bautismos={admin.bautismos}
             ayuda={admin.ayuda}
+            miembros={admin.miembros}
         />
     );
 }

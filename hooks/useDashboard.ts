@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 
 const GROWTH_RANGES = [
     { key: '3M', label: '3 meses', months: 3 },
@@ -54,8 +54,13 @@ export function useDashboard({
     const todayTrend = yesterdayCount > 0 ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100) : null;
 
     const lastServiceDate = (asistencias7dias || []).filter(d => d.total > 0).slice(-1)[0];
-    const nextSunday = new Date();
-    nextSunday.setDate(nextSunday.getDate() + ((7 - nextSunday.getDay()) % 7 || 7));
+    const [nextSundayString, setNextSundayString] = useState('');
+
+    useEffect(() => {
+        const nextSunday = new Date();
+        nextSunday.setDate(nextSunday.getDate() + ((7 - nextSunday.getDay()) % 7 || 7));
+        setNextSundayString(nextSunday.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' }));
+    }, []);
 
     return {
         growthRange,
@@ -65,7 +70,7 @@ export function useDashboard({
         todayCount,
         todayTrend,
         lastServiceDate,
-        nextSunday,
+        nextSundayString,
         GROWTH_RANGES,
         COLORS
     };

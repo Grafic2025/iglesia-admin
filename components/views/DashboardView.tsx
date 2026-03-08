@@ -43,7 +43,7 @@ const DashboardView = ({
         todayCount,
         todayTrend,
         lastServiceDate,
-        nextSunday,
+        nextSundayString,
         GROWTH_RANGES,
         COLORS
     } = useDashboard({ asistencias, asistencias7dias, crecimientoAnual, miembros });
@@ -89,7 +89,7 @@ const DashboardView = ({
 
             <ServiceQuickInfo
                 lastServiceDate={lastServiceDate}
-                nextSunday={nextSunday}
+                nextSundayString={nextSundayString}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
