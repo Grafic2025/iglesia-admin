@@ -11,6 +11,8 @@ import { useMemberActions } from './useMemberActions';
 
 export const useAdminMaster = () => {
     const [fechaInternal, setFechaInternal] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }));
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const toggleSidebar = useCallback(() => setIsSidebarOpen(prev => !prev), []);
 
     const auth = useAdminAuth();
     const { miembros, fetchMiembros, loading: miembrosLoading } = useMiembros();
@@ -143,6 +145,9 @@ export const useAdminMaster = () => {
         // Combined UI state & methods
         ...dashboard,
         ...auth,
-        ...memberActions
+        ...memberActions,
+        isSidebarOpen,
+        setIsSidebarOpen,
+        toggleSidebar
     };
 };

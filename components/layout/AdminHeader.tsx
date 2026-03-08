@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu } from 'lucide-react';
 import { TAB_LABELS } from '../../app/constants';
 
 import { usePathname } from 'next/navigation';
@@ -14,20 +14,27 @@ const AdminHeader: React.FC = () => {
         setExportStart,
         setExportEnd,
         setShowExportModal,
-        handleLogout
+        handleLogout,
+        toggleSidebar
     } = useAdminContext();
 
     const pathname = usePathname();
     const activeTab = pathname === '/' ? 'dashboard' : pathname.replace('/', '');
     return (
-        <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-10 shrink-0">
+        <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-6 lg:px-10 shrink-0">
             <div className="flex items-center gap-4">
-                <div className="h-10 w-1.5 bg-indigo-600 rounded-full"></div>
+                <button
+                    onClick={toggleSidebar}
+                    className="lg:hidden p-2 text-[#888] hover:text-white"
+                >
+                    <Menu size={24} />
+                </button>
+                <div className="hidden sm:block h-10 w-1.5 bg-indigo-600 rounded-full"></div>
                 <div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight">
+                    <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
                     </h2>
-                    <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Iglesia del Salvador</p>
+                    <p className="text-[10px] md:text-xs text-gray-500 font-medium uppercase tracking-widest leading-none">Iglesia del Salvador</p>
                 </div>
             </div>
 
