@@ -27,12 +27,12 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
     return (
         <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-10 shrink-0">
             <div className="flex items-center gap-4">
-                <div className="h-10 w-1.5 bg-red-600 rounded-full"></div>
+                <div className="h-10 w-1.5 bg-indigo-600 rounded-full"></div>
                 <div>
                     <h2 className="text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
                     </h2>
-                    <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Iglesia del Salvador • Gestión Rev</p>
+                    <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Iglesia del Salvador</p>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                         />
                         <button
                             onClick={exportarCSV}
-                            className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-red-600/20"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-600/20"
                         >
                             Exportar Hoy
                         </button>
@@ -66,7 +66,7 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all border border-white/5"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-indigo-500/10 text-gray-400 hover:text-indigo-400 transition-all border border-white/5"
                 >
                     <LogOut size={18} />
                     <span className="text-sm font-bold">Salir</span>
