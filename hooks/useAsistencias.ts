@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+
+const EMPTY_ARRAY: any[] = [];
 
 export const useAsistencias = (fechaSeleccionada: string) => {
 
@@ -35,18 +38,18 @@ export const useAsistencias = (fechaSeleccionada: string) => {
             }));
 
             return {
-                asistencias: asistDay || [],
-                chartData: counts || []
+                asistencias: asistDay || EMPTY_ARRAY,
+                chartData: counts || EMPTY_ARRAY
             };
         },
         staleTime: 1000 * 60 * 2, // 2 minutes
     });
 
     return {
-        asistencias: data?.asistencias || [],
-        asistencias7dias: data?.chartData || [],
+        asistencias: data?.asistencias || EMPTY_ARRAY,
+        asistencias7dias: data?.chartData || EMPTY_ARRAY,
         loading: isLoading || isFetching,
-        fetchAsistencias: async () => { await refetch(); },
-        fetchAsistencias7dias: async () => { await refetch(); }
+        fetchAsistencias: useCallback(async () => { await refetch(); }, [refetch]),
+        fetchAsistencias7dias: useCallback(async () => { await refetch(); }, [refetch])
     };
 };

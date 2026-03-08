@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { supabase } from '../lib/supabase';
+const EMPTY_ARRAY: any[] = [];
 
 export const useMiembros = () => {
 
@@ -28,9 +29,9 @@ export const useMiembros = () => {
     }, [refetch]);
 
     return {
-        miembros: miembros || [],
+        miembros: miembros || EMPTY_ARRAY,
         loading: isLoading || isFetching,
-        fetchMiembros: async () => { await refetch(); },
+        fetchMiembros: useCallback(async () => { await refetch(); }, [refetch]),
         toggleServerStatus
     };
 };
