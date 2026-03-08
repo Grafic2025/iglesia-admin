@@ -171,11 +171,7 @@ const NotificacionesView = ({
                             )}
                         </div>
 
-                        {/* Time/Date on phone */}
-                        <div className="absolute top-32 left-0 right-0 items-center flex flex-col pointer-events-none opacity-40">
-                            <span className="text-4xl font-light text-white">10:45</span>
-                            <span className="text-[10px] text-white">Martes, 24 de Febrero</span>
-                        </div>
+                        {/* Time/Date on phone removed as requested */}
                     </div>
                     <p className="text-[10px] text-[#555] mt-6 italic">Así es como el usuario verá la notificación push.</p>
                 </div>
