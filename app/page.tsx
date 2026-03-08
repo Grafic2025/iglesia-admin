@@ -1,6 +1,9 @@
 'use client'
 import React from 'react'
+import { supabase } from '../lib/supabase'
 import Sidebar from '../components/Sidebar'
+import AdminHeader from '../components/layout/AdminHeader'
+import ExportModal from '../components/layout/ExportModal'
 import DashboardView from '../components/views/DashboardView'
 import MiembrosView from '../components/views/MiembrosView'
 import NotificacionesView from '../components/views/NotificacionesView'
@@ -14,26 +17,11 @@ import AuditoriaView from '../components/views/AuditoriaView'
 import AlertasView from '../components/views/AlertasView'
 import SolicitudesView from '../components/views/SolicitudesView'
 import BotView from '../components/views/BotView'
-import { LogOut, ShieldAlert } from 'lucide-react'
+import { ShieldAlert } from 'lucide-react'
+import { TAB_LABELS } from './constants'
 
 // Custom Hooks
 import { useAdminMaster } from '../hooks/useAdminMaster'
-
-const TAB_LABELS: Record<string, string> = {
-  dashboard: 'Dashboard',
-  miembros: 'Asistencias',
-  gente: 'Gente',
-  notificaciones: 'Mensajería',
-  solicitudes: 'Solicitudes',
-  cms: 'Contenido',
-  servicios: 'Plan de Culto',
-  equipos: 'Equipos / Servir',
-  cancionero: 'Cancionero',
-  agenda_config: 'Configuración de Agenda',
-  auditoria: 'Auditoría',
-  alertas: 'Retención (Alertas)',
-  bot: 'IDS BOT',
-};
 
 /**
  * Componente raíz del Panel de Administración.
@@ -65,9 +53,11 @@ export default function AdminDashboard() {
     imageUrlPush, setImageUrlPush,
     typePush, setTypePush,
     enviarNotificacion,
+    enviarPushGeneral,
     enviando,
     notificacionStatus,
     enviarNotificacionIndividual,
+    eliminarProgramacion,
 
     // CSV
     exportStart, setExportStart,
@@ -116,16 +106,16 @@ export default function AdminDashboard() {
             type="submit"
             disabled={loginLocked}
             className={`w-full p-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${loginLocked
-                ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
-                : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/20'
+              ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
+              : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/20'
               }`}
           >
             {loginLocked ? `Bloqueado (${lockTimer}s)` : 'Entrar al Panel'}
           </button>
         </form>
         {loginLocked && (
-          <p className="mt-4 text-center text-red-500 text-sm font-medium bg-red-500/10 p-3 rounded-lg border border-red-500/20">
-            Demasiados intentos fallidos. Por favor, espere.
+          <p className="text-center mt-6 text-red-500 text-sm font-bold animate-pulse flex items-center justify-center gap-2">
+            ⚠️ Demasiados intentos fallidos.
           </p>
         )}
       </div>
@@ -133,61 +123,36 @@ export default function AdminDashboard() {
   )
 
   return (
-    <div className="flex h-screen bg-[#0f0f0f] text-gray-100 font-sans overflow-hidden">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
+    <div className="flex h-screen bg-[#121212] text-white overflow-hidden font-sans selection:bg-red-500/30">
+      {/* Sidebar - Ahora es un componente desacoplado */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={handleLogout}
+      />
 
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        {/* Header Superior */}
-        <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-10 shrink-0">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-1.5 bg-red-600 rounded-full"></div>
-            <div>
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                {TAB_LABELS[activeTab]}
-              </h2>
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Iglesia del Salvador • Gestión Rev</p>
-            </div>
+        {/* Header Superior Desacoplado */}
+        <AdminHeader
+          activeTab={activeTab}
+          fechaSeleccionada={fechaSeleccionada}
+          setFechaSeleccionada={setFechaSeleccionada}
+          exportarCSV={exportarCSV}
+          setExportStart={setExportStart}
+          setExportEnd={setExportEnd}
+          setShowExportModal={setShowExportModal}
+          handleLogout={handleLogout}
+        />
+
+        {/* Notificaciones flotantes */}
+        {notificacionStatus.show && (
+          <div className={`fixed top-24 right-10 z-[100] p-4 rounded-2xl shadow-2xl border flex items-center gap-3 animate-in slide-in-from-right duration-500 ${notificacionStatus.error ? 'bg-red-500/10 border-red-500/50 text-red-500' : 'bg-green-500/10 border-green-500/50 text-green-500'}`}>
+            <div className={`w-2 h-2 rounded-full ${notificacionStatus.error ? 'bg-red-500' : 'bg-green-500'} animate-pulse`}></div>
+            <span className="font-bold text-sm">{notificacionStatus.message}</span>
           </div>
+        )}
 
-          <div className="flex items-center gap-6">
-            {activeTab === 'miembros' && (
-              <div className="flex items-center gap-3 bg-[#1e1e1e] p-1.5 rounded-xl border border-white/5 shadow-inner">
-                <input
-                  type="date"
-                  value={fechaSeleccionada}
-                  onChange={(e) => setFechaSeleccionada(e.target.value)}
-                  className="bg-transparent text-white px-3 py-1.5 rounded-lg focus:outline-none text-sm font-medium"
-                />
-                <button
-                  onClick={exportarCSV}
-                  className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-red-600/20"
-                >
-                  Exportar Hoy
-                </button>
-                <button
-                  onClick={() => {
-                    setExportStart(fechaSeleccionada);
-                    setExportEnd(fechaSeleccionada);
-                    setShowExportModal(true);
-                  }}
-                  className="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
-                >
-                  Rango...
-                </button>
-              </div>
-            )}
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all border border-white/5"
-            >
-              <LogOut size={18} />
-              <span className="text-sm font-bold">Salir</span>
-            </button>
-          </div>
-        </header>
-
-        {/* Contenido de la Vista */}
+        {/* Area de Contenido */}
         <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
           {activeTab === 'dashboard' && (
             <DashboardView
@@ -197,7 +162,7 @@ export default function AdminDashboard() {
               nuevosMes={nuevosMes}
               crecimientoAnual={crecimientoAnual}
               horariosReunion={horariosDisponibles}
-              miembrosTotales={miembros.length}
+              miembros={miembros}
             />
           )}
 
@@ -212,10 +177,11 @@ export default function AdminDashboard() {
               premiosEntregados={premiosEntregados}
               marcarComoEntregado={marcarComoEntregado}
               enviarNotificacionIndividual={enviarNotificacionIndividual}
-              fecha={hoyArg}
+              hoyArg={hoyArg}
+              supabase={supabase}
               fetchAsistencias={fetchAsistencias}
               fetchMiembros={fetchMiembros}
-              horariosReunion={horariosDisponibles}
+              horariosDisponibles={horariosDisponibles}
               registrarAuditoria={registrarAuditoria}
             />
           )}
@@ -223,9 +189,10 @@ export default function AdminDashboard() {
           {activeTab === 'gente' && (
             <GenteView
               miembros={miembros}
-              fechaHoy={hoyArg}
+              hoyArg={hoyArg}
               fetchMiembros={fetchMiembros}
               enviarNotificacionIndividual={enviarNotificacionIndividual}
+              registrarAuditoria={registrarAuditoria}
             />
           )}
 
@@ -243,8 +210,12 @@ export default function AdminDashboard() {
               enviando={enviando}
               notificacionStatus={notificacionStatus}
               cronogramas={cronogramas}
-              horariosReunion={horariosDisponibles}
-              fetchCronogramas={fetchCronogramas}
+              eliminarProgramacion={eliminarProgramacion}
+              fetchProgramaciones={fetchCronogramas}
+              supabase={supabase}
+              logs={logs}
+              logsError={logsError}
+              horariosDisponibles={horariosDisponibles}
               registrarAuditoria={registrarAuditoria}
               typePush={typePush}
               setTypePush={setTypePush}
@@ -253,84 +224,69 @@ export default function AdminDashboard() {
 
           {activeTab === 'solicitudes' && (
             <SolicitudesView
-              registrarAuditoria={registrarAuditoria}
+              bautismos={bautismos}
+              ayuda={ayuda}
             />
           )}
 
           {activeTab === 'alertas' && (
             <AlertasView
-              setActiveTab={setActiveTab}
-              enviarNotificacionIndividual={enviarNotificacionIndividual}
+              supabase={supabase}
+              registrarAuditoria={registrarAuditoria}
             />
           )}
 
-          {activeTab === 'cms' && <CMSView />}
+          {activeTab === 'cms' && (
+            <CMSView
+              noticias={noticias}
+              syncYouTube={syncYouTube}
+              eliminarNoticia={eliminarNoticia}
+              supabase={supabase}
+              fetchNoticias={fetchNoticias}
+              registrarAuditoria={registrarAuditoria}
+              enviarPushGeneral={enviarPushGeneral}
+            />
+          )}
           {activeTab === 'servicios' && (
             <ServiciosView
-              horariosReunion={horariosDisponibles}
-              fetchHorarios={fetchHorarios}
+              supabase={supabase}
+              enviarNotificacionIndividual={enviarNotificacionIndividual}
               registrarAuditoria={registrarAuditoria}
             />
           )}
           {activeTab === 'auditoria' && (
-            <AuditoriaView auditLogs={auditLogs} />
+            <AuditoriaView logs={auditLogs} />
           )}
           {activeTab === 'equipos' && (
-            <EquiposView registrarAuditoria={registrarAuditoria} />
+            <EquiposView
+              supabase={supabase}
+              registrarAuditoria={registrarAuditoria}
+              enviarNotificacionIndividual={enviarNotificacionIndividual}
+            />
           )}
-          {activeTab === 'cancionero' && <CancioneroView />}
-          {activeTab === 'agenda_config' && <AgendaConfigView />}
-          {activeTab === 'bot' && <BotView />}
+          {activeTab === 'cancionero' && <CancioneroView supabase={supabase} />}
+          {activeTab === 'agenda_config' && (
+            <AgendaConfigView
+              supabase={supabase}
+              horariosDisponibles={horariosDisponibles}
+              fetchHorarios={fetchHorarios}
+              registrarAuditoria={registrarAuditoria}
+            />
+          )}
+          {activeTab === 'bot' && <BotView supabase={supabase} registrarAuditoria={registrarAuditoria} />}
         </div>
 
-        {/* Modal de Exportación por Rango */}
-        {showExportModal && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-            <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <div className="w-2 h-6 bg-red-600 rounded-full"></div>
-                Exportar por Rango
-              </h3>
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Inicio</label>
-                  <input
-                    type="date"
-                    value={exportStart}
-                    onChange={(e) => setExportStart(e.target.value)}
-                    className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Fin</label>
-                  <input
-                    type="date"
-                    value={exportEnd}
-                    onChange={(e) => setExportEnd(e.target.value)}
-                    className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button
-                    onClick={() => setShowExportModal(false)}
-                    className="flex-1 px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold transition-all border border-white/5"
-                  >
-                    Cerrar
-                  </button>
-                  <button
-                    onClick={() => {
-                      exportarCSVRango(exportStart, exportEnd);
-                      setShowExportModal(false);
-                    }}
-                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-lg shadow-red-600/20"
-                  >
-                    Descargar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Modal de Exportación Desacoplado */}
+        <ExportModal
+          showExportModal={showExportModal}
+          setShowExportModal={setShowExportModal}
+          exportStart={exportStart}
+          setExportStart={setExportStart}
+          exportEnd={exportEnd}
+          setExportEnd={setExportEnd}
+          exportarCSVRango={exportarCSVRango}
+          fechaSeleccionada={fechaSeleccionada}
+        />
       </main>
     </div>
   )

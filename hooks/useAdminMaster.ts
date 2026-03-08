@@ -6,10 +6,13 @@ import { useNoticias } from './useNoticias';
 import { useNotificaciones } from './useNotificaciones';
 import { useExportCSV } from './useExportCSV';
 import { useAdminDashboard } from './useAdminDashboard';
+import { useAdminAuth } from './useAdminAuth';
+import { useMemberActions } from './useMemberActions';
 
 export const useAdminMaster = () => {
     const [fechaInternal, setFechaInternal] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }));
 
+    const auth = useAdminAuth();
     const { miembros, fetchMiembros } = useMiembros();
     const { asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias } = useAsistencias(fechaInternal);
     const { noticias, fetchNoticias, syncYouTube, eliminarNoticia } = useNoticias();
@@ -22,6 +25,13 @@ export const useAdminMaster = () => {
     } = useExportCSV();
 
     const dashboard = useAdminDashboard({ fetchAsistencias, fetchLogs });
+
+    const memberActions = useMemberActions({
+        fetchMiembros,
+        fetchAsistencias,
+        enviarNotificacionIndividual: dashboard.enviarNotificacionIndividual,
+        registrarAuditoria: dashboard.registrarAuditoria
+    });
 
     // Shell / Orchestration logic moved from page.tsx
     const enviarNotificacion = async () => {
@@ -44,6 +54,13 @@ export const useAdminMaster = () => {
 
     const exportarCSV = () => exportarCSVGlobal(dashboard.fechaSeleccionada, asistencias);
 
+    const eliminarProgramacion = async (id: string) => {
+        if (!confirm('¿Eliminar esta programación?')) return;
+        const { error } = await supabase.from('cronogramas').delete().eq('id', id);
+        if (!error) dashboard.fetchCronogramas();
+        else alert('Error: ' + error.message);
+    };
+
     const datosFiltrados = useMemo(() => (asistencias || []).filter((a: any) => {
         const nombre = `${a.miembros?.nombre || ''} ${a.miembros?.apellido || ''}`.toLowerCase();
         const cumpleHorario = dashboard.filtroHorario === 'Todas' || a.horario_reunion === dashboard.filtroHorario;
@@ -52,7 +69,7 @@ export const useAdminMaster = () => {
 
     // 1. Initial Data Fetch (Orchestration)
     useEffect(() => {
-        if (dashboard.authorized) {
+        if (auth.authorized) {
             fetchMiembros();
             dashboard.fetchCronogramas();
             dashboard.calcularOracionesActivas();
@@ -67,7 +84,7 @@ export const useAdminMaster = () => {
             dashboard.fetchAuditLogs();
         }
     }, [
-        dashboard.authorized,
+        auth.authorized,
         fetchMiembros,
         dashboard.fetchCronogramas,
         dashboard.calcularOracionesActivas,
@@ -84,10 +101,10 @@ export const useAdminMaster = () => {
 
     // 2. Date-specific Fetch sync
     useEffect(() => {
-        if (dashboard.authorized) {
+        if (auth.authorized) {
             setFechaInternal(dashboard.fechaSeleccionada);
         }
-    }, [dashboard.authorized, dashboard.fechaSeleccionada]);
+    }, [auth.authorized, dashboard.fechaSeleccionada]);
 
     // 4. Rewards calculation
     useEffect(() => {
@@ -96,7 +113,7 @@ export const useAdminMaster = () => {
 
     // 3. Realtime subscriptions
     useEffect(() => {
-        if (dashboard.authorized) {
+        if (auth.authorized) {
             const channels = [
                 supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe(),
                 supabase.channel('cambios-programas').on('postgres_changes', { event: '*', schema: 'public', table: 'cronogramas' }, () => dashboard.fetchCronogramas()).subscribe(),
@@ -107,7 +124,7 @@ export const useAdminMaster = () => {
                 channels.forEach((ch: any) => supabase.removeChannel(ch));
             };
         }
-    }, [dashboard.authorized, fetchAsistencias, dashboard.fetchCronogramas, fetchLogs]);
+    }, [auth.authorized, fetchAsistencias, dashboard.fetchCronogramas, fetchLogs]);
 
     return {
         // Source hooks
@@ -120,9 +137,12 @@ export const useAdminMaster = () => {
         // Orchestrated logic
         enviarNotificacion,
         exportarCSV,
+        eliminarProgramacion,
         datosFiltrados,
 
-        // Dashboard/UI state & methods
-        ...dashboard
+        // Combined UI state & methods
+        ...dashboard,
+        ...auth,
+        ...memberActions
     };
 };

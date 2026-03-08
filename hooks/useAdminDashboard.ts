@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+'use client';
+import { useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface UseAdminDashboardProps {
-    fetchAsistencias: () => void;
-    fetchLogs: () => void;
+    fetchAsistencias?: () => void;
+    fetchLogs?: () => void;
 }
 
 export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashboardProps) {
-    const [authorized, setAuthorized] = useState(false);
-    const [password, setPassword] = useState('');
     const [activeTab, setActiveTab] = useState('dashboard');
 
     // UI States
@@ -21,9 +20,6 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     const [typePush, setTypePush] = useState('General');
     const [enviando, setEnviando] = useState(false);
     const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false });
-    const [loginAttempts, setLoginAttempts] = useState(0);
-    const [loginLocked, setLoginLocked] = useState(false);
-    const [lockTimer, setLockTimer] = useState(0);
 
     // Data States
     const [cronogramas, setCronogramas] = useState<any[]>([]);
@@ -38,64 +34,6 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([]);
 
     const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-
-    // 1. Authentication Logic
-    useEffect(() => {
-        const isAuth = localStorage.getItem('admin_auth');
-        if (isAuth === 'true') setAuthorized(true);
-
-        if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'https:') {
-            window.location.href = window.location.href.replace('http:', 'https:');
-        }
-    }, []);
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (loginLocked) return;
-
-        try {
-            const res = await fetch('/api/auth', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password }),
-            });
-
-            const data = await res.json();
-
-            if (res.ok && data.success) {
-                setAuthorized(true);
-                localStorage.setItem('admin_auth', 'true');
-                setLoginAttempts(0);
-            } else {
-                const newAttempts = loginAttempts + 1;
-                setLoginAttempts(newAttempts);
-                if (newAttempts >= 5) {
-                    setLoginLocked(true);
-                    let seconds = 30;
-                    setLockTimer(seconds);
-                    const interval = setInterval(() => {
-                        seconds--;
-                        setLockTimer(seconds);
-                        if (seconds <= 0) {
-                            clearInterval(interval);
-                            setLoginLocked(false);
-                            setLoginAttempts(0);
-                        }
-                    }, 1000);
-                    return;
-                }
-                alert(`Contraseña incorrecta (${newAttempts}/5 intentos)`);
-            }
-        } catch (e) {
-            alert('Error conectando al servidor.');
-        }
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('admin_auth');
-        setAuthorized(false);
-        setPassword('');
-    };
 
     // 2. Data Fetching Logic
     const fetchCronogramas = useCallback(async () => {
@@ -216,8 +154,6 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
     }, []);
 
     return {
-        authorized,
-        password, setPassword,
         activeTab, setActiveTab,
         filtroHorario, setFiltroHorario,
         busqueda, setBusqueda,
@@ -228,7 +164,6 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
         typePush, setTypePush,
         enviando, setEnviando,
         notificacionStatus, setNotificacionStatus,
-        loginLocked, lockTimer,
         cronogramas, setCronogramas,
         premiosPendientes,
         oracionesActivas,
@@ -240,8 +175,6 @@ export function useAdminDashboard({ fetchAsistencias, fetchLogs }: UseAdminDashb
         auditLogs,
         crecimientoAnual,
         hoyArg,
-        handleLogin,
-        handleLogout,
         fetchCronogramas,
         calcularOracionesActivas,
         calcularNuevosMes,

@@ -16,13 +16,21 @@ interface DashboardViewProps {
     oracionesActivas: number;
     nuevosMes: number;
     crecimientoAnual: any[];
-    horariosDisponibles: any[];
-    miembros?: any[];
+    horariosReunion: any[]; // Renombrado de horariosDisponibles
+    miembros: any[];       // Hecho obligatorio
 }
 
 import { useDashboard } from '../../hooks/useDashboard';
 
-const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevosMes, crecimientoAnual, horariosDisponibles, miembros = [] }: DashboardViewProps) => {
+const DashboardView = ({
+    asistencias,
+    asistencias7dias,
+    oracionesActivas,
+    nuevosMes,
+    crecimientoAnual,
+    horariosReunion,
+    miembros
+}: DashboardViewProps) => {
     const {
         growthRange,
         setGrowthRange,
@@ -54,7 +62,7 @@ const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevos
                     icon={<LayoutDashboard size={18} />}
                     trend={todayTrend}
                 />
-                {(horariosDisponibles || []).map(h => (
+                {(horariosReunion || []).map(h => (
                     <StatCard
                         key={h}
                         label={`${h} HS`}
