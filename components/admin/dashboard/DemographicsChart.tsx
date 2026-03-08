@@ -14,7 +14,7 @@ const DemographicsChart: React.FC<DemographicsChartProps> = ({ data, COLORS }) =
                 <Users2 size={18} className="text-[#FFB400]" /> Edades de la Congregación
             </h3>
             <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={250}>
                     <ReLineBarChart data={data} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
                         <XAxis type="number" stroke="#888" fontSize={10} />

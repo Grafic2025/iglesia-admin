@@ -13,7 +13,7 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ data }) => {
                 <LucideBarChart size={18} className="text-[#A8D500]" /> Tendencia: Últimos 7 Días
             </h3>
             <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={250}>
                     <ReLineBarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                         <XAxis dataKey="dia" stroke="#888" fontSize={10} />

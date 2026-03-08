@@ -29,7 +29,7 @@ const GrowthChart: React.FC<GrowthChartProps> = ({ data, growthRange, setGrowthR
                 </div>
             </div>
             <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height={250}>
                     <ReLineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                         <XAxis dataKey="mes" stroke="#888" fontSize={10} />
