@@ -11,7 +11,7 @@ export const useMiembros = () => {
             const { data, error } = await supabase
                 .from('miembros')
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('nombre', { ascending: true });
             if (error) throw error;
             setMiembros(data || []);
         } catch (error) {

@@ -20,54 +20,21 @@ interface DashboardViewProps {
     miembros?: any[];
 }
 
-const GROWTH_RANGES = [
-    { key: '3M', label: '3 meses', months: 3 },
-    { key: '6M', label: '6 meses', months: 6 },
-    { key: '12M', label: '12 meses', months: 12 },
-];
-
-const COLORS = ['#A8D500', '#00D9FF', '#FFB400', '#9333EA', '#FF4444', '#3B82F6'];
+import { useDashboard } from '../../hooks/useDashboard';
 
 const DashboardView = ({ asistencias, asistencias7dias, oracionesActivas, nuevosMes, crecimientoAnual, horariosDisponibles, miembros = [] }: DashboardViewProps) => {
-    const [growthRange, setGrowthRange] = useState('12M');
-
-    // Calculate Demographic Data
-    const demographicData = useMemo(() => {
-        const ages = { 'Niños (<13)': 0, 'Adolescentes (13-17)': 0, 'Jóvenes (18-29)': 0, 'Adultos (30-59)': 0, 'Mayores (60+)': 0, 'S/D': 0 };
-
-        miembros.forEach(m => {
-            if (m.fecha_nacimiento) {
-                const age = new Date().getFullYear() - new Date(m.fecha_nacimiento).getFullYear();
-                if (age < 13) ages['Niños (<13)']++;
-                else if (age < 18) ages['Adolescentes (13-17)']++;
-                else if (age < 30) ages['Jóvenes (18-29)']++;
-                else if (age < 60) ages['Adultos (30-59)']++;
-                else ages['Mayores (60+)']++;
-            } else {
-                ages['S/D']++;
-            }
-        });
-
-        const ageChart = Object.entries(ages).map(([name, value]) => ({ name, value })).filter(d => d.value > 0);
-        return { ageChart };
-    }, [miembros]);
-
-    // Filter growth data based on selected range
-    const filteredGrowth = useMemo(() => {
-        const rangeConfig = GROWTH_RANGES.find(r => r.key === growthRange);
-        if (!rangeConfig || !crecimientoAnual.length) return crecimientoAnual;
-        return crecimientoAnual.slice(-rangeConfig.months);
-    }, [crecimientoAnual, growthRange]);
-
-    // Calculate trend for "Total Hoy"
-    const todayCount = (asistencias || []).length;
-    const yesterdayCount = (asistencias7dias || []).length >= 2 ? asistencias7dias[asistencias7dias.length - 2]?.total || 0 : 0;
-    const todayTrend = yesterdayCount > 0 ? Math.round(((todayCount - yesterdayCount) / yesterdayCount) * 100) : null;
-
-    // Quick service info
-    const lastServiceDate = (asistencias7dias || []).filter(d => d.total > 0).slice(-1)[0];
-    const nextSunday = new Date();
-    nextSunday.setDate(nextSunday.getDate() + ((7 - nextSunday.getDay()) % 7 || 7));
+    const {
+        growthRange,
+        setGrowthRange,
+        demographicData,
+        filteredGrowth,
+        todayCount,
+        todayTrend,
+        lastServiceDate,
+        nextSunday,
+        GROWTH_RANGES,
+        COLORS
+    } = useDashboard({ asistencias, asistencias7dias, crecimientoAnual, miembros });
 
     return (
         <div className="space-y-6">

@@ -8,31 +8,18 @@ interface AuditoriaViewProps {
 
 const LOGS_PER_PAGE = 25;
 
+import { useAuditoria } from '../../hooks/useAuditoria';
+
 const AuditoriaView = ({ logs }: AuditoriaViewProps) => {
-    const [search, setSearch] = useState('');
-    const [actionFilter, setActionFilter] = useState('Todas');
-    const [page, setPage] = useState(1);
-
-    // Get unique action types for filter dropdown
-    const actionTypes = useMemo(() => {
-        const types = new Set((logs || []).map(l => l.accion));
-        return ['Todas', ...Array.from(types)];
-    }, [logs]);
-
-    const filteredLogs = useMemo(() => {
-        return (logs || []).filter(l => {
-            const matchSearch = !search ||
-                l.accion?.toLowerCase().includes(search.toLowerCase()) ||
-                l.detalle?.toLowerCase().includes(search.toLowerCase()) ||
-                l.admin_id?.toLowerCase().includes(search.toLowerCase()) ||
-                (l.created_at ? new Date(l.created_at).toLocaleString('es-AR').includes(search) : false);
-            const matchAction = actionFilter === 'Todas' || l.accion === actionFilter;
-            return matchSearch && matchAction;
-        });
-    }, [logs, search, actionFilter]);
-
-    const totalPages = Math.max(1, Math.ceil(filteredLogs.length / LOGS_PER_PAGE));
-    const paginatedLogs = filteredLogs.slice((page - 1) * LOGS_PER_PAGE, page * LOGS_PER_PAGE);
+    const {
+        search, setSearch,
+        actionFilter, setActionFilter,
+        page, setPage,
+        actionTypes,
+        filteredLogs,
+        totalPages,
+        paginatedLogs
+    } = useAuditoria({ logs });
 
     return (
         <div className="space-y-6">

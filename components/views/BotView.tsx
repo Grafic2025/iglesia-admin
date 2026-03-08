@@ -7,78 +7,29 @@ interface BotViewProps {
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
+import { useBot } from '../../hooks/useBot';
+
 const BotView = ({ supabase, registrarAuditoria }: BotViewProps) => {
-    const [aprendizaje, setAprendizaje] = useState<any[]>([]);
-    const [cerebro, setCerebro] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'aprendizaje' | 'cerebro'>('aprendizaje');
-
-    // Form para agregar/editar conocimiento
-    const [showModal, setShowModal] = useState(false);
-    const [currentKnowledge, setCurrentKnowledge] = useState<any>(null);
-    const [palabrasClave, setPalabrasClave] = useState('');
-    const [respuesta, setRespuesta] = useState('');
-
-    useEffect(() => {
-        fetchData();
-    }, []);
-
-    const fetchData = async () => {
-        setLoading(true);
-        const { data: a } = await supabase.from('ids_bot_aprendizaje').select('*').order('fecha', { ascending: false });
-        const { data: c } = await supabase.from('ids_bot_cerebro').select('*');
-        setAprendizaje(a || []);
-        setCerebro(c || []);
-        setLoading(false);
-    };
-
-    const handleSaveKnowledge = async () => {
-        if (!palabrasClave || !respuesta) return;
-
-        const payload = {
-            palabras_clave: palabrasClave,
-            respuesta
-        };
-
-        let err;
-        if (currentKnowledge?.id) {
-            const { error } = await supabase.from('ids_bot_cerebro').update(payload).eq('id', currentKnowledge.id);
-            err = error;
-        } else {
-            const { error } = await supabase.from('ids_bot_cerebro').insert([payload]);
-            err = error;
-            // Si viene de una pregunta de aprendizaje, podríamos borrarla
-            if (currentKnowledge?.fromAprendizajeId) {
-                await supabase.from('ids_bot_aprendizaje').delete().eq('id', currentKnowledge.fromAprendizajeId);
-            }
-        }
-
-        if (err) alert("Error: " + err.message);
-        else {
-            if (registrarAuditoria) registrarAuditoria(currentKnowledge?.id ? 'EDITAR CEREBRO BOT' : 'AGREGAR CEREBRO BOT', palabrasClave);
-            setShowModal(false);
-            fetchData();
-        }
-    };
-
-    const deleteAprendizaje = async (id: string) => {
-        if (!confirm('¿Borrar esta pregunta?')) return;
-        await supabase.from('ids_bot_aprendizaje').delete().eq('id', id);
-        fetchData();
-    };
-
-    const deleteCerebro = async (id: string) => {
-        if (!confirm('¿Eliminar este conocimiento?')) return;
-        await supabase.from('ids_bot_cerebro').delete().eq('id', id);
-        fetchData();
-    };
-
-    const openEnseñar = (pregunta: any) => {
-        setCurrentKnowledge({ fromAprendizajeId: pregunta.id });
-        setPalabrasClave(pregunta.pregunta);
-        setRespuesta('');
-        setShowModal(true);
-    };
+    const {
+        aprendizaje,
+        cerebro,
+        loading,
+        activeTab,
+        setActiveTab,
+        showModal,
+        setShowModal,
+        currentKnowledge,
+        setCurrentKnowledge,
+        palabrasClave,
+        setPalabrasClave,
+        respuesta,
+        setRespuesta,
+        // fetchData,
+        handleSaveKnowledge,
+        deleteAprendizaje,
+        deleteCerebro,
+        openEnseñar
+    } = useBot({ supabase, registrarAuditoria });
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 w-full min-h-full pb-32">

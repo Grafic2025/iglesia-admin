@@ -1,6 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback, useMemo } from 'react'
-import { supabase } from '../lib/supabase'
+import React from 'react'
 import Sidebar from '../components/Sidebar'
 import DashboardView from '../components/views/DashboardView'
 import MiembrosView from '../components/views/MiembrosView'
@@ -18,11 +17,7 @@ import BotView from '../components/views/BotView'
 import { LogOut, ShieldAlert } from 'lucide-react'
 
 // Custom Hooks
-import { useMiembros } from '../hooks/useMiembros'
-import { useAsistencias } from '../hooks/useAsistencias'
-import { useNoticias } from '../hooks/useNoticias'
-import { useNotificaciones } from '../hooks/useNotificaciones'
-import { useExportCSV } from '../hooks/useExportCSV'
+import { useAdminMaster } from '../hooks/useAdminMaster'
 
 const TAB_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
@@ -42,454 +37,158 @@ const TAB_LABELS: Record<string, string> = {
 
 /**
  * Componente raíz del Panel de Administración.
- * Maneja la autenticación, el estado de las pestañas principales (vistas),
- * y la coordinación de datos globales entre los diferentes módulos (Asistencias, CMS, Planta de Culto, etc.).
+ * Maneja la autenticación y la coordinación de datos globales.
  */
 export default function AdminDashboard() {
-  const [authorized, setAuthorized] = useState(false)
-  const [password, setPassword] = useState('')
-  const [activeTab, setActiveTab] = useState('dashboard')
+  const {
+    authorized,
+    password, setPassword,
+    activeTab, setActiveTab,
+    handleLogin,
+    handleLogout,
+    loginLocked, lockTimer,
 
-  // UI States
-  const [filtroHorario, setFiltroHorario] = useState('Todas')
-  const [busqueda, setBusqueda] = useState('')
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" }))
-  const [tituloPush, setTituloPush] = useState('Iglesia del Salvador')
-  const [mensajePush, setMensajePush] = useState('')
-  const [imageUrlPush, setImageUrlPush] = useState('')
-  const [typePush, setTypePush] = useState('General')
-  const [enviando, setEnviando] = useState(false)
-  const [notificacionStatus, setNotificacionStatus] = useState({ show: false, message: '', error: false })
-  const [loginAttempts, setLoginAttempts] = useState(0)
-  const [loginLocked, setLoginLocked] = useState(false)
-  const [lockTimer, setLockTimer] = useState(0)
+    // Asistencias / Miembros
+    miembros, fetchMiembros,
+    asistencias, asistencias7dias, fetchAsistencias,
+    datosFiltrados,
+    busqueda, setBusqueda,
+    filtroHorario, setFiltroHorario,
+    fechaSeleccionada, setFechaSeleccionada,
+    horariosDisponibles, fetchHorarios,
 
-  // Custom Hooks Data
-  const { miembros, fetchMiembros, toggleServerStatus } = useMiembros();
-  const { asistencias, asistencias7dias, fetchAsistencias, fetchAsistencias7dias } = useAsistencias(fechaSeleccionada);
-  const { noticias, fetchNoticias, syncYouTube, eliminarNoticia } = useNoticias();
-  const { logs, fetchLogs, enviarPushGeneral, error: logsError } = useNotificaciones();
-  const { exportStart, setExportStart, exportEnd, setExportEnd, showExportModal, setShowExportModal, exportarCSVGlobal, exportarCSVRango } = useExportCSV();
+    // CMS / Notificaciones
+    noticias, fetchNoticias, syncYouTube, eliminarNoticia,
+    logs, fetchLogs, logsError,
+    tituloPush, setTituloPush,
+    mensajePush, setMensajePush,
+    imageUrlPush, setImageUrlPush,
+    typePush, setTypePush,
+    enviarNotificacion,
+    enviando,
+    notificacionStatus,
+    enviarNotificacionIndividual,
 
-  // Other complex states (to be refactored eventually)
-  const [cronogramas, setCronogramas] = useState<any[]>([])
-  const [premiosPendientes, setPremiosPendientes] = useState<any>({ nivel5: [], nivel10: [], nivel20: [], nivel30: [] })
-  const [oracionesActivas, setOracionesActivas] = useState(0)
-  const [nuevosMes, setNuevosMes] = useState(0)
-  const [premiosEntregados, setPremiosEntregados] = useState<any[]>([])
-  const [bautismos, setBautismos] = useState<any[]>([])
-  const [ayuda, setAyuda] = useState<any[]>([])
-  const [horariosDisponibles, setHorariosDisponibles] = useState<any[]>([])
-  const [auditLogs, setAuditLogs] = useState<any[]>([])
-  const [crecimientoAnual, setCrecimientoAnual] = useState<any[]>([])
+    // CSV
+    exportStart, setExportStart,
+    exportEnd, setExportEnd,
+    showExportModal, setShowExportModal,
+    exportarCSV,
+    exportarCSVRango,
 
-  const hoyArg = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
-
-  useEffect(() => {
-    const isAuth = localStorage.getItem('admin_auth')
-    if (isAuth === 'true') setAuthorized(true)
-
-    // HTTPS check (only in production)
-    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.protocol !== 'https:') {
-      window.location.href = window.location.href.replace('http:', 'https:');
-    }
-  }, [])
-
-  /**
-   * Obtiene los próximos cronogramas (planes de culto) desde la base de datos.
-   */
-  const fetchCronogramas = useCallback(async () => {
-    const { data } = await supabase.from('cronogramas').select('*').order('fecha', { ascending: true }).limit(20);
-    if (data) setCronogramas(data);
-  }, []);
-
-  /**
-   * Cuenta la cantidad total de pedidos de oración registrados.
-   */
-  const calcularOracionesActivas = useCallback(async () => {
-    // Removed .eq('activo', true) as it might not exist, or could be 'activa'
-    const { count } = await supabase.from('pedidos_oracion').select('*', { count: 'exact', head: true });
-    setOracionesActivas(count || 0);
-  }, []);
-
-  /**
-   * Calcula cuántos miembros nuevos se registraron en el mes actual.
-   */
-  const calcularNuevosMes = useCallback(async () => {
-    const monthStart = new Date();
-    monthStart.setDate(1);
-    // Setting time to 00:00:00 to avoid issues
-    monthStart.setHours(0, 0, 0, 0);
-    const { count } = await supabase.from('miembros').select('*', { count: 'exact', head: true }).gte('created_at', monthStart.toISOString());
-    setNuevosMes(count || 0);
-  }, []);
-
-  /**
-   * Carga el historial de premios de racha que ya han sido entregados a los miembros.
-   */
-  const cargarPremiosEntregados = useCallback(async () => {
-    const { data } = await supabase.from('premios_entregados').select('*').order('created_at', { ascending: false });
-    if (data) setPremiosEntregados(data);
-  }, []);
-
-  /**
-   * Recupera las solicitudes de bautismo pendientes y procesadas.
-   */
-  const fetchBautismos = useCallback(async () => {
-    // Simplified query to troubleshoot 400 error
-    const { data } = await supabase.from('solicitudes_bautismo').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
-    if (data) setBautismos(data);
-  }, []);
-
-  /**
-   * Recupera las consultas de ayuda cargadas por los usuarios de la app.
-   */
-  const fetchAyuda = useCallback(async () => {
-    // Simplified query to troubleshoot 400 error
-    const { data } = await supabase.from('consultas_ayuda').select('*, miembros(nombre, apellido)').order('created_at', { ascending: false });
-    if (data) setAyuda(data);
-  }, []);
-
-  /**
-   * Obtiene los logs de auditoría para rastrear las acciones realizadas por los administradores.
-   */
-  const fetchAuditLogs = useCallback(async () => {
-    const { data } = await supabase.from('auditoria').select('*').order('created_at', { ascending: false }).limit(100);
-    if (data) setAuditLogs(data);
-  }, []);
-
-  /**
-   * Obtiene la configuración de horarios de reunión base desde la tabla de configuración.
-   */
-  const fetchHorarios = useCallback(async () => {
-    const { data } = await supabase.from('configuracion').select('*').eq('clave', 'horarios_reunion').maybeSingle();
-    if (data) setHorariosDisponibles(data.valor || []);
-    else setHorariosDisponibles(['09:00', '11:00', '20:00']);
-  }, []);
-
-  const fetchAnalytics = useCallback(async () => {
-    // Analytics simplified
-  }, []);
-
-  /**
-   * Prepara datos estáticos o calculados para el gráfico de crecimiento anual.
-   */
-  const fetchCrecimientoAnual = useCallback(async () => {
-    const dummy = [
-      { mes: 'Ene', c: 150 }, { mes: 'Feb', c: 165 }, { mes: 'Mar', c: 180 },
-      { mes: 'Abr', c: 195 }, { mes: 'May', c: 210 }, { mes: 'Jun', c: 240 },
-      { mes: 'Jul', c: 265 }, { mes: 'Ago', c: 290 }, { mes: 'Sep', c: 310 },
-      { mes: 'Oct', c: 340 }, { mes: 'Nov', c: 365 }, { mes: 'Dic', c: 400 }
-    ];
-    setCrecimientoAnual(dummy);
-  }, []);
-
-  // 1. Initial Data Fetch (On Mount / Auth)
-  useEffect(() => {
-    if (authorized) {
-      fetchMiembros();
-      fetchCronogramas();
-      calcularOracionesActivas();
-      calcularNuevosMes();
-      cargarPremiosEntregados();
-      fetchBautismos();
-      fetchAyuda();
-      fetchNoticias();
-      fetchLogs();
-      fetchCrecimientoAnual();
-      fetchHorarios();
-      fetchAuditLogs();
-      fetchAnalytics();
-    }
-  }, [authorized, fetchMiembros, fetchCronogramas, calcularOracionesActivas, calcularNuevosMes, cargarPremiosEntregados, fetchBautismos, fetchAyuda, fetchNoticias, fetchLogs, fetchCrecimientoAnual, fetchHorarios, fetchAuditLogs, fetchAnalytics]);
-
-  // 2. Date-specific Fetch
-  useEffect(() => {
-    if (authorized) {
-      fetchAsistencias();
-      fetchAsistencias7dias();
-    }
-  }, [authorized, fechaSeleccionada, fetchAsistencias, fetchAsistencias7dias]);
-
-  // 3. Realtime subscriptions
-  useEffect(() => {
-    if (authorized) {
-      const channels = [
-        supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => fetchAsistencias()).subscribe(),
-        supabase.channel('cambios-programas').on('postgres_changes', { event: '*', schema: 'public', table: 'cronogramas' }, () => fetchCronogramas()).subscribe(),
-        supabase.channel('cambios-logs').on('postgres_changes', { event: '*', schema: 'public', table: 'notificacion_logs' }, () => fetchLogs()).subscribe()
-      ];
-
-      return () => {
-        channels.forEach(ch => supabase.removeChannel(ch));
-      };
-    }
-  }, [authorized, fetchAsistencias, fetchCronogramas, fetchLogs, fetchMiembros, fetchNoticias, calcularOracionesActivas]);
-
-  /**
-   * Analiza la racha de asistencias de todos los miembros para determinar quiénes
-   * tienen premios pendientes de entrega (niveles 5, 10, 20, 30).
-   */
-  const calcularPremios = useCallback(() => {
-    const pend: any = { nivel5: [], nivel10: [], nivel20: [], nivel30: [] };
-    miembros.forEach(m => {
-      const asist = asistencias.filter(a => a.miembro_id === m.id);
-      const racha = asist.length;
-      if (racha >= 30) pend.nivel30.push({ ...m, racha });
-      else if (racha >= 20) pend.nivel20.push({ ...m, racha });
-      else if (racha >= 10) pend.nivel10.push({ ...m, racha });
-      else if (racha >= 5) pend.nivel5.push({ ...m, racha });
-    });
-    setPremiosPendientes(pend);
-  }, [miembros, asistencias]);
-
-  useEffect(() => {
-    calcularPremios();
-  }, [miembros, asistencias, calcularPremios]);
-
-  /**
-   * Registra una acción administrativa en la tabla de auditoría.
-   * 
-   * @param accion Breve descripción de la acción (ej: "EDITAR_MIEMBRO").
-   * @param detalle Información adicional o resumen del cambio.
-   */
-  const registrarAuditoria = async (accion: string, detalle: string) => {
-    await supabase.from('auditoria').insert([{ accion, detalle, admin_id: 'admin_general' }]);
-    fetchAuditLogs();
-  }
-
-  /**
-   * Crea un registro indicando que se ha entregado físicamente un premio de racha a un miembro.
-   * 
-   * @param miembroId ID del miembro.
-   * @param nivel Nivel del premio (5, 10, 20 o 30).
-   * @param nombreCompleto Nombre del miembro para el mensaje de confirmación.
-   */
-  const marcarComoEntregado = async (miembroId: string, nivel: number, nombreCompleto: string) => {
-    if (!confirm(`¿Marcar como entregado el premio de nivel ${nivel} para ${nombreCompleto}?`)) return;
-    const { error } = await supabase.from('premios_entregados').insert({ miembro_id: miembroId, nivel, entregado_por: 'Admin', notas: '' });
-    if (error) alert('Error: ' + error.message);
-    else {
-      alert('✅ Premio entregado');
-      cargarPremiosEntregados();
-      fetchAsistencias();
-      if (registrarAuditoria) await registrarAuditoria('ENTREGA PREMIO', `Nivel ${nivel} entregado a ${nombreCompleto}`);
-    }
-  }
-
-  /**
-   * Valida la contraseña del administrador contra la variable de entorno configurada.
-   * Implementa un bloqueo temporal tras 5 intentos fallidos.
-   */
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loginLocked) return;
-
-    try {
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setAuthorized(true);
-        localStorage.setItem('admin_auth', 'true');
-        setLoginAttempts(0);
-      } else {
-        const newAttempts = loginAttempts + 1;
-        setLoginAttempts(newAttempts);
-        if (newAttempts >= 5) {
-          setLoginLocked(true);
-          let seconds = 30;
-          setLockTimer(seconds);
-          const interval = setInterval(() => {
-            seconds--;
-            setLockTimer(seconds);
-            if (seconds <= 0) {
-              clearInterval(interval);
-              setLoginLocked(false);
-              setLoginAttempts(0);
-            }
-          }, 1000);
-          return;
-        }
-        alert(`Contraseña incorrecta (${newAttempts}/5 intentos)`);
-      }
-    } catch (e) {
-      alert('Error conectando al servidor.');
-    }
-  };
-
-  /**
-   * Finaliza la sesión del administrador y limpia el estado local.
-   */
-  const handleLogout = () => {
-    localStorage.removeItem('admin_auth'); setAuthorized(false); setPassword('');
-  }
-
-  /**
-   * Envía una notificación push global a todos los usuarios que tengan la app instalada.
-   */
-  const enviarNotificacion = async () => {
-    if (!mensajePush) return;
-    setEnviando(true);
-    const finalType = typePush === 'General' ? 'service_reminder' : typePush.toLowerCase();
-    const result = await enviarPushGeneral(tituloPush, mensajePush, imageUrlPush, finalType);
-    if (result.success) {
-      setNotificacionStatus({ show: true, message: '✅ Notificación enviada', error: false });
-      setMensajePush('');
-      setImageUrlPush('');
-      if (registrarAuditoria) await registrarAuditoria('NOTIFICACION GENERAL', `Dirigida a: ${filtroHorario}. Mensaje: ${mensajePush.substring(0, 50)}...`);
-    } else {
-      setNotificacionStatus({ show: true, message: '❌ Error: ' + result.error, error: true });
-    }
-    setEnviando(false);
-    setTimeout(() => setNotificacionStatus({ show: false, message: '', error: false }), 4000);
-  }
-
-  /**
-   * Envía una notificación push dirigida a un solo dispositivo mediante su token.
-   * 
-   * @param token Push Token del dispositivo (Expo/Firebase).
-   * @param nombre Nombre del usuario (para la UI).
-   * @param mensajeCustom Opcional: El mensaje a enviar; si no se provee, se solicita mediante un prompt.
-   */
-  const enviarNotificacionIndividual = async (token: string, nombre: string, mensajeCustom?: string, type: string = 'service_reminder', extraData: any = {}) => {
-    const mensaje = mensajeCustom || prompt(`Enviar notificación a ${nombre}:\nEscribe el mensaje:`);
-    if (!mensaje) return false;
-
-    try {
-      const res = await fetch('/api/notify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: 'Iglesia del Salvador',
-          message: mensaje,
-          specificToken: token,
-          type: type,
-          ...extraData
-        }),
-      });
-
-      const data = await res.json();
-      console.log(`Respuesta API (/api/notify) para ${nombre}:`, data);
-
-      if (res.ok && data.success) {
-        if (!mensajeCustom) alert(`✅ Enviado a ${nombre}`);
-        fetchLogs();
-        return true;
-      } else {
-        console.error(`Error en API para ${nombre}:`, data.error || 'Respuesta no exitosa');
-        if (!mensajeCustom) alert(`❌ Error al enviar a ${nombre}: ${data.error || 'Desconocido'}`);
-        return false;
-      }
-    } catch (e: any) {
-      console.error(`Error de red al enviar a ${nombre}:`, e.message);
-      if (!mensajeCustom) alert(`❌ Error de red al enviar a ${nombre}`);
-      return false;
-    }
-  }
-
-  /**
-   * Genera y descarga un archivo CSV con las asistencias registradas en la fecha seleccionada actualmente.
-   */
-  const exportarCSV = () => exportarCSVGlobal(fechaSeleccionada, asistencias);
-
-  const datosFiltrados = useMemo(() => (asistencias || []).filter(a => {
-    const nombre = `${a.miembros?.nombre || ''} ${a.miembros?.apellido || ''}`.toLowerCase();
-    const cumpleHorario = filtroHorario === 'Todas' || a.horario_reunion === filtroHorario;
-    return nombre.includes((busqueda || '').toLowerCase()) && cumpleHorario;
-  }), [asistencias, filtroHorario, busqueda]);
+    // Dashboard Data
+    cronogramas, fetchCronogramas,
+    premiosPendientes,
+    oracionesActivas,
+    nuevosMes,
+    premiosEntregados,
+    bautismos,
+    ayuda,
+    auditLogs,
+    crecimientoAnual,
+    hoyArg,
+    registrarAuditoria,
+    marcarComoEntregado,
+  } = useAdminMaster();
 
   if (!authorized) return (
     <div className="h-screen flex items-center justify-center bg-[#121212] font-sans">
-      <form onSubmit={handleLogin} className="bg-[#1E1E1E] p-10 rounded-[30px] shadow-2xl border border-[#333] text-center w-full max-w-sm">
-        <div className="w-20 h-20 bg-[#A8D50015] rounded-full flex items-center justify-center mx-auto mb-6">
-          <LogOut className="text-[#A8D500] rotate-180" size={32} />
-        </div>
-        <h2 className="text-[#A8D500] text-2xl font-bold mb-2 uppercase tracking-tight">Acceso Admin</h2>
-        <p className="text-[#888] text-sm mb-8">Iglesia del Salvador Digital</p>
-        <input
-          type="password"
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-4 mb-6 rounded-2xl border border-[#444] bg-[#222] text-white outline-none focus:border-[#A8D500] transition-all"
-        />
-        {loginLocked && (
-          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-center">
-            <ShieldAlert size={20} className="text-red-500 mx-auto mb-1" />
-            <p className="text-red-400 text-sm font-bold">Demasiados intentos</p>
-            <p className="text-red-300 text-xs">Espera {lockTimer}s para reintentar</p>
+      <div className="bg-[#1e1e1e] p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/10">
+        <div className="flex justify-center mb-8">
+          <div className="bg-red-500/10 p-5 rounded-full border border-red-500/20">
+            <ShieldAlert size={48} className="text-red-500" />
           </div>
+        </div>
+        <h1 className="text-3xl font-bold mb-8 text-center text-white tracking-tight">Panel Principal</h1>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2 px-1">Contraseña de Acceso</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
+              disabled={loginLocked}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loginLocked}
+            className={`w-full p-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${loginLocked
+                ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
+                : 'bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-600/20'
+              }`}
+          >
+            {loginLocked ? `Bloqueado (${lockTimer}s)` : 'Entrar al Panel'}
+          </button>
+        </form>
+        {loginLocked && (
+          <p className="mt-4 text-center text-red-500 text-sm font-medium bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+            Demasiados intentos fallidos. Por favor, espere.
+          </p>
         )}
-        <button type="submit" disabled={loginLocked} className={`w-full p-4 rounded-2xl font-black uppercase tracking-widest transition-all active:scale-95 ${loginLocked ? 'bg-[#333] text-[#666] cursor-not-allowed' : 'bg-[#A8D500] hover:bg-[#b0f000] text-black shadow-[0_10px_20px_rgba(168,213,0,0.2)]'}`}>{loginLocked ? `BLOQUEADO (${lockTimer}s)` : 'ENTRAR'}</button>
-      </form>
+      </div>
     </div>
   )
 
   return (
-    <div className="flex bg-[#121212] h-screen text-white font-sans overflow-hidden">
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={handleLogout}
-      />
+    <div className="flex h-screen bg-[#0f0f0f] text-gray-100 font-sans overflow-hidden">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onLogout={handleLogout} />
 
-      <main className="flex-1 overflow-y-auto px-4 md:px-8 pt-8 pb-32 custom-scrollbar relative">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
-              {TAB_LABELS[activeTab] || activeTab.replace('_', ' ')}
-            </h1>
-            <p className="text-[#888] text-sm">Gestión del sistema Iglesia del Salvador</p>
+      <main className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Header Superior */}
+        <header className="h-20 bg-[#161616] border-b border-white/5 flex items-center justify-between px-10 shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-1.5 bg-red-600 rounded-full"></div>
+            <div>
+              <h2 className="text-2xl font-bold text-white tracking-tight">
+                {TAB_LABELS[activeTab]}
+              </h2>
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-widest">Iglesia del Salvador • Gestión Rev</p>
+            </div>
           </div>
 
-          {(activeTab === 'dashboard' || activeTab === 'miembros') && (
-            <div className="flex items-center gap-4 bg-[#1E1E1E] p-2 rounded-2xl border border-[#333]">
-              <div className="flex flex-col px-3 cursor-pointer" onClick={(e) => {
-                const input = e.currentTarget.querySelector('input');
-                if (input) {
-                  try {
-                    (input as any).showPicker();
-                  } catch (err) {
-                    input.focus();
-                  }
-                }
-              }}>
-                <label className="text-[9px] text-[#A8D500] font-black uppercase tracking-widest">Consultar Asistencia</label>
+          <div className="flex items-center gap-6">
+            {activeTab === 'miembros' && (
+              <div className="flex items-center gap-3 bg-[#1e1e1e] p-1.5 rounded-xl border border-white/5 shadow-inner">
                 <input
                   type="date"
                   value={fechaSeleccionada}
                   onChange={(e) => setFechaSeleccionada(e.target.value)}
-                  className="bg-transparent text-white outline-none text-sm cursor-pointer [color-scheme:dark]"
+                  className="bg-transparent text-white px-3 py-1.5 rounded-lg focus:outline-none text-sm font-medium"
                 />
+                <button
+                  onClick={exportarCSV}
+                  className="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-red-600/20"
+                >
+                  Exportar Hoy
+                </button>
+                <button
+                  onClick={() => {
+                    setExportStart(fechaSeleccionada);
+                    setExportEnd(fechaSeleccionada);
+                    setShowExportModal(true);
+                  }}
+                  className="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
+                >
+                  Rango...
+                </button>
               </div>
-              <div className="w-px h-8 bg-[#333]"></div>
-              <button
-                onClick={exportarCSV}
-                className="bg-white text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#eee] transition-all"
-              >
-                📥 HOY
-              </button>
-              <button
-                onClick={() => {
-                  setExportStart(fechaSeleccionada);
-                  setExportEnd(fechaSeleccionada);
-                  setShowExportModal(true);
-                }}
-                className="bg-[#A8D500] text-black text-xs font-bold px-4 py-2 rounded-xl hover:bg-[#b0f000] transition-all"
-              >
-                📊 RANGO
-              </button>
-            </div>
-          )}
+            )}
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-red-500/10 text-gray-400 hover:text-red-400 transition-all border border-white/5"
+            >
+              <LogOut size={18} />
+              <span className="text-sm font-bold">Salir</span>
+            </button>
+          </div>
         </header>
 
-        <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+        {/* Contenido de la Vista */}
+        <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
           {activeTab === 'dashboard' && (
             <DashboardView
               asistencias={asistencias}
@@ -497,8 +196,8 @@ export default function AdminDashboard() {
               oracionesActivas={oracionesActivas}
               nuevosMes={nuevosMes}
               crecimientoAnual={crecimientoAnual}
-              horariosDisponibles={horariosDisponibles}
-              miembros={miembros}
+              horariosReunion={horariosDisponibles}
+              miembrosTotales={miembros.length}
             />
           )}
 
@@ -513,11 +212,10 @@ export default function AdminDashboard() {
               premiosEntregados={premiosEntregados}
               marcarComoEntregado={marcarComoEntregado}
               enviarNotificacionIndividual={enviarNotificacionIndividual}
-              hoyArg={hoyArg}
-              supabase={supabase}
+              fecha={hoyArg}
               fetchAsistencias={fetchAsistencias}
               fetchMiembros={fetchMiembros}
-              horariosDisponibles={horariosDisponibles}
+              horariosReunion={horariosDisponibles}
               registrarAuditoria={registrarAuditoria}
             />
           )}
@@ -525,7 +223,7 @@ export default function AdminDashboard() {
           {activeTab === 'gente' && (
             <GenteView
               miembros={miembros}
-              hoyArg={hoyArg}
+              fechaHoy={hoyArg}
               fetchMiembros={fetchMiembros}
               enviarNotificacionIndividual={enviarNotificacionIndividual}
             />
@@ -533,144 +231,107 @@ export default function AdminDashboard() {
 
           {activeTab === 'notificaciones' && (
             <NotificacionesView
-              tituloPush={tituloPush} setTituloPush={setTituloPush}
-              mensajePush={mensajePush} setMensajePush={setMensajePush}
-              imageUrlPush={imageUrlPush} setImageUrlPush={setImageUrlPush}
-              filtroHorario={filtroHorario} setFiltroHorario={setFiltroHorario}
+              tituloPush={tituloPush}
+              setTituloPush={setTituloPush}
+              mensajePush={mensajePush}
+              setMensajePush={setMensajePush}
+              imageUrlPush={imageUrlPush}
+              setImageUrlPush={setImageUrlPush}
+              filtroHorario={filtroHorario}
+              setFiltroHorario={setFiltroHorario}
               enviarNotificacion={enviarNotificacion}
               enviando={enviando}
               notificacionStatus={notificacionStatus}
               cronogramas={cronogramas}
-              eliminarProgramacion={async (id) => {
-                if (confirm('¿Eliminar?')) { await supabase.from('cronogramas').delete().eq('id', id); fetchCronogramas(); }
-              }}
-              fetchProgramaciones={fetchCronogramas}
-              supabase={supabase}
-              logs={logs}
-              logsError={logsError}
-              horariosDisponibles={horariosDisponibles}
+              horariosReunion={horariosDisponibles}
+              fetchCronogramas={fetchCronogramas}
               registrarAuditoria={registrarAuditoria}
               typePush={typePush}
               setTypePush={setTypePush}
             />
           )}
 
-          {activeTab === 'bot' && (
-            <BotView supabase={supabase} registrarAuditoria={registrarAuditoria} />
-          )}
-
           {activeTab === 'solicitudes' && (
             <SolicitudesView
-              bautismos={bautismos}
-              ayuda={ayuda}
-            />
-          )}
-
-          {activeTab === 'cms' && (
-            <CMSView
-              noticias={noticias}
-              syncYouTube={syncYouTube}
-              eliminarNoticia={eliminarNoticia}
-              supabase={supabase}
-              fetchNoticias={fetchNoticias}
               registrarAuditoria={registrarAuditoria}
-              enviarPushGeneral={enviarPushGeneral}
             />
           )}
 
+          {activeTab === 'alertas' && (
+            <AlertasView
+              setActiveTab={setActiveTab}
+              enviarNotificacionIndividual={enviarNotificacionIndividual}
+            />
+          )}
+
+          {activeTab === 'cms' && <CMSView />}
           {activeTab === 'servicios' && (
-            <ServiciosView supabase={supabase} enviarNotificacionIndividual={enviarNotificacionIndividual} registrarAuditoria={registrarAuditoria} />
-          )}
-
-          {activeTab === 'equipos' && (
-            <EquiposView supabase={supabase} setActiveTab={setActiveTab} enviarNotificacionIndividual={enviarNotificacionIndividual} />
-          )}
-
-          {activeTab === 'cancionero' && (
-            <CancioneroView supabase={supabase} />
-          )}
-
-          {activeTab === 'agenda_config' && (
-            <AgendaConfigView
-              supabase={supabase}
-              horariosDisponibles={horariosDisponibles}
+            <ServiciosView
+              horariosReunion={horariosDisponibles}
               fetchHorarios={fetchHorarios}
               registrarAuditoria={registrarAuditoria}
             />
           )}
-
           {activeTab === 'auditoria' && (
-            <AuditoriaView logs={auditLogs} />
+            <AuditoriaView auditLogs={auditLogs} />
           )}
-
-          {activeTab === 'alertas' && (
-            <AlertasView supabase={supabase} registrarAuditoria={registrarAuditoria} />
+          {activeTab === 'equipos' && (
+            <EquiposView registrarAuditoria={registrarAuditoria} />
           )}
-        </section>
-      </main>
+          {activeTab === 'cancionero' && <CancioneroView />}
+          {activeTab === 'agenda_config' && <AgendaConfigView />}
+          {activeTab === 'bot' && <BotView />}
+        </div>
 
-      {/* MODAL: Export por rango */}
-      {showExportModal && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] p-8 shadow-2xl">
-            <h3 className="text-white font-bold text-xl mb-2">📊 Exportar por Rango</h3>
-            <p className="text-[#888] text-sm mb-6">Selecciona el período de asistencias a exportar</p>
-            <div className="space-y-4 mb-6">
-              <div>
-                <label className="text-[#888] text-[10px] font-bold uppercase mb-2 block">Desde</label>
-                <input
-                  type="date"
-                  value={exportStart}
-                  onChange={e => setExportStart(e.target.value)}
-                  className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]"
-                />
-              </div>
-              <div>
-                <label className="text-[#888] text-[10px] font-bold uppercase mb-2 block">Hasta</label>
-                <input
-                  type="date"
-                  value={exportEnd}
-                  onChange={e => setExportEnd(e.target.value)}
-                  className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] [color-scheme:dark]"
-                />
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {[
-                { label: 'Esta semana', days: 7 },
-                { label: 'Este mes', days: 30 },
-                { label: '3 meses', days: 90 },
-                { label: 'Este año', days: 365 },
-              ].map(({ label, days }) => {
-                const end = new Date();
-                const start = new Date();
-                start.setDate(start.getDate() - days);
-                return (
+        {/* Modal de Exportación por Rango */}
+        {showExportModal && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+            <div className="bg-[#1e1e1e] border border-white/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <div className="w-2 h-6 bg-red-600 rounded-full"></div>
+                Exportar por Rango
+              </h3>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Inicio</label>
+                  <input
+                    type="date"
+                    value={exportStart}
+                    onChange={(e) => setExportStart(e.target.value)}
+                    className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Fin</label>
+                  <input
+                    type="date"
+                    value={exportEnd}
+                    onChange={(e) => setExportEnd(e.target.value)}
+                    className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                  />
+                </div>
+                <div className="flex gap-3 pt-4">
                   <button
-                    key={label}
+                    onClick={() => setShowExportModal(false)}
+                    className="flex-1 px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold transition-all border border-white/5"
+                  >
+                    Cerrar
+                  </button>
+                  <button
                     onClick={() => {
-                      setExportStart(start.toLocaleDateString('en-CA'));
-                      setExportEnd(end.toLocaleDateString('en-CA'));
+                      exportarCSVRango(exportStart, exportEnd);
+                      setShowExportModal(false);
                     }}
-                    className="text-xs px-3 py-1.5 rounded-lg bg-[#222] text-[#888] hover:bg-[#333] font-bold transition-all"
-                  >{label}</button>
-                );
-              })}
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowExportModal(false)}
-                className="flex-1 py-3 bg-[#222] text-white font-bold rounded-xl border border-[#333]"
-              >CANCELAR</button>
-              <button
-                onClick={() => exportarCSVRango(fechaSeleccionada)}
-                disabled={!exportStart || !exportEnd}
-                className="flex-1 py-3 bg-[#A8D500] text-black font-black rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              >📥 DESCARGAR CSV</button>
+                    className="flex-1 px-4 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-lg shadow-red-600/20"
+                  >
+                    Descargar
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </main>
     </div>
-  );
+  )
 }

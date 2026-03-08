@@ -24,6 +24,8 @@ interface MiembrosViewProps {
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
+import { useMiembrosView } from '../../hooks/useMiembrosView';
+
 const PAGE_SIZE = 25;
 
 const MiembrosView = ({
@@ -33,14 +35,23 @@ const MiembrosView = ({
     fetchAsistencias, fetchMiembros, horariosDisponibles, registrarAuditoria
 }: MiembrosViewProps) => {
 
-    const [page, setPage] = useState(1);
-    const [selectedMember, setSelectedMember] = useState<any>(null);
-
-    const totalPages = Math.max(1, Math.ceil(datosFiltrados.length / PAGE_SIZE));
-    const paginatedData = datosFiltrados.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-    const handleBusqueda = (v: string) => { setBusqueda(v); setPage(1); };
-    const handleFiltro = (v: string) => { setFiltroHorario(v); setPage(1); };
+    const {
+        page, setPage,
+        selectedMember, setSelectedMember,
+        handleBusqueda,
+        handleFiltro,
+        toggleServerStatus,
+        totalPages,
+        paginatedData
+    } = useMiembrosView({
+        supabase,
+        setBusqueda,
+        setFiltroHorario,
+        fetchAsistencias,
+        fetchMiembros,
+        registrarAuditoria,
+        datosFiltrados
+    });
 
     return (
         <div className="space-y-6">
@@ -122,17 +133,7 @@ const MiembrosView = ({
                                                     </button>
                                                 )}
                                                 <button
-                                                    onClick={async () => {
-                                                        const newVal = !a.miembros?.es_servidor;
-                                                        const { error } = await supabase.from('miembros').update({ es_servidor: newVal }).eq('id', a.miembro_id);
-                                                        if (!error) {
-                                                            await fetchAsistencias();
-                                                            await fetchMiembros();
-                                                            if (registrarAuditoria) await registrarAuditoria(newVal ? 'DAR ACCESO SERVIDOR' : 'QUITAR ACCESO SERVIDOR', `${a.miembros.nombre} ${a.miembros.apellido}`);
-                                                        } else {
-                                                            alert("Error: " + error.message);
-                                                        }
-                                                    }}
+                                                    onClick={() => toggleServerStatus(a.miembro_id, `${a.miembros.nombre} ${a.miembros.apellido}`, a.miembros?.es_servidor)}
                                                     className={`p-2 rounded-full transition-all ${a.miembros?.es_servidor ? 'bg-[#A8D500] text-black' : 'bg-[#333] text-[#555] hover:text-[#A8D500]'}`}
                                                     title={a.miembros?.es_servidor ? "Quitar Acceso Servidor" : "Dar Acceso Servidor"}
                                                 >
