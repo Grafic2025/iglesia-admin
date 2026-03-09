@@ -3,7 +3,7 @@ import React from 'react';
 import { LogOut, Menu } from 'lucide-react';
 import { TAB_LABELS } from '../../app/constantes';
 
-import { usePathname } from 'next/navegacion';
+import { usePathname } from 'next/navigation';
 import { useContextoAdmin } from '../../contextos/ContextoAdmin';
 
 const CabeceraAdmin: React.FC = () => {

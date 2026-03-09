@@ -1,4 +1,4 @@
-import { usarQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { supabase } from '../libreria/supabase';
 import { Miembro } from '../libreria/tipos';
@@ -7,7 +7,7 @@ const ARRAY_VACIO: Miembro[] = [];
 
 export const usarMiembros = () => {
 
-    const { data: miembros, isLoading: estaCargando, isFetching: estaBuscando, refetch: recargar } = usarQuery<Miembro[]>({
+    const { data: miembros, isLoading: estaCargando, isFetching: estaBuscando, refetch: recargar } = useQuery<Miembro[]>({
         queryKey: ['administrador_miembros'],
         queryFn: async () => {
             const { data, error } = await supabase

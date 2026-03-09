@@ -1,0 +1,26 @@
+
+> iglesia-administrador@0.1.0 build
+> next build
+
+▲ Next.js 16.1.4 (Turbopack)
+- Environments: .env
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.6s
+  Running TypeScript ...
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+Failed to compile.
+
+./componentes/administrador/panel/GraficoDemografico.tsx:18:49
+Type error: Type '{ children: Element[]; data: any[]; diseno: string; }' is not assignable to type 'IntrinsicAttributes & CartesianChartProps & RefAttributes<SVGSVGElement>'.
+  Property 'diseno' does not exist on type 'IntrinsicAttributes & CartesianChartProps & RefAttributes<SVGSVGElement>'.
+
+[0m [90m 16 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"h-[250px]"[39m[33m>[39m
+ [90m 17 |[39m                 [33m<[39m[33mResponsiveContainer[39m width[33m=[39m[32m"100%"[39m height[33m=[39m{[35m250[39m}[33m>[39m
+[31m[1m>[22m[39m[90m 18 |[39m                     [33m<[39m[33mReLineBarChart[39m data[33m=[39m{data} diseno[33m=[39m[32m"vertical"[39m[33m>[39m
+ [90m    |[39m                                                 [31m[1m^[22m[39m
+ [90m 19 |[39m                         [33m<[39m[33mCartesianGrid[39m strokeDasharray[33m=[39m[32m"3 3"[39m stroke[33m=[39m[32m"#333"[39m horizontal[33m=[39m{[36mfalse[39m} [33m/[39m[33m>[39m
+ [90m 20 |[39m                         [33m<[39m[33mXAxis[39m type[33m=[39m[32m"number"[39m stroke[33m=[39m[32m"#888"[39m fontSize[33m=[39m{[35m10[39m} [33m/[39m[33m>[39m
+ [90m 21 |[39m                         [33m<[39m[33mYAxis[39m dataKey[33m=[39m[32m"nombre"[39m type[33m=[39m[32m"category"[39m stroke[33m=[39m[32m"#888"[39m fontSize[33m=[39m{[35m10[39m} width[33m=[39m{[35m120[39m} [33m/[39m[33m>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

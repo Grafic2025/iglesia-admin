@@ -1,12 +1,12 @@
 'use client';
-import EquiposView from '../../componentes/vistas/EquiposView';
+import VistaEquipos from '../../componentes/vistas/VistaEquipos';
 import { useContextoAdmin } from '../../contextos/ContextoAdmin';
 import { supabase } from '../../libreria/supabase';
 
 export default function EquiposPage() {
     const administrador = useContextoAdmin();
     return (
-        <EquiposView
+        <VistaEquipos
             supabase={supabase}
             registrarAuditoria={administrador.registrarAuditoria}
             enviarNotificacionIndividual={administrador.enviarNotificacionIndividual}

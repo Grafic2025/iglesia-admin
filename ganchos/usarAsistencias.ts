@@ -1,4 +1,4 @@
-import { usarQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { supabase } from '../libreria/supabase';
 import { Asistencia, AsistenciaDiaria } from '../libreria/tipos';
@@ -7,7 +7,7 @@ const ARRAY_VACIO: any[] = [];
 
 export const usarAsistencias = (fechaSeleccionada: string) => {
 
-    const { data: datos, isLoading: estaCargando, isFetching: estaBuscando, refetch: recargar } = usarQuery({
+    const { data: datos, isLoading: estaCargando, isFetching: estaBuscando, refetch: recargar } = useQuery({
         queryKey: ['asistencias_dia_y_stats', fechaSeleccionada],
         queryFn: async () => {
             // Obtener asistencias del día

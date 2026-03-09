@@ -7,7 +7,7 @@ import TarjetaEstado from '../TarjetaEstado';
 import GraficoAsistencia from '../administrador/panel/GraficoAsistencia';
 import GraficoCrecimiento from '../administrador/panel/GraficoCrecimiento';
 import GraficoDemografico from '../administrador/panel/GraficoDemografico';
-import ServiceQuickInfo from '../administrador/panel/ServiceQuickInfo';
+import InfoRapidaServicio from '../administrador/panel/InfoRapidaServicio';
 import ResumenActividad from '../administrador/panel/ResumenActividad';
 
 import { usarDashboard } from '../../ganchos/usarDashboard';
@@ -87,7 +87,7 @@ const VistaPanel = ({
                 <TarjetaEstado label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>
 
-            <ServiceQuickInfo
+            <InfoRapidaServicio
                 lastServiceDate={fechaUltimoServicio}
                 nextSundayString={proximoDomingoTexto}
             />
