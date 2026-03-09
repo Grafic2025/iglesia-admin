@@ -20,11 +20,11 @@ const PantallaLogin = ({
         <div className="h-screen flex items-center justify-center bg-[#121212] font-sans">
             <div className="bg-[#1e1e1e] p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/10">
                 <div className="flex justify-center mb-8">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center bg-white/5 rounded-full p-2 border border-white/10 shadow-lg glow-effect">
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center rounded-full border border-white/10 shadow-[0_0_30px_rgba(168,213,0,0.15)] overflow-hidden">
                         <img
                             src="/logo.png"
                             alt="Logo Iglesia"
-                            className="w-full h-full object-contain drop-shadow-lg"
+                            className="w-full h-full object-cover"
                         />
                     </div>
                 </div>
@@ -41,7 +41,7 @@ const PantallaLogin = ({
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-medium"
                             disabled={loginLocked}
                         />
                     </div>
@@ -50,7 +50,7 @@ const PantallaLogin = ({
                         disabled={loginLocked}
                         className={`w-full p-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${loginLocked
                             ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                            : 'bg-[#A8D500] hover:bg-[#bbf000] text-black shadow-[0_4px_20px_-5px_rgba(168,213,0,0.4)]'
                             }`}
                     >
                         {loginLocked ? `Bloqueado (${lockTimer}s)` : 'Entrar al Panel'}
