@@ -108,10 +108,13 @@ export const usarAdminMaster = () => {
         }
     }, [autenticacion.autorizado, panel.fechaSeleccionada]);
 
-    // 3. Cálculo de premios
+    // 3. Cálculo de premios y retención
     useEffect(() => {
         panel.calcularPremios(miembros, asistencias);
-    }, [miembros, asistencias, panel.calcularPremios]);
+        if (miembros.length > 0) {
+            panel.calcularTasaRetencion(miembros.length);
+        }
+    }, [miembros, asistencias, panel.calcularPremios, panel.calcularTasaRetencion]);
 
     // 4. Suscripciones en tiempo real
     useEffect(() => {

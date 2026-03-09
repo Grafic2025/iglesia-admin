@@ -9,6 +9,7 @@ import GraficoCrecimiento from '../administrador/panel/GraficoCrecimiento';
 import GraficoDemografico from '../administrador/panel/GraficoDemografico';
 import InfoRapidaServicio from '../administrador/panel/InfoRapidaServicio';
 import ResumenActividad from '../administrador/panel/ResumenActividad';
+import UltimosMiembros from '../administrador/panel/UltimosMiembros';
 
 import { usarDashboard } from '../../ganchos/usarDashboard';
 
@@ -22,6 +23,7 @@ interface VistaPanelProps {
     miembros: any[];
     bautismos: any[];
     ayuda: any[];
+    tasaRetencion: number;
 }
 
 const VistaPanel = ({
@@ -33,7 +35,8 @@ const VistaPanel = ({
     horariosReunion,
     miembros,
     bautismos,
-    ayuda
+    ayuda,
+    tasaRetencion
 }: VistaPanelProps) => {
     const {
         rangoCrecimiento,
@@ -44,6 +47,7 @@ const VistaPanel = ({
         tendenciaHoy,
         fechaUltimoServicio,
         proximoDomingoTexto,
+        ultimosMiembros,
         RANGOS_CRECIMIENTO,
         COLORES
     } = usarDashboard({ asistencias, asistencias7dias, crecimientoAnual, miembros });
@@ -57,7 +61,7 @@ const VistaPanel = ({
             />
 
             {/* Tarjetas de Estadísticas */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-4">
                 <TarjetaEstado
                     label="Total Hoy"
                     value={conteoHoy}
@@ -84,6 +88,7 @@ const VistaPanel = ({
                 <TarjetaEstado label="Oraciones" value={oracionesActivas} color="#9333EA" isActive={oracionesActivas > 0} icon="🙏" />
                 <TarjetaEstado label="Bautismos" value={bautismos?.length || 0} color="#3B82F6" isActive={(bautismos?.length || 0) > 0} icon="💧" />
                 <TarjetaEstado label="Acompañamiento" value={ayuda?.length || 0} color="#EF4444" isActive={(ayuda?.length || 0) > 0} icon="🤝" />
+                <TarjetaEstado label="Retención 30D" value={`${tasaRetencion || 0}%`} color="#FFB400" isActive={tasaRetencion > 0} icon="✨" />
                 <TarjetaEstado label="Nuevos Mes" value={nuevosMes} color="#00D9FF" isActive={nuevosMes > 0} icon="📈" />
             </div>
 
@@ -103,10 +108,17 @@ const VistaPanel = ({
                 />
             </div>
 
-            <GraficoDemografico
-                data={datosDemograficos.graficoEdades}
-                COLORS={COLORES}
-            />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                    <GraficoDemografico
+                        data={datosDemograficos.graficoEdades}
+                        COLORS={COLORES}
+                    />
+                </div>
+                <div className="lg:col-span-1">
+                    <UltimosMiembros miembros={ultimosMiembros} />
+                </div>
+            </div>
         </div>
     );
 };

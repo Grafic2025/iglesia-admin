@@ -8,9 +8,10 @@ interface TarjetaServicioProps {
     onNotify: (service: any) => void;
     onToggleChat: (service: any) => void;
     onExport: (service: any) => void;
+    searchQuery?: string;
 }
 
-const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDelete, onNotify, onToggleChat, onExport }) => {
+const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDelete, onNotify, onToggleChat, onExport, searchQuery }) => {
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all group relative text-left">
             <div className="flex justify-between items-start mb-4">
@@ -34,6 +35,32 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
                     <Users2 size={12} /> {service.equipo_ids?.length || 0} PERSONAS
                 </div>
             </div>
+
+            {searchQuery && (() => {
+                const lowerQ = searchQuery.toLowerCase();
+                const matches: string[] = [];
+                service.equipo_ids?.forEach((m: any) => {
+                    if ((m.nombre && m.nombre.toLowerCase().includes(lowerQ)) || (m.rol && m.rol.toLowerCase().includes(lowerQ))) {
+                        matches.push(`${m.nombre || 'Alguien'} \x1b(${m.rol || 'Sin rol'}\x1b)`);
+                    }
+                });
+                service.plan_detallado?.forEach((r: any) => {
+                    if (r.responsable && r.responsable.toLowerCase().includes(lowerQ)) {
+                        matches.push(`${r.responsable} \x1b(${r.item || 'Item'}\x1b)`);
+                    }
+                });
+                if (matches.length > 0) {
+                    return (
+                        <div className="mt-3 p-2 bg-[#A8D500]/10 rounded-lg border border-[#A8D500]/20">
+                            <p className="text-[#A8D500] text-[10px] font-bold mb-1 uppercase">Resultado de búsqueda:</p>
+                            {matches.map((m, i) => (
+                                <p key={i} className="text-[#eee] text-[10px] mb-0.5">• {m.replace(/\x1b/g, '')}</p>
+                            ))}
+                        </div>
+                    );
+                }
+                return null;
+            })()}
 
             <div className="flex gap-2 mt-4">
                 <button

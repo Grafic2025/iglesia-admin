@@ -58,6 +58,12 @@ export function usarDashboard({
         return crecimientoAnual.slice(-configRango.meses);
     }, [crecimientoAnual, rangoCrecimiento]);
 
+    const ultimosMiembros = useMemo(() => {
+        return [...miembros]
+            .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+            .slice(0, 5);
+    }, [miembros]);
+
     const conteoHoy = (asistencias || []).length;
     const conteoAyer = (asistencias7dias || []).length >= 2 ? asistencias7dias[asistencias7dias.length - 2]?.total || 0 : 0;
     const tendenciaHoy = conteoAyer > 0 ? Math.round(((conteoHoy - conteoAyer) / conteoAyer) * 100) : null;
@@ -80,6 +86,7 @@ export function usarDashboard({
         tendenciaHoy,
         fechaUltimoServicio,
         proximoDomingoTexto,
+        ultimosMiembros,
         RANGOS_CRECIMIENTO,
         COLORES
     };

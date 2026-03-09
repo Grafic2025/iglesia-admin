@@ -107,6 +107,7 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
                     <TarjetaServicio
                         key={s.id}
                         service={s}
+                        searchQuery={musicianSearch}
                         onEdit={handleOpenModal}
                         onDelete={deleteSchedule}
                         onNotify={notificarEquipoManual}

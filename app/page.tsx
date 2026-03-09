@@ -11,6 +11,7 @@ export default function DashboardPage() {
       asistencias7dias={administrador.asistencias7dias}
       oracionesActivas={administrador.oracionesActivas}
       nuevosMes={administrador.nuevosMes}
+      tasaRetencion={administrador.tasaRetencion}
       crecimientoAnual={administrador.crecimientoAnual}
       horariosReunion={administrador.horariosDisponibles}
       miembros={administrador.miembros}

@@ -10,6 +10,8 @@ export interface Miembro {
     fecha_nacimiento?: string;
     token_notificacion?: string;
     activo?: boolean;
+    created_at?: string;
+    foto_perfil?: string;
 }
 
 export interface Asistencia {

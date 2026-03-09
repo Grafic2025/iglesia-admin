@@ -1,6 +1,5 @@
 'use client'
 import React from 'react';
-import { ShieldAlert } from 'lucide-react';
 
 interface PantallaLoginProps {
     password: string;
@@ -21,8 +20,12 @@ const PantallaLogin = ({
         <div className="h-screen flex items-center justify-center bg-[#121212] font-sans">
             <div className="bg-[#1e1e1e] p-10 rounded-2xl shadow-2xl w-full max-w-md border border-white/10">
                 <div className="flex justify-center mb-8">
-                    <div className="bg-indigo-500/10 p-5 rounded-full border border-indigo-500/20">
-                        <ShieldAlert size={48} className="text-indigo-500" />
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center bg-white/5 rounded-full p-2 border border-white/10 shadow-lg glow-effect">
+                        <img
+                            src="/logo.png"
+                            alt="Logo Iglesia"
+                            className="w-full h-full object-contain drop-shadow-lg"
+                        />
                     </div>
                 </div>
                 <h1 className="text-3xl font-bold mb-8 text-center text-white tracking-tight">

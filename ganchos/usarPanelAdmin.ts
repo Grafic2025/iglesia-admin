@@ -26,6 +26,7 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
     const [premiosPendientes, establecerPremiosPendientes] = useState<any>({ nivel5: [], nivel10: [], nivel20: [], nivel30: [] });
     const [oracionesActivas, establecerOracionesActivas] = useState(0);
     const [nuevosMes, establecerNuevosMes] = useState(0);
+    const [tasaRetencion, establecerTasaRetencion] = useState(0);
     const [premiosEntregados, establecerPremiosEntregados] = useState<any[]>([]);
     const [bautismos, establecerBautismos] = useState<any[]>([]);
     const [ayuda, establecerAyuda] = useState<any[]>([]);
@@ -58,6 +59,18 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
         inicioMes.setHours(0, 0, 0, 0);
         const { count } = await supabase.from('miembros').select('*', { count: 'exact', head: true }).gte('created_at', inicioMes.toISOString());
         establecerNuevosMes(count || 0);
+    }, []);
+
+    const calcularTasaRetencion = useCallback(async (totalMiembros: number) => {
+        if (totalMiembros === 0) return;
+        const hace30Dias = new Date();
+        hace30Dias.setDate(hace30Dias.getDate() - 30);
+
+        const { data } = await supabase.from('asistencias').select('miembro_id').gte('fecha', hace30Dias.toISOString().split('T')[0]);
+        if (data) {
+            const activos = new Set(data.map(a => a.miembro_id)).size;
+            establecerTasaRetencion(Math.round((activos / totalMiembros) * 100));
+        }
     }, []);
 
     const cargarPremiosEntregados = useCallback(async () => {
@@ -174,6 +187,7 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
         premiosPendientes,
         oracionesActivas,
         nuevosMes,
+        tasaRetencion,
         premiosEntregados,
         bautismos,
         ayuda,
@@ -184,6 +198,7 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
         obtenerCronogramas,
         calcularOracionesActivas,
         calcularNuevosMes,
+        calcularTasaRetencion,
         cargarPremiosEntregados,
         obtenerBautismos,
         obtenerAyuda,
