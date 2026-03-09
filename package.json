@@ -15,7 +15,7 @@
     "@tanstack/react-query": "^5.90.21",
     "expo": "^54.0.32",
     "expo-device": "~8.0.10",
-    "expo-notificaciones": "~0.32.16",
+    "expo-notifications": "~0.32.16",
     "expo-updates": "~29.0.16",
     "lucide-react": "^0.563.0",
     "next": "16.1.4",
