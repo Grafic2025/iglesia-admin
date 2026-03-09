@@ -10,6 +10,12 @@ import GraficoDemografico from '../administrador/panel/GraficoDemografico';
 import InfoRapidaServicio from '../administrador/panel/InfoRapidaServicio';
 import ResumenActividad from '../administrador/panel/ResumenActividad';
 import UltimosMiembros from '../administrador/panel/UltimosMiembros';
+import ProximosCumpleanos from '../administrador/panel/ProximosCumpleanos';
+import UltimaAuditoria from '../administrador/panel/UltimaAuditoria';
+import RetencionMensual from '../administrador/panel/RetencionMensual';
+import TareasPendientes from '../administrador/panel/TareasPendientes';
+import RadarAusencias from '../administrador/panel/RadarAusencias';
+import TermometroServidores from '../administrador/panel/TermometroServidores';
 
 import { usarDashboard } from '../../ganchos/usarDashboard';
 
@@ -24,6 +30,9 @@ interface VistaPanelProps {
     bautismos: any[];
     ayuda: any[];
     tasaRetencion: number;
+    ausentes: any[];
+    servidoresQuemados: any[];
+    logsAuditoria?: any[];
 }
 
 const VistaPanel = ({
@@ -36,7 +45,10 @@ const VistaPanel = ({
     miembros,
     bautismos,
     ayuda,
-    tasaRetencion
+    tasaRetencion,
+    ausentes,
+    servidoresQuemados,
+    logsAuditoria = []
 }: VistaPanelProps) => {
     const {
         rangoCrecimiento,
@@ -48,6 +60,7 @@ const VistaPanel = ({
         fechaUltimoServicio,
         proximoDomingoTexto,
         ultimosMiembros,
+        proximosCumpleanos,
         RANGOS_CRECIMIENTO,
         COLORES
     } = usarDashboard({ asistencias, asistencias7dias, crecimientoAnual, miembros });
@@ -108,7 +121,7 @@ const VistaPanel = ({
                 />
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-2">
                     <GraficoDemografico
                         data={datosDemograficos.graficoEdades}
@@ -116,7 +129,31 @@ const VistaPanel = ({
                     />
                 </div>
                 <div className="lg:col-span-1">
+                    <ProximosCumpleanos cumpleanos={proximosCumpleanos} />
+                </div>
+                <div className="lg:col-span-1">
                     <UltimosMiembros miembros={ultimosMiembros} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-1">
+                    <RetencionMensual tasa={tasaRetencion} activos={conteoHoy} total={miembros.length} />
+                </div>
+                <div className="lg:col-span-1">
+                    <TareasPendientes ayuda={ayuda} bautismos={bautismos} />
+                </div>
+                <div className="lg:col-span-1">
+                    <RadarAusencias ausentes={ausentes} />
+                </div>
+                <div className="lg:col-span-1">
+                    <TermometroServidores servidoresQuemados={servidoresQuemados} />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="lg:col-span-2">
+                    <UltimaAuditoria logsAuditoria={logsAuditoria} />
                 </div>
             </div>
         </div>

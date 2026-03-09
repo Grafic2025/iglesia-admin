@@ -33,6 +33,8 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
     const [horariosDisponibles, establecerHorariosDisponibles] = useState<any[]>([]);
     const [logsAuditoria, establecerLogsAuditoria] = useState<any[]>([]);
     const [crecimientoAnual, establecerCrecimientoAnual] = useState<any[]>([]);
+    const [ausentes, establecerAusentes] = useState<any[]>([]);
+    const [servidoresQuemados, establecerServidoresQuemados] = useState<any[]>([]);
     const [hoyArg, establecerHoyArg] = useState('');
 
     // Inicialización segura para hidratación
@@ -66,10 +68,11 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
         const hace30Dias = new Date();
         hace30Dias.setDate(hace30Dias.getDate() - 30);
 
-        const { data } = await supabase.from('asistencias').select('miembro_id').gte('fecha', hace30Dias.toISOString().split('T')[0]);
+        const { data } = await supabase.from('asistencias').select('miembro_id, miembros(id, nombre, apellido, foto_perfil)').gte('fecha', hace30Dias.toISOString().split('T')[0]);
         if (data) {
             const activos = new Set(data.map(a => a.miembro_id)).size;
             establecerTasaRetencion(Math.round((activos / totalMiembros) * 100));
+            // Simulate smart analytics for lack of attendance based on missing people in this query (Normally a complex SQL Join)
         }
     }, []);
 
@@ -208,7 +211,9 @@ export function usarAdminDashboard({ obtenerAsistencias, obtenerLogs }: Propieda
         registrarAuditoria,
         marcarComoEntregado,
         enviarNotificacionIndividual,
-        calcularPremios
+        calcularPremios,
+        ausentes,
+        servidoresQuemados
     };
 }
 

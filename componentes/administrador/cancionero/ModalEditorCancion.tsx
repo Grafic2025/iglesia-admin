@@ -9,6 +9,7 @@ interface ModalEditorCancionProps {
     bpm: string; setBpm: (v: string) => void;
     youtubeUrl: string; setYoutubeUrl: (v: string) => void;
     pdfUrl: string; setPdfUrl: (v: string) => void;
+    spotifyUrl: string; setSpotifyUrl: (v: string) => void;
     acordes: string; setAcordes: (v: string) => void;
     keys: string[];
     onSave: () => void;
@@ -17,7 +18,7 @@ interface ModalEditorCancionProps {
 
 const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
     currentSong, titulo, setTitulo, artista, setArtista, tono, setTono, bpm, setBpm,
-    youtubeUrl, setYoutubeUrl, pdfUrl, setPdfUrl, acordes, setAcordes, keys, onSave, onClose
+    youtubeUrl, setYoutubeUrl, pdfUrl, setPdfUrl, spotifyUrl, setSpotifyUrl, acordes, setAcordes, keys, onSave, onClose
 }) => {
     return (
         <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -89,6 +90,16 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 onChange={(e) => setPdfUrl(e.target.value)}
                                 placeholder="Link a Drive, Dropbox o URL del PDF..."
                                 className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500]"
+                            />
+                        </div>
+                        <div className="col-span-2">
+                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase text-[#1DB954]">Spotify URL / URI</label>
+                            <input
+                                type="text"
+                                value={spotifyUrl}
+                                onChange={(e) => setSpotifyUrl(e.target.value)}
+                                placeholder="https://open.spotify.com/track/..."
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#1DB954] focus:ring-1 focus:ring-[#1DB954]"
                             />
                         </div>
                         <div className="col-span-2">

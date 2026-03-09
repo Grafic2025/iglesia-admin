@@ -25,6 +25,7 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
         bpm, setBpm,
         youtubeUrl, setYoutubeUrl,
         pdfUrl, setPdfUrl,
+        spotifyUrl, setSpotifyUrl,
         acordes, setAcordes,
         handleOpenModal,
         handleSave,
@@ -91,6 +92,7 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
                     bpm={bpm} setBpm={setBpm}
                     youtubeUrl={youtubeUrl} setYoutubeUrl={setYoutubeUrl}
                     pdfUrl={pdfUrl} setPdfUrl={setPdfUrl}
+                    spotifyUrl={spotifyUrl} setSpotifyUrl={setSpotifyUrl}
                     acordes={acordes} setAcordes={setAcordes}
                     keys={keys}
                     onSave={handleSave}

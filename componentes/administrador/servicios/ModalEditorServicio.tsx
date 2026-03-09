@@ -19,6 +19,7 @@ interface ModalEditorServicioProps {
     setAssignedStaff: (staff: any[]) => void;
     allMembers: any[];
     roleCategories: any[];
+    updateRole?: (id: string, role: string) => void;
     notificarAlGuardar: boolean;
     setNotificarAlGuardar: (b: boolean) => void;
     onClose: () => void;
@@ -40,6 +41,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
     assignedStaff, setAssignedStaff,
     allMembers,
     roleCategories,
+    updateRole,
     notificarAlGuardar, setNotificarAlGuardar,
     onClose,
     onSave,
@@ -201,6 +203,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                             roleCategories={roleCategories}
                             allMembers={allMembers}
                             onAddStaff={onShowStaffPicker}
+                            updateRole={updateRole}
                         />
 
                         <div>

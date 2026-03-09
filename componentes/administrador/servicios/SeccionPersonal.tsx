@@ -7,6 +7,7 @@ interface SeccionPersonalProps {
     roleCategories: any[];
     allMembers: any[];
     onAddStaff: () => void;
+    updateRole?: (id: string, role: string) => void;
 }
 
 const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
@@ -14,7 +15,8 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
     setAssignedStaff,
     roleCategories,
     allMembers,
-    onAddStaff
+    onAddStaff,
+    updateRole
 }) => {
     const getRoleCategory = (rol: string) => {
         for (const cat of roleCategories) {
@@ -68,7 +70,25 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                                                 </div>
                                                 <div className="text-left">
                                                     <p className="text-white font-bold text-sm line-clamp-1">{s.nombre}</p>
-                                                    <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.specificRol}</p>
+                                                    {updateRole ? (
+                                                        <select
+                                                            value={s.specificRol}
+                                                            onChange={(e) => updateRole(s.miembro_id, e.target.value)}
+                                                            className="bg-transparent text-[#A8D500] text-[10px] font-black uppercase outline-none cursor-pointer p-0 appearance-none drop-shadow-md border-b border-[#A8D500]/30 min-w-[100px]"
+                                                        >
+                                                            {roleCategories.map(cat => (
+                                                                <optgroup key={cat.name} label={cat.name} className="bg-[#1A1A1A] text-[#888]">
+                                                                    {cat.roles.map((r: string) => (
+                                                                        <option key={r} value={r} className="bg-[#1A1A1A] text-white">
+                                                                            {r}
+                                                                        </option>
+                                                                    ))}
+                                                                </optgroup>
+                                                            ))}
+                                                        </select>
+                                                    ) : (
+                                                        <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.specificRol}</p>
+                                                    )}
                                                 </div>
                                                 <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :
                                                     s.estado === 'rechazado' ? 'bg-red-500/20 text-red-500' :

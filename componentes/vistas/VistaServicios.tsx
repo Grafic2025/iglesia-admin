@@ -13,7 +13,7 @@ import { usarServicios } from '../../ganchos/usarServicios';
 
 const ROLE_CATEGORIES = [
     { name: "Audio", roles: ["Operador de Monitoreo", "Sonidista", "Streaming Audio", "Sonido"] },
-    { name: "Banda", roles: ["Ginterfaztarra Acústica", "Bajo", "Directora Musical", "Batería", "Ginterfaztarra Eléctrica 1", "Ginterfaztarra Eléctrica 2", "Piano", "Teclados", "Ginterfaztarra"] },
+    { name: "Banda", roles: ["Guitarra Acústica", "Bajo", "Directora Musical", "Batería", "Guitarra Eléctrica 1", "Guitarra Eléctrica 2", "Piano", "Teclados", "Guitarra"] },
     { name: "Medios", roles: ["Edición Multicámara", "Filmación", "Fotografía", "Slides TV", "Pantalla LED", "Livestreaming", "Luces", "YouTube CM", "Proyección"] },
     { name: "Voces", roles: ["Soprano", "Tenor", "Worship Leader", "Voz", "Vocal 1", "Vocal 2"] },
     { name: "General", roles: ["Servidor", "Ujier", "Bienvenida", "Director/Pastor"] }
@@ -55,6 +55,10 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
     } = usarServicios({ supabase, enviarNotificacionIndividual, registrarAuditoria });
 
     const [musicianSearch, setMusicianSearch] = useState('');
+
+    const updateRole = (miembroId: string, role: string) => {
+        setAssignedStaff(prev => prev.map(s => s.miembro_id === miembroId ? { ...s, rol: role } : s));
+    };
 
     const filteredSchedules = schedules.filter((s: any) => {
         if (!musicianSearch) return true;
@@ -129,6 +133,7 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
                     assignedStaff={assignedStaff} setAssignedStaff={setAssignedStaff}
                     allMembers={allMembers}
                     roleCategories={ROLE_CATEGORIES}
+                    updateRole={updateRole}
                     notificarAlGuardar={notificarAlGuardar} setNotificarAlGuardar={setNotificarAlGuardar}
                     onClose={() => setShowModal(false)}
                     onSave={handleSave}
@@ -154,6 +159,8 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
                 <ModalSelectorPersonal
                     allMembers={allMembers}
                     assignedStaff={assignedStaff}
+                    roleCategories={ROLE_CATEGORIES}
+                    updateRole={updateRole}
                     staffSearch={staffSearch}
                     setStaffSearch={setStaffSearch}
                     assignStaff={assignStaff}

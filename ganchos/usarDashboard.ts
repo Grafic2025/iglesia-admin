@@ -64,6 +64,41 @@ export function usarDashboard({
             .slice(0, 5);
     }, [miembros]);
 
+    const proximosCumpleanos = useMemo(() => {
+        const hoy = new Date();
+        const hoyMes = hoy.getMonth() + 1; // 1-12
+        const hoyDia = hoy.getDate(); // 1-31
+
+        const conCumple = miembros.filter(m => m.fecha_nacimiento);
+        const mapCumple = conCumple.map(m => {
+            const [y, mStr, dStr] = m.fecha_nacimiento!.split('-');
+            const mesNac = parseInt(mStr, 10);
+            const diaNac = parseInt(dStr, 10);
+
+            // Calcular diferencia en "días aproximados" en el año actual
+            let diffMes = mesNac - hoyMes;
+            let diffDia = diaNac - hoyDia;
+
+            // Si el cumpleaños ya pasó este año, sumamos 12 meses para el proxy de ordenamiento
+            if (diffMes < 0 || (diffMes === 0 && diffDia < 0)) {
+                diffMes += 12;
+            }
+
+            // Un peso numérico simple para ordenar por proximidad
+            const proxy = diffMes * 31 + diffDia;
+            return { miembro: m, proxy, esHoy: diffMes === 0 && diffDia === 0 };
+        });
+
+        // Filtrar solo los que cumplen en los próximos 30 días aprox (proxy <= 30) y ordenarlos
+        const cercanos = mapCumple
+            .filter(item => item.proxy >= 0 && item.proxy <= 31)
+            .sort((a, b) => a.proxy - b.proxy)
+            .slice(0, 6)
+            .map(item => ({ ...item.miembro, proxy: item.proxy }));
+
+        return cercanos;
+    }, [miembros]);
+
     const conteoHoy = (asistencias || []).length;
     const conteoAyer = (asistencias7dias || []).length >= 2 ? asistencias7dias[asistencias7dias.length - 2]?.total || 0 : 0;
     const tendenciaHoy = conteoAyer > 0 ? Math.round(((conteoHoy - conteoAyer) / conteoAyer) * 100) : null;
@@ -87,6 +122,7 @@ export function usarDashboard({
         fechaUltimoServicio,
         proximoDomingoTexto,
         ultimosMiembros,
+        proximosCumpleanos,
         RANGOS_CRECIMIENTO,
         COLORES
     };

@@ -21,6 +21,7 @@ export function usarCancionero({ supabase }: UseCancioneroProps) {
     const [bpm, setBpm] = useState('');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [pdfUrl, setPdfUrl] = useState('');
+    const [spotifyUrl, setSpotifyUrl] = useState('');
     const [acordes, setAcordes] = useState('');
 
     const fetchSongs = async () => {
@@ -52,6 +53,7 @@ export function usarCancionero({ supabase }: UseCancioneroProps) {
             setBpm(song.bpm || '');
             setYoutubeUrl(song.youtube_url || '');
             setPdfUrl(song.pdf_url || '');
+            setSpotifyUrl(song.spotify_url || '');
             setAcordes(song.acordes || '');
             setTransposedOffset(0);
         } else {
@@ -62,6 +64,7 @@ export function usarCancionero({ supabase }: UseCancioneroProps) {
             setBpm('');
             setYoutubeUrl('');
             setPdfUrl('');
+            setSpotifyUrl('');
             setAcordes('');
         }
         setShowModal(true);
@@ -74,6 +77,7 @@ export function usarCancionero({ supabase }: UseCancioneroProps) {
             titulo, artista, tono, bpm,
             youtube_url: youtubeUrl,
             pdf_url: pdfUrl,
+            spotify_url: spotifyUrl,
             acordes: acordes
         };
 
@@ -149,6 +153,7 @@ export function usarCancionero({ supabase }: UseCancioneroProps) {
         bpm, setBpm,
         youtubeUrl, setYoutubeUrl,
         pdfUrl, setPdfUrl,
+        spotifyUrl, setSpotifyUrl,
         acordes, setAcordes,
         handleOpenModal,
         handleSave,

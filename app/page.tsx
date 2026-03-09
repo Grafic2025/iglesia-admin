@@ -17,6 +17,9 @@ export default function DashboardPage() {
       miembros={administrador.miembros}
       bautismos={administrador.bautismos}
       ayuda={administrador.ayuda}
+      ausentes={administrador.ausentes || []}
+      servidoresQuemados={administrador.servidoresQuemados || []}
+      logsAuditoria={administrador.logsAuditoria}
     />
   );
 }

@@ -18,7 +18,7 @@ const TarjetaEstado = ({ label, value, color = '#A8D500', icon, isActive, trend 
     return (
         <div className={`p-4 rounded-2xl bg-[#1E1E1E] border border-[#333] transition-all duration-300 ${isActive ? 'shadow-[0_4px_20px_-5px_rgba(168,213,0,0.1)]' : ''}`}>
             <div className="flex items-start justify-between mb-2 gap-2">
-                <span className="text-[#888] text-[10px] md:text-xs font-semibold uppercase tracking-wider flex-1 break-words leading-tight">{label}</span>
+                <span className="text-[#888] text-[10px] md:text-xs font-semibold uppercase tracking-wider flex-1 min-w-0 break-all sm:break-words leading-tight">{label}</span>
                 {icon && <div className="shrink-0" style={{ color }}>{typeof icon === 'string' ? <span className="text-base leading-none">{icon}</span> : icon}</div>}
             </div>
             <div className="flex items-baseline gap-2">

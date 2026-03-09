@@ -39,7 +39,7 @@ const CabeceraAdmin: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-6">
-                {activeTab === 'miembros' && (
+                {(activeTab === 'miembros' || activeTab === 'panel') && (
                     <div className="flex items-center gap-3 bg-[#1e1e1e] p-1.5 rounded-xl border border-white/5 shadow-inner">
                         <input
                             type="date"
@@ -47,22 +47,26 @@ const CabeceraAdmin: React.FC = () => {
                             onChange={(e) => establecerFechaSeleccionada(e.target.value)}
                             className="bg-transparent text-white px-3 py-1.5 rounded-lg focus:outline-none text-sm font-medium"
                         />
-                        <button
-                            onClick={exportarCSV}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-600/20"
-                        >
-                            Exportar Hoy
-                        </button>
-                        <button
-                            onClick={() => {
-                                establecerInicioExportacion(fechaSeleccionada);
-                                establecerFinExportacion(fechaSeleccionada);
-                                establecerMostrarModalExportacion(true);
-                            }}
-                            className="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
-                        >
-                            Rango...
-                        </button>
+                        {activeTab === 'miembros' && (
+                            <>
+                                <button
+                                    onClick={exportarCSV}
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-600/20"
+                                >
+                                    Exportar Hoy
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        establecerInicioExportacion(fechaSeleccionada);
+                                        establecerFinExportacion(fechaSeleccionada);
+                                        establecerMostrarModalExportacion(true);
+                                    }}
+                                    className="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
+                                >
+                                    Rango...
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
 

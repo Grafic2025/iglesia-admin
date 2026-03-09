@@ -4,6 +4,8 @@ import { X, Search, User } from 'lucide-react';
 interface ModalSelectorPersonalProps {
     allMembers: any[];
     assignedStaff: any[];
+    roleCategories?: any[];
+    updateRole?: (id: string, role: string) => void;
     staffSearch: string;
     setStaffSearch: (s: string) => void;
     assignStaff: (m: any) => void;
@@ -13,6 +15,8 @@ interface ModalSelectorPersonalProps {
 const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
     allMembers,
     assignedStaff,
+    roleCategories,
+    updateRole,
     staffSearch,
     setStaffSearch,
     assignStaff,
@@ -50,7 +54,29 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
                                 </div>
                                 <div>
                                     <p className="font-bold text-sm">{m.nombre} {m.apellido}</p>
-                                    <p className={`text-[10px] ${assignedStaff.some(s => s.miembro_id === m.id) ? 'text-white/60' : 'text-[#555]'}`}>Servidor</p>
+                                    {assignedStaff.some(s => s.miembro_id === m.id) && updateRole && roleCategories ? (
+                                        <select
+                                            value={assignedStaff.find(s => s.miembro_id === m.id)?.rol || 'Servidor'}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                updateRole(m.id, e.target.value);
+                                            }}
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="mt-1 bg-black/20 text-[#A8D500] text-[10px] uppercase font-bold px-1.5 py-1 rounded border border-[#A8D500]/30 outline-none max-w-[150px] appearance-none cursor-pointer"
+                                        >
+                                            {roleCategories.map(cat => (
+                                                <optgroup key={cat.name} label={cat.name} className="bg-[#1A1A1A] text-[#888]">
+                                                    {cat.roles.map((r: string) => (
+                                                        <option key={r} value={r} className="bg-[#1A1A1A] text-white">
+                                                            {r}
+                                                        </option>
+                                                    ))}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <p className={`text-[10px] uppercase ${assignedStaff.some(s => s.miembro_id === m.id) ? 'text-white/60' : 'text-[#555]'}`}>Servidor</p>
+                                    )}
                                 </div>
                             </div>
                             {assignedStaff.some(s => s.miembro_id === m.id) && <X size={14} />}
