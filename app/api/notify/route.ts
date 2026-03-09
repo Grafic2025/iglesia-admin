@@ -4,7 +4,7 @@ import { supabase } from '@/libreria/supabase';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, message, horario, specificToken, type, imageUrl } = body;
+    const { title, message, horario, specificToken, type, imageUrl, skipLog } = body;
 
     console.log("=== NUEVA NOTIFICACIÓN ===");
     console.log("Título:", title);
@@ -16,20 +16,48 @@ export async function POST(req: Request) {
     if (specificToken) {
       tokens = [specificToken];
     } else {
-      const hoy = new Date().toLocaleDateString("en-CA", {
-        timeZone: "America/Argentina/Buenos_Aires"
-      });
       let query = supabase.from('miembros').select('id, token_notificacion');
-      if (horario && horario !== 'Todas') {
-        const { data: asistenciasHoy } = await supabase
-          .from('asistencias')
-          .select('miembro_id')
-          .eq('horario_reunion', horario)
-          .eq('fecha', hoy);
-        const ids = asistenciasHoy?.map(a => a.miembro_id) || [];
-        if (ids.length === 0) return NextResponse.json({ error: 'No hay asistentes' }, { status: 400 });
-        query = query.in('id', ids);
+
+      const hoyStr = new Date().toLocaleDateString("en-CA", { timeZone: "America/Argentina/Buenos_Aires" });
+      const ultimoMes = new Date();
+      ultimoMes.setDate(ultimoMes.getDate() - 30);
+      const hace30diasStr = ultimoMes.toISOString();
+
+      if (horario) {
+        if (horario === 'Lideres') {
+          query = query.eq('es_lider', true);
+        } else if (horario === 'Servidores') {
+          query = query.eq('es_servidor', true);
+        } else if (horario === 'Nuevos') {
+          query = query.gte('fecha_creacion', hace30diasStr);
+        } else if (horario === 'Varones') {
+          query = query.eq('genero', 'Hombre');
+        } else if (horario === 'Mujeres') {
+          query = query.eq('genero', 'Mujer');
+        } else if (horario === 'Adolescentes') {
+          // Asumiendo que pueden filtrar por edad < 18 si tuvieran fecha_nacimiento. Si no, ignoramos o usar rango
+          // query = query.lte('fecha_nacimiento', fecha18YearsAgo)
+        } else if (horario === 'EquipoMusica') {
+          // Join para obtener solo los que estan en algun equipo de musica
+          const { data: musicoIds } = await supabase.from('miembros_equipos').select('miembro_id');
+          if (musicoIds && musicoIds.length > 0) {
+            query = query.in('id', musicoIds.map(m => m.miembro_id));
+          } else {
+            query = query.in('id', ['-1']); // Forzar vacio
+          }
+        } else if (horario !== 'Todas') {
+          // Es un horario específico (ej: 09:00)
+          const { data: asistenciasHoy } = await supabase
+            .from('asistencias')
+            .select('miembro_id')
+            .eq('horario_reunion', horario)
+            .eq('fecha', hoyStr);
+          const ids = asistenciasHoy?.map(a => a.miembro_id) || [];
+          if (ids.length === 0) return NextResponse.json({ error: 'No hay asistentes registrados para este segmento.' }, { status: 400 });
+          query = query.in('id', ids);
+        }
       }
+
       const { data: miembros } = await query;
       tokens = miembros
         ?.map(m => m.token_notificacion)
@@ -39,7 +67,7 @@ export async function POST(req: Request) {
       tokens = [...new Set(tokens)];
     }
 
-    if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens válidos' }, { status: 400 });
+    if (tokens.length === 0) return NextResponse.json({ error: 'No se encontraron dispositivos registrados para este segmento.' }, { status: 400 });
 
     // 2. PREPARAR NOTIFICACIONES
     const notificaciones = tokens.map(token => {
@@ -93,16 +121,18 @@ export async function POST(req: Request) {
     }
 
     // --- GUARDAR EN LOGS ---
-    try {
-      await supabase.from('notificacion_logs').insert([{
-        fecha: new Date().toISOString(),
-        titulo: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
-        mensaje: errorMessage ? `${message} (ERROR: ${errorMessage})` : message,
-        destinatarios_count: tokens.length,
-        estado: finalStatus
-      }]);
-    } catch (dbError) {
-      console.error("Error guardando log:", dbError);
+    if (!skipLog) {
+      try {
+        await supabase.from('notificacion_logs').insert([{
+          fecha: new Date().toISOString(),
+          titulo: (!title || title.trim() === "" || title.toLowerCase() === "aviso") ? "Iglesia del Salvador" : title,
+          mensaje: errorMessage ? `${message} (ERROR: ${errorMessage})` : message,
+          destinatarios_count: tokens.length,
+          estado: finalStatus
+        }]);
+      } catch (dbError) {
+        console.error("Error guardando log:", dbError);
+      }
     }
 
     return NextResponse.json({

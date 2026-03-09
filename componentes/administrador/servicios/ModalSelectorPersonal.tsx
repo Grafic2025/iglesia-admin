@@ -1,5 +1,5 @@
-import React from 'react';
 import { X, Search, User } from 'lucide-react';
+import SelectorRolesMultiple from './SelectorRolesMultiple';
 
 interface ModalSelectorPersonalProps {
     allMembers: any[];
@@ -55,25 +55,13 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
                                 <div>
                                     <p className="font-bold text-sm">{m.nombre} {m.apellido}</p>
                                     {assignedStaff.some(s => s.miembro_id === m.id) && updateRole && roleCategories ? (
-                                        <select
-                                            value={assignedStaff.find(s => s.miembro_id === m.id)?.rol || 'Servidor'}
-                                            onChange={(e) => {
-                                                e.stopPropagation();
-                                                updateRole(m.id, e.target.value);
-                                            }}
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="mt-1 bg-black/20 text-[#A8D500] text-[10px] uppercase font-bold px-1.5 py-1 rounded border border-[#A8D500]/30 outline-none max-w-[150px] appearance-none cursor-pointer"
-                                        >
-                                            {roleCategories.map(cat => (
-                                                <optgroup key={cat.name} label={cat.name} className="bg-[#1A1A1A] text-[#888]">
-                                                    {cat.roles.map((r: string) => (
-                                                        <option key={r} value={r} className="bg-[#1A1A1A] text-white">
-                                                            {r}
-                                                        </option>
-                                                    ))}
-                                                </optgroup>
-                                            ))}
-                                        </select>
+                                        <div className="mt-1" onClick={e => e.stopPropagation()}>
+                                            <SelectorRolesMultiple
+                                                roleCategories={roleCategories}
+                                                selectedRoles={(assignedStaff.find(s => s.miembro_id === m.id)?.rol || 'Servidor').split(', ').filter(Boolean)}
+                                                onChange={(newRoles) => updateRole(m.id, newRoles.join(', '))}
+                                            />
+                                        </div>
                                     ) : (
                                         <p className={`text-[10px] uppercase ${assignedStaff.some(s => s.miembro_id === m.id) ? 'text-white/60' : 'text-[#555]'}`}>Servidor</p>
                                     )}

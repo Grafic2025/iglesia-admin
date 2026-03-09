@@ -16,10 +16,10 @@ const TarjetaEstado = ({ label, value, color = '#A8D500', icon, isActive, trend 
     const TrendIcon = trend && trend > 0 ? TrendingUp : trend && trend < 0 ? TrendingDown : Minus;
 
     return (
-        <div className={`p-4 rounded-2xl bg-[#1E1E1E] border border-[#333] transition-all duration-300 ${isActive ? 'shadow-[0_4px_20px_-5px_rgba(168,213,0,0.1)]' : ''}`}>
-            <div className="flex items-start justify-between mb-2 gap-2">
-                <span className="text-[#888] text-[10px] md:text-xs font-semibold uppercase tracking-wider flex-1 min-w-0 break-all sm:break-words leading-tight">{label}</span>
-                {icon && <div className="shrink-0" style={{ color }}>{typeof icon === 'string' ? <span className="text-base leading-none">{icon}</span> : icon}</div>}
+        <div className={`p-4 rounded-xl bg-[#1E1E1E] border border-[#333] transition-all duration-300 flex flex-col justify-between ${isActive ? 'shadow-[0_4px_20px_-5px_rgba(168,213,0,0.1)]' : ''}`}>
+            <div className="flex items-center justify-between mb-2 gap-2">
+                <span className="text-[#888] text-[10px] xl:text-[9.5px] 2xl:text-[11px] font-bold uppercase tracking-wide flex-1 truncate" title={label}>{label}</span>
+                {icon && <div className="shrink-0 flex items-center justify-center p-1.5 rounded-md bg-white/5" style={{ color }}>{typeof icon === 'string' ? <span className="text-xs leading-none">{icon}</span> : icon}</div>}
             </div>
             <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold" style={{ color: isActive ? color : '#fff' }}>

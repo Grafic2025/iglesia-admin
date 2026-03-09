@@ -1,5 +1,5 @@
-import React from 'react';
 import { Users2, X, CheckCircle2, Clock, Plus } from 'lucide-react';
+import SelectorRolesMultiple from './SelectorRolesMultiple';
 
 interface SeccionPersonalProps {
     assignedStaff: any[];
@@ -71,21 +71,11 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                                                 <div className="text-left">
                                                     <p className="text-white font-bold text-sm line-clamp-1">{s.nombre}</p>
                                                     {updateRole ? (
-                                                        <select
-                                                            value={s.specificRol}
-                                                            onChange={(e) => updateRole(s.miembro_id, e.target.value)}
-                                                            className="bg-transparent text-[#A8D500] text-[10px] font-black uppercase outline-none cursor-pointer p-0 appearance-none drop-shadow-md border-b border-[#A8D500]/30 min-w-[100px]"
-                                                        >
-                                                            {roleCategories.map(cat => (
-                                                                <optgroup key={cat.name} label={cat.name} className="bg-[#1A1A1A] text-[#888]">
-                                                                    {cat.roles.map((r: string) => (
-                                                                        <option key={r} value={r} className="bg-[#1A1A1A] text-white">
-                                                                            {r}
-                                                                        </option>
-                                                                    ))}
-                                                                </optgroup>
-                                                            ))}
-                                                        </select>
+                                                        <SelectorRolesMultiple
+                                                            roleCategories={roleCategories}
+                                                            selectedRoles={(s.rol || 'Servidor').split(', ').filter(Boolean)}
+                                                            onChange={(newRoles) => updateRole(s.miembro_id, newRoles.join(', '))}
+                                                        />
                                                     ) : (
                                                         <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.specificRol}</p>
                                                     )}

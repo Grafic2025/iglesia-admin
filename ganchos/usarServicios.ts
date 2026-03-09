@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 interface UseServiciosProps {
     supabase: any;
-    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>;
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string, tipo?: string, datosExtra?: any) => Promise<any>;
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>;
 }
 
@@ -162,7 +162,7 @@ export function usarServicios({ supabase, enviarNotificacionIndividual, registra
                     msg = `⚠️ ACTUALIZACIÓN en el plan de ${staff.rol} (${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'numeric' })}): Se actualizó el horario o las canciones. Por favor revisalo.`;
                 }
 
-                return enviarNotificacionIndividual(miembro.token_notificacion, miembro.nombre, msg);
+                return enviarNotificacionIndividual(miembro.token_notificacion, miembro.nombre, msg, 'service_reminder', { skipLog: true });
             }
             return null;
         });
@@ -194,7 +194,9 @@ export function usarServicios({ supabase, enviarNotificacionIndividual, registra
                             return enviarNotificacionIndividual(
                                 miembro.token_notificacion,
                                 miembro.nombre,
-                                `💬 ¡Chat Abierto! Ya podés coordinar con tu equipo para el plan del ${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`
+                                `💬 ¡Chat Abierto! Ya podés coordinar con tu equipo para el plan del ${new Date(sched.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`,
+                                'service_reminder',
+                                { skipLog: true }
                             );
                         }
                     });

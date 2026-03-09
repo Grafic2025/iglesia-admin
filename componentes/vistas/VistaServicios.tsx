@@ -21,7 +21,7 @@ const ROLE_CATEGORIES = [
 
 const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAuditoria }: {
     supabase: any,
-    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string) => Promise<any>,
+    enviarNotificacionIndividual?: (token: string, nombre: string, mensaje: string, tipo?: string, datosExtra?: any) => Promise<any>,
     registrarAuditoria?: (accion: string, detalle: string) => Promise<void>
 }) => {
     const {
