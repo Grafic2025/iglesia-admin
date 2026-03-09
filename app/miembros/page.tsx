@@ -1,30 +1,30 @@
 'use client';
-import React from 'react';
-import MiembrosView from '../../components/views/MiembrosView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaMiembros from '../../componentes/vistas/VistaMiembros';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function AsistenciasPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
 
     return (
-        <MiembrosView
-            busqueda={admin.busqueda}
-            setBusqueda={admin.setBusqueda}
-            filtroHorario={admin.filtroHorario}
-            setFiltroHorario={admin.setFiltroHorario}
-            datosFiltrados={admin.datosFiltrados}
-            premiosPendientes={admin.premiosPendientes}
-            premiosEntregados={admin.premiosEntregados}
-            marcarComoEntregado={admin.marcarComoEntregado}
-            enviarNotificacionIndividual={admin.enviarNotificacionIndividual}
-            hoyArg={admin.hoyArg}
+        <VistaMiembros
+            busqueda={administrador.busqueda}
+            setBusqueda={administrador.establecerBusqueda}
+            filtroHorario={administrador.filtroHorario}
+            setFiltroHorario={administrador.establecerFiltroHorario}
+            datosFiltrados={administrador.datosFiltrados}
+            premiosPendientes={administrador.premiosPendientes}
+            premiosEntregados={administrador.premiosEntregados}
+            marcarComoEntregado={administrador.marcarComoEntregado}
+            enviarNotificacionIndividual={administrador.enviarNotificacionIndividual}
+            hoyArg={administrador.hoyArg}
             supabase={supabase}
-            fetchAsistencias={admin.fetchAsistencias}
-            fetchMiembros={admin.fetchMiembros}
-            horariosDisponibles={admin.horariosDisponibles}
-            registrarAuditoria={admin.registrarAuditoria}
-            loading={admin.asistenciasLoading}
+            fetchAsistencias={administrador.obtenerAsistencias}
+            fetchMiembros={administrador.obtenerMiembros}
+            horariosDisponibles={administrador.horariosDisponibles}
+            registrarAuditoria={administrador.registrarAuditoria}
+            loading={administrador.asistenciasCargando}
         />
     );
 }
+

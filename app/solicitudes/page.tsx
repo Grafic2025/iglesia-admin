@@ -1,15 +1,15 @@
 'use client';
-import React from 'react';
-import SolicitudesView from '../../components/views/SolicitudesView';
-import { useAdminContext } from '../../context/AdminContext';
+import VistaSolicitudes from '../../componentes/vistas/VistaSolicitudes';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
 
 export default function SolicitudesPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <SolicitudesView
-            bautismos={admin.bautismos}
-            ayuda={admin.ayuda}
-            miembros={admin.miembros}
+        <VistaSolicitudes
+            bautismos={administrador.bautismos}
+            ayuda={administrador.ayuda}
+            miembros={administrador.miembros}
         />
     );
 }
+

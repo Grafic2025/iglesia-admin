@@ -1,8 +1,8 @@
 'use client';
-import React from 'react';
-import CancioneroView from '../../components/views/CancioneroView';
-import { supabase } from '../../lib/supabase';
+import VistaCancionero from '../../componentes/vistas/VistaCancionero';
+import { supabase } from '../../libreria/supabase';
 
 export default function CancioneroPage() {
-    return <CancioneroView supabase={supabase} />;
+    return <VistaCancionero supabase={supabase} />;
 }
+

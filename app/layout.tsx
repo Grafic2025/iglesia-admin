@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Providers from "@/components/Providers";
-import { AdminProvider } from "../context/AdminContext";
-import MainLayout from "@/components/MainLayout";
+import Proveedores from "@/componentes/Proveedores";
+import { AdminProvider } from "../contextos/ContextoAdmin";
+import DisenoPrincipal from "@/componentes/DisenoPrincipal";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Iglesia del Salvador | Admin Panel",
-  description: "Panel de administración para la Iglesia del Salvador",
+  description: "Panel de administradoristración para la Iglesia del Salvador",
 };
 
 export default function RootLayout({
@@ -30,14 +30,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-[#A8D500] selection:text-black`}
       >
-        <Providers>
+        <Proveedores>
           <AdminProvider>
-            <MainLayout>
+            <DisenoPrincipal>
               {children}
-            </MainLayout>
+            </DisenoPrincipal>
           </AdminProvider>
-        </Providers>
+        </Proveedores>
       </body>
     </html>
   );
 }
+

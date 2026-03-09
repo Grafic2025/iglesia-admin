@@ -1,17 +1,17 @@
 'use client';
-import React from 'react';
-import AgendaConfigView from '../../components/views/AgendaConfigView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaConfigAgenda from '../../componentes/vistas/VistaConfigAgenda';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function AgendaConfigPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <AgendaConfigView
+        <VistaConfigAgenda
             supabase={supabase}
-            horariosDisponibles={admin.horariosDisponibles}
-            fetchHorarios={admin.fetchHorarios}
-            registrarAuditoria={admin.registrarAuditoria}
+            horariosDisponibles={administrador.horariosDisponibles}
+            fetchHorarios={administrador.obtenerHorarios}
+            registrarAuditoria={administrador.registrarAuditoria}
         />
     );
 }
+

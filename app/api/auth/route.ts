@@ -7,12 +7,12 @@ export async function POST(request: Request) {
 
         // Comparamos la contraseña en el servidor, no en el cliente.
         // Usamos la variable de entorno del lado del servidor (sin NEXT_PUBLIC_)
-        const adminPassword = process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
+        const administradorPassword = process.env.ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD;
 
-        if (password === adminPassword) {
+        if (password === administradorPassword) {
             // Set rigorous HTTP-only cookie for middleware validation
             const cookieStore = await cookies();
-            cookieStore.set('admin_auth_token', 'verified', {
+            cookieStore.set('administrador_autenticacion_token', 'verified', {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
@@ -26,3 +26,4 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: false, error: 'Error processing request' }, { status: 500 });
     }
 }
+

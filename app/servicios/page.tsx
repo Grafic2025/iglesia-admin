@@ -1,16 +1,16 @@
 'use client';
-import React from 'react';
-import ServiciosView from '../../components/views/ServiciosView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaServicios from '../../componentes/vistas/VistaServicios';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function ServiciosPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <ServiciosView
+        <VistaServicios
             supabase={supabase}
-            enviarNotificacionIndividual={admin.enviarNotificacionIndividual}
-            registrarAuditoria={admin.registrarAuditoria}
+            enviarNotificacionIndividual={administrador.enviarNotificacionIndividual}
+            registrarAuditoria={administrador.registrarAuditoria}
         />
     );
 }
+

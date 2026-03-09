@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function PrivacyPolicy() {
     return (
         <div className="min-h-screen bg-[#0d0d0d] text-white p-8 md:p-20 font-sans">
@@ -96,3 +94,4 @@ export default function PrivacyPolicy() {
         </div>
     );
 }
+

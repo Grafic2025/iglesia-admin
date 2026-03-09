@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/libreria/supabase';
 
 export async function GET(req: Request) {
   // 1. Verificar token de seguridad
@@ -45,9 +45,9 @@ export async function GET(req: Request) {
         for (const p of upcoming) {
           const mIds = (p.equipo_ids || []).map((m: any) => m.miembro_id).filter(Boolean);
           if (mIds.length > 0) {
-            const { data: members } = await supabaseAdmin.from('miembros').select('token_notificacion').in('id', mIds).not('token_notificacion', 'is', null);
-            if (members && members.length > 0) {
-              const tokens = members.map((m: any) => m.token_notificacion).filter(Boolean);
+            const { data: miembros } = await supabaseAdmin.from('miembros').select('token_notificacion').in('id', mIds).not('token_notificacion', 'is', null);
+            if (miembros && miembros.length > 0) {
+              const tokens = miembros.map((m: any) => m.token_notificacion).filter(Boolean);
               if (tokens.length > 0) {
                 const msg = `💬 ¡Chat Abierto! Ya podés coordinar el servicio del ${new Date(p.fecha + 'T12:00:00').toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}.`;
                 await sendToExpo(tokens, '🙌 Equipo de Servicio', msg, { type: 'plan_chat', planId: p.id });
@@ -122,11 +122,11 @@ export async function GET(req: Request) {
 
 async function sendToExpo(tokens: string[], title: string, body: string, data: any) {
   try {
-    const notifications = tokens.map((t: string) => ({ to: t, title, body, data, sound: 'default' }));
+    const notificaciones = tokens.map((t: string) => ({ to: t, title, body, data, sound: 'default' }));
     const response = await fetch('https://exp.host/--/api/v2/push/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(notifications),
+      body: JSON.stringify(notificaciones),
     });
     return response.ok;
   } catch (e) {

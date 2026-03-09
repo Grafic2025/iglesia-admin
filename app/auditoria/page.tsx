@@ -1,9 +1,9 @@
 'use client';
-import React from 'react';
-import AuditoriaView from '../../components/views/AuditoriaView';
-import { useAdminContext } from '../../context/AdminContext';
+import VistaAuditoria from '../../componentes/vistas/VistaAuditoria';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
 
 export default function AuditoriaPage() {
-    const admin = useAdminContext();
-    return <AuditoriaView logs={admin.auditLogs} />;
+    const administrador = useContextoAdmin();
+    return <VistaAuditoria logs={administrador.logsAuditoria} />;
 }
+

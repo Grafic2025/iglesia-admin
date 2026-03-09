@@ -1,15 +1,15 @@
 'use client';
-import React from 'react';
-import AlertasView from '../../components/views/AlertasView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaAlertas from '../../componentes/vistas/VistaAlertas';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function AlertasPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <AlertasView
+        <VistaAlertas
             supabase={supabase}
-            registrarAuditoria={admin.registrarAuditoria}
+            registrarAuditoria={administrador.registrarAuditoria}
         />
     );
 }
+

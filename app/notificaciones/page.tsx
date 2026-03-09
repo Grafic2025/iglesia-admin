@@ -1,35 +1,35 @@
 'use client';
-import React from 'react';
-import NotificacionesView from '../../components/views/NotificacionesView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaNotificaciones from '../../componentes/vistas/VistaNotificaciones';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function NotificacionesPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <NotificacionesView
-            tituloPush={admin.tituloPush}
-            setTituloPush={admin.setTituloPush}
-            mensajePush={admin.mensajePush}
-            setMensajePush={admin.setMensajePush}
-            imageUrlPush={admin.imageUrlPush}
-            setImageUrlPush={admin.setImageUrlPush}
-            filtroHorario={admin.filtroHorario}
-            setFiltroHorario={admin.setFiltroHorario}
-            enviarNotificacion={admin.enviarNotificacion}
-            enviando={admin.enviando}
-            notificacionStatus={admin.notificacionStatus}
-            cronogramas={admin.cronogramas}
-            eliminarProgramacion={admin.eliminarProgramacion}
-            fetchProgramaciones={admin.fetchCronogramas}
+        <VistaNotificaciones
+            tituloPush={administrador.tituloPush}
+            setTituloPush={administrador.establecerTituloPush}
+            mensajePush={administrador.mensajePush}
+            setMensajePush={administrador.establecerMensajePush}
+            imageUrlPush={administrador.urlImagenPush}
+            setImageUrlPush={administrador.establecerUrlImagenPush}
+            filtroHorario={administrador.filtroHorario}
+            setFiltroHorario={administrador.establecerFiltroHorario}
+            enviarNotificacion={administrador.enviarNotificacion}
+            enviando={administrador.estaEnviando}
+            notificacionStatus={administrador.estadoNotificacion}
+            cronogramas={administrador.cronogramas}
+            eliminarProgramacion={administrador.eliminarProgramacion}
+            fetchProgramaciones={administrador.obtenerCronogramas}
             supabase={supabase}
-            logs={admin.logs}
-            logsError={admin.logsError}
-            horariosDisponibles={admin.horariosDisponibles}
-            registrarAuditoria={admin.registrarAuditoria}
-            typePush={admin.typePush}
-            setTypePush={admin.setTypePush}
-            loading={admin.logsLoading}
+            logs={administrador.logs}
+            logsError={administrador.errorLogs}
+            horariosDisponibles={administrador.horariosDisponibles}
+            registrarAuditoria={administrador.registrarAuditoria}
+            typePush={administrador.tipoPush}
+            setTypePush={administrador.establecerTipoPush}
+            loading={administrador.logsCargando}
         />
     );
 }
+

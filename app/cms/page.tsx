@@ -1,20 +1,20 @@
 'use client';
-import React from 'react';
-import CMSView from '../../components/views/CMSView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaCMS from '../../componentes/vistas/VistaCMS';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function CMSPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
-        <CMSView
-            noticias={admin.noticias}
-            syncYouTube={admin.syncYouTube}
-            eliminarNoticia={admin.eliminarNoticia}
+        <VistaCMS
+            noticias={administrador.noticias}
+            syncYouTube={administrador.sincronizarYouTube}
+            eliminarNoticia={administrador.eliminarNoticia}
             supabase={supabase}
-            fetchNoticias={admin.fetchNoticias}
-            registrarAuditoria={admin.registrarAuditoria}
-            enviarPushGeneral={admin.enviarPushGeneral}
+            fetchNoticias={administrador.obtenerNoticias}
+            registrarAuditoria={administrador.registrarAuditoria}
+            enviarPushGeneral={administrador.enviarPushGeneral}
         />
     );
 }
+

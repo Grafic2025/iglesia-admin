@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/libreria/supabase';
 
 export async function POST(req: Request) {
   try {
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     if (tokens.length === 0) return NextResponse.json({ error: 'Sin tokens válidos' }, { status: 400 });
 
     // 2. PREPARAR NOTIFICACIONES
-    const notifications = tokens.map(token => {
+    const notificaciones = tokens.map(token => {
       const notification: any = {
         to: token,
         sound: 'default',
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
         'Content-Type': 'application/json',
         ...(process.env.EXPO_ACCESS_TOKEN ? { 'Authorization': `Bearer ${process.env.EXPO_ACCESS_TOKEN}` } : {})
       },
-      body: JSON.stringify(notifications),
+      body: JSON.stringify(notificaciones),
     });
 
     const expoData = await response.json();
@@ -118,3 +118,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

@@ -1,22 +1,22 @@
 'use client';
-import React from 'react';
-import DashboardView from '../components/views/DashboardView';
-import { useAdminContext } from '../context/AdminContext';
+import VistaPanel from '../componentes/vistas/VistaPanel';
+import { useContextoAdmin } from '../contextos/ContextoAdmin';
 
 export default function DashboardPage() {
-  const admin = useAdminContext();
+  const administrador = useContextoAdmin();
 
   return (
-    <DashboardView
-      asistencias={admin.asistencias}
-      asistencias7dias={admin.asistencias7dias}
-      oracionesActivas={admin.oracionesActivas}
-      nuevosMes={admin.nuevosMes}
-      crecimientoAnual={admin.crecimientoAnual}
-      horariosReunion={admin.horariosDisponibles}
-      miembros={admin.miembros}
-      bautismos={admin.bautismos}
-      ayuda={admin.ayuda}
+    <VistaPanel
+      asistencias={administrador.asistencias}
+      asistencias7dias={administrador.asistencias7dias}
+      oracionesActivas={administrador.oracionesActivas}
+      nuevosMes={administrador.nuevosMes}
+      crecimientoAnual={administrador.crecimientoAnual}
+      horariosReunion={administrador.horariosDisponibles}
+      miembros={administrador.miembros}
+      bautismos={administrador.bautismos}
+      ayuda={administrador.ayuda}
     />
   );
 }
+

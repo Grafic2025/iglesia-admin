@@ -1,16 +1,16 @@
 'use client';
-import React from 'react';
-import EquiposView from '../../components/views/EquiposView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import EquiposView from '../../componentes/vistas/EquiposView';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function EquiposPage() {
-    const admin = useAdminContext();
+    const administrador = useContextoAdmin();
     return (
         <EquiposView
             supabase={supabase}
-            registrarAuditoria={admin.registrarAuditoria}
-            enviarNotificacionIndividual={admin.enviarNotificacionIndividual}
+            registrarAuditoria={administrador.registrarAuditoria}
+            enviarNotificacionIndividual={administrador.enviarNotificacionIndividual}
         />
     );
 }
+

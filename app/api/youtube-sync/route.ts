@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/libreria/supabase';
 
 export const dynamic = 'force-dynamic'; // Evitar caché forzado por Next.js
 
@@ -100,3 +100,4 @@ export async function GET(req: Request) {
         }, { status: 500 });
     }
 }
+

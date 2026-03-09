@@ -1,10 +1,10 @@
 'use client';
-import React from 'react';
-import BotView from '../../components/views/BotView';
-import { useAdminContext } from '../../context/AdminContext';
-import { supabase } from '../../lib/supabase';
+import VistaBot from '../../componentes/vistas/VistaBot';
+import { useContextoAdmin } from '../../contextos/ContextoAdmin';
+import { supabase } from '../../libreria/supabase';
 
 export default function BotPage() {
-    const admin = useAdminContext();
-    return <BotView supabase={supabase} registrarAuditoria={admin.registrarAuditoria} />;
+    const administrador = useContextoAdmin();
+    return <VistaBot supabase={supabase} registrarAuditoria={administrador.registrarAuditoria} />;
 }
+
