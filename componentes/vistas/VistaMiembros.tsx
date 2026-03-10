@@ -43,6 +43,7 @@ const VistaMiembros = ({
         handleBusqueda,
         handleFiltro,
         toggleServerStatus,
+        resetearPin,
         totalPages,
         paginatedData
     } = usarVistaMiembros({
@@ -108,6 +109,7 @@ const VistaMiembros = ({
             <ModalPerfilMiembro
                 member={selectedMember}
                 onClose={() => setSelectedMember(null)}
+                resetearPin={resetearPin}
             />
         </div >
     );

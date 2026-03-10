@@ -4,9 +4,10 @@ import { X, User } from 'lucide-react';
 interface ModalPerfilMiembroProps {
     member: any;
     onClose: () => void;
+    resetearPin?: (id: string, nombre: string) => void;
 }
 
-const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose }) => {
+const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose, resetearPin }) => {
     if (!member) return null;
 
     return (
@@ -47,6 +48,14 @@ const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose
                         <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${member.miembros?.es_servidor ? 'bg-[#A8D50020] text-[#A8D500] border border-[#A8D50030]' : 'bg-[#222] text-[#555]'}`}>
                             {member.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
                         </div>
+                        {resetearPin && (
+                            <button
+                                onClick={() => resetearPin(member.miembro_id, `${member.miembros?.nombre} ${member.miembros?.apellido}`)}
+                                className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-black uppercase hover:bg-red-500/20 transition-colors"
+                            >
+                                Resetear PIN
+                            </button>
+                        )}
                     </div>
                     {member.miembros?.created_at && (
                         <p className="text-[#555] text-xs text-center border-t border-[#333] pt-4">

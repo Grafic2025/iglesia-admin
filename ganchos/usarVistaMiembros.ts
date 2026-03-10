@@ -55,6 +55,22 @@ export function usarVistaMiembros({
         }
     };
 
+    const resetearPin = async (miembroId: string, nombreCompleto: string) => {
+        if (!confirm(`¿Seguro quieres resetear el PIN de ${nombreCompleto}? Podrá crear uno nuevo la próxima vez que intente ingresar.`)) return;
+        const { error } = await supabase.from('miembros').update({ pin: null }).eq('id', miembroId);
+
+        if (!error) {
+            alert('PIN reseteado correctamente');
+            await fetchAsistencias();
+            await fetchMiembros();
+            if (registrarAuditoria) {
+                await registrarAuditoria('RESETEAR PIN', nombreCompleto);
+            }
+        } else {
+            alert("Error: " + error.message);
+        }
+    };
+
     return {
         page,
         setPage,
@@ -63,6 +79,7 @@ export function usarVistaMiembros({
         handleBusqueda,
         handleFiltro,
         toggleServerStatus,
+        resetearPin,
         totalPages,
         paginatedData
     };

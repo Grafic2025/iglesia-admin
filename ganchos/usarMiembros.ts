@@ -30,11 +30,25 @@ export const usarMiembros = () => {
         return { error };
     }, [recargar]);
 
+    const resetearPin = useCallback(async (id: string) => {
+        if (!confirm('¿Seguro quieres resetear el PIN de este miembro? Podrá crear uno nuevo al ingresar.')) return;
+        const { error } = await supabase
+            .from('miembros')
+            .update({ pin: null })
+            .eq('id', id);
+        if (!error) {
+            alert('PIN reseteado correctamente');
+            await recargar();
+        }
+        return { error };
+    }, [recargar]);
+
     return {
         miembros: miembros || ARRAY_VACIO,
         cargando: estaCargando || estaBuscando,
         obtenerMiembros: useCallback(async () => { await recargar(); }, [recargar]),
-        alternarEstadoServidor
+        alternarEstadoServidor,
+        resetearPin
     };
 };
 

@@ -45,7 +45,7 @@ const CabeceraAdmin: React.FC = () => {
                             type="date"
                             value={fechaSeleccionada}
                             onChange={(e) => establecerFechaSeleccionada(e.target.value)}
-                            className="bg-transparent text-white px-3 py-1.5 rounded-lg focus:outline-none text-sm font-medium"
+                            className="bg-transparent text-white px-3 py-1.5 rounded-lg focus:outline-none text-sm font-medium [color-scheme:dark]"
                         />
                         {activeTab === 'miembros' && (
                             <>

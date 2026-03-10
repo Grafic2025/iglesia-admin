@@ -38,7 +38,7 @@ const ModalExportar: React.FC<ModalExportarProps> = ({
                             type="date"
                             value={exportStart}
                             onChange={(e) => setExportStart(e.target.value)}
-                            className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                            className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50 [color-scheme:dark]"
                         />
                     </div>
                     <div>
@@ -47,7 +47,7 @@ const ModalExportar: React.FC<ModalExportarProps> = ({
                             type="date"
                             value={exportEnd}
                             onChange={(e) => setExportEnd(e.target.value)}
-                            className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50"
+                            className="w-full bg-[#161616] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:ring-1 focus:ring-red-500/50 [color-scheme:dark]"
                         />
                     </div>
                     <div className="flex gap-3 pt-4">
