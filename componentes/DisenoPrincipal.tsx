@@ -9,7 +9,12 @@ export default function DisenoPrincipal({ children }: { children: React.ReactNod
     const administrador = useContextoAdmin();
 
     return (
-        <div className="flex h-screen bg-[#121212] text-white overflow-hidden font-sans selection:bg-[#A8D500]/30 selection:text-white">
+        <div className="flex h-screen bg-[#0F0F0F] text-white overflow-hidden font-sans selection:bg-[#A8D500]/30 selection:text-white relative">
+            {/* Efectos de Brillo (Fondo) */}
+            <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-[#A8D500]/[0.03] blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-[#A8D500]/[0.02] blur-[120px] pointer-events-none"></div>
+            <div className="absolute top-[30%] right-[-10%] w-[30%] h-[30%] rounded-full bg-indigo-500/[0.03] blur-[120px] pointer-events-none"></div>
+
             <BarraLateral onLogout={administrador.manejarCerrarSesion} />
             <main className="flex-1 flex flex-col overflow-hidden relative">
                 <CabeceraAdmin />
