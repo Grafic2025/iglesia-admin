@@ -33,11 +33,11 @@ export const usarNoticias = () => {
             const datos = await respuesta.json();
             if (datos.success) {
                 await obtenerNoticias();
-                return { exito: true };
+                return { success: true };
             }
-            return { exito: false, error: datos.error };
+            return { success: false, error: datos.error };
         } catch (error) {
-            return { exito: false, error: 'Error de conexión' };
+            return { success: false, error: 'Error de conexión' };
         }
     }, [obtenerNoticias]);
 
