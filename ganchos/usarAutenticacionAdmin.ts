@@ -40,7 +40,7 @@ export function usarAdminAuth() {
             clearTimeout(temporizadorInactividad);
             eventos.forEach(e => window.removeEventListener(e, reiniciarTemporizador));
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [autorizado]);
 
     const manejarInicioSesion = async (e: React.FormEvent) => {

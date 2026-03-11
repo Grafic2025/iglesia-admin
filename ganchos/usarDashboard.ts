@@ -77,7 +77,7 @@ export function usarDashboard({
 
             // Calcular diferencia en "días aproximados" en el año actual
             let diffMes = mesNac - hoyMes;
-            let diffDia = diaNac - hoyDia;
+            const diffDia = diaNac - hoyDia;
 
             // Si el cumpleaños ya pasó este año, sumamos 12 meses para el proxy de ordenamiento
             if (diffMes < 0 || (diffMes === 0 && diffDia < 0)) {

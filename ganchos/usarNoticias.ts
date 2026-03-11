@@ -24,7 +24,7 @@ export const usarNoticias = () => {
 
     const sincronizarYouTube = useCallback(async () => {
         try {
-            const token = process.env.NEXT_PUBLIC_CRON_SECRET || 'iglesia_administrador_cron_2025';
+            const token = process.env.NEXT_PUBLIC_CRON_SECRET || 'iglesia_admin_cron_2025';
             if (!token) {
                 console.error("Token de sincronización no configurado");
                 return { exito: false, error: 'Configuración de seguridad faltante' };

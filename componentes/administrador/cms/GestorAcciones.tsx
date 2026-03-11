@@ -114,7 +114,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
             activa: true
         };
 
-        let newList = [...acciones];
+        const newList = [...acciones];
         if (editIndex !== null) {
             newList[editIndex] = newAction;
         } else {

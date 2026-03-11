@@ -60,6 +60,11 @@ export function usarCMS({
     };
 
     const handleSave = async () => {
+        if (imagenUrl.startsWith('data:') || imagenUrl.length > 1000) {
+            alert("La URL de la imagen es inválida o demasiado larga. Por favor, utiliza el botón '+' para subir una imagen o pega una URL válida de internet.");
+            return;
+        }
+
         const payload = {
             titulo,
             descripcion,
