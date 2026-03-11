@@ -14,15 +14,15 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
         <div className="bg-[#1e1e1e] border border-white/5 rounded-2xl p-6 shadow-xl flex flex-col h-full">
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-500/10 rounded-xl">
-                        <History size={20} className="text-indigo-400" />
+                    <div className="p-2 bg-[#A8D500]/10 rounded-xl">
+                        <History size={20} className="text-[#A8D500]" />
                     </div>
                     <div>
                         <h3 className="text-white font-bold tracking-widest text-sm uppercase">Auditoría Reciente</h3>
                         <p className="text-[#888] text-[10px] uppercase font-bold">Actividad de administradores</p>
                     </div>
                 </div>
-                <Link href="/auditoria" className="text-[10px] text-indigo-400 font-bold uppercase hover:underline">Ver Todo</Link>
+                <Link href="/auditoria" className="text-[10px] text-[#A8D500] font-bold uppercase hover:underline">Ver Todo</Link>
             </div>
 
             <div className="flex-1 space-y-3">

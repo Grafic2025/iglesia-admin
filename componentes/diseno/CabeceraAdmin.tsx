@@ -29,7 +29,7 @@ const CabeceraAdmin: React.FC = () => {
                 >
                     <Menu size={24} />
                 </button>
-                <div className="hidden sm:block h-10 w-1.5 bg-indigo-600 rounded-full"></div>
+                <div className="hidden sm:block h-10 w-1.5 bg-[#A8D500] rounded-full shadow-[0_0_15px_rgba(168,213,0,0.3)]"></div>
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
@@ -51,7 +51,7 @@ const CabeceraAdmin: React.FC = () => {
                             <>
                                 <button
                                     onClick={exportarCSV}
-                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-indigo-600/20"
+                                    className="bg-[#A8D500] hover:bg-[#c5ff00] text-black px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-[#A8D500]/20"
                                 >
                                     Exportar Hoy
                                 </button>
@@ -72,7 +72,7 @@ const CabeceraAdmin: React.FC = () => {
 
                 <button
                     onClick={manejarCerrarSesion}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-indigo-500/10 text-gray-400 hover:text-indigo-400 transition-all border border-white/5"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-[#A8D500]/10 text-gray-400 hover:text-[#A8D500] transition-all border border-white/5"
                 >
                     <LogOut size={18} />
                     <span className="text-sm font-bold">Salir</span>
