@@ -16,6 +16,7 @@ import {
     ShieldAlert,
     Bot,
     ClipboardList,
+    Video,
     X,
 } from 'lucide-react';
 
@@ -39,6 +40,7 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
         { id: 'solicitudes', label: 'Solicitudes', icon: ClipboardList },
         { id: 'alertas', label: 'Retención (Alertas)', icon: ShieldAlert },
         { id: 'cms', label: 'Contenido', icon: ImageIcon },
+        { id: 'videos', label: 'Videoteca', icon: Video },
         { id: 'servicios', label: 'Plan de Culto', icon: Calendar },
         { id: 'equipos', label: 'Equipos/Servir', icon: Users2 },
         { id: 'cancionero', label: 'Cancionero', icon: Music },
