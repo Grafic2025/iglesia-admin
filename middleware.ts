@@ -12,6 +12,8 @@ export function middleware(request: NextRequest) {
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api/autenticacion') ||
         pathname.startsWith('/favicon.ico') ||
+        pathname.startsWith('/videos_config.json') ||
+        pathname.startsWith('/ver.html') ||
         pathname.includes('.') // Archivos estáticos
     ) {
         return NextResponse.next();
@@ -25,7 +27,8 @@ export function middleware(request: NextRequest) {
     // o simplemente dejar que carguen "/" y ContextoAdmin mostrará el cuadro de Login.
     // Sin embargo, si intentan acceder a "/miembros" directamente sin un token,
     // podemos redirigirlos de vuelta a "/" para ingresar la contraseña.
-    if (!hasAuthToken && pathname !== '/') {
+    const isPublicFile = pathname === '/videos_config.json' || pathname === '/ver.html';
+    if (!hasAuthToken && pathname !== '/' && !isPublicFile) {
         return NextResponse.redirect(new URL('/', request.url));
     }
 
@@ -42,6 +45,6 @@ export const config = {
          * - _next/image (archivos de optimización de imágenes)
          * - favicon.ico (archivo de favicon)
          */
-        '/((?!api/autenticacion|_next/static|_next/image|favicon.ico|.*\\.).*)',
+        '/((?!api/autenticacion|videos_config.json|ver.html|_next/static|_next/image|favicon.ico|.*\\.).*)',
     ],
 };
