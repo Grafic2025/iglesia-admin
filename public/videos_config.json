@@ -1,0 +1,27 @@
+{
+  "predicas": [
+    { "id": "TrbgzzYroR8", "titulo": "Esenciales | El Prójimo", "descripcion": "Descubrí el llamado bíblico de amar y servir a quienes nos rodean.", "fecha": "2024-03-05" },
+    { "id": "ajYJitRcmNM", "titulo": "Esenciales | Dones", "descripcion": "Descubrí cómo Dios ha equipado a su iglesia con herramientas espirituales.", "fecha": "2024-02-26" },
+    { "id": "-A4WkBh8Pbc", "titulo": "Esenciales | Identidad", "descripcion": "Comprendé tu verdadera identidad en Cristo.", "fecha": "2024-02-19" },
+    { "id": "RY2A-EqvPSo", "titulo": "Esenciales | Los Atributos De Dios", "descripcion": "Un viaje profundo a través del carácter de Dios.", "fecha": "2024-02-12" },
+    { "id": "1WEbEMosr4Y", "titulo": "Esenciales | La Trinidad", "descripcion": "Exploramos el misterio de la Trinidad: Padre, Hijo y Espíritu Santo.", "fecha": "2024-02-05" },
+    { "id": "8N10Cm1eYrM", "titulo": "Esenciales | El Señor", "descripcion": "Reconocer el señorío de Cristo en cada área de nuestras vidas.", "fecha": "2024-01-29" },
+    { "id": "_xXHimF8LYA", "titulo": "Esenciales | La Segunda Venida", "descripcion": "Nuestra mayor esperanza: la promesa del regreso de nuestro Salvador.", "fecha": "2024-01-22" },
+    { "id": "GuIwcWzk9Po", "titulo": "Esenciales | La Iglesia", "descripcion": "Somos un organismo vivo y familia de la fe llamados a cambiar el mundo.", "fecha": "2024-01-15" },
+    { "id": "qT7N-PNa_0o", "titulo": "Esenciales | La Oración y La Palabra", "descripcion": "Los nutrientes vitales del creyente.", "fecha": "2024-01-08" },
+    { "id": "1l7d7ZYzXCQ", "titulo": "Esenciales | El Salvador", "descripcion": "Volver a la base fundamental de nuestra fe: la obra redentora de Jesús.", "fecha": "2024-01-01" }
+  ],
+  "podcasts": [
+    { "id": "1l7d7ZYzXCQ", "titulo": "Episodio 01 | El Salvador", "descripcion": "Volver a la base fundamental de nuestra fe.", "fecha": "2024-01-01" },
+    { "id": "qT7N-PNa_0o", "titulo": "Episodio 02 | La Oración y La Palabra", "descripcion": "Cómo fortalecer nuestra comunicación íntima con el Padre.", "fecha": "2024-01-08" },
+    { "id": "GuIwcWzk9Po", "titulo": "Episodio 03 | La Iglesia", "descripcion": "Familia de la fe llamados a cambiar el mundo.", "fecha": "2024-01-15" },
+    { "id": "_xXHimF8LYA", "titulo": "Episodio 04 | La Segunda Venida", "descripcion": "La promesa inquebrantable del regreso de nuestro Salvador.", "fecha": "2024-01-22" },
+    { "id": "8N10Cm1eYrM", "titulo": "Episodio 05 | El Señor", "descripcion": "Reconocer el señorío de Cristo en cada área de nuestras vidas.", "fecha": "2024-01-29" },
+    { "id": "1WEbEMosr4Y", "titulo": "Episodio 06 | La Trinidad", "descripcion": "Padre, Hijo y Espíritu Santo en perfecta unidad.", "fecha": "2024-02-05" },
+    { "id": "RY2A-EqvPSo", "titulo": "Episodio 07 | Los Atributos De Dios", "descripcion": "Conociendo su santidad, gracia, amor y justicia.", "fecha": "2024-02-12" },
+    { "id": "-A4WkBh8Pbc", "titulo": "Episodio 08 | Identidad", "descripcion": "Fuiste diseñado por Dios con un propósito eterno.", "fecha": "2024-02-19" },
+    { "id": "ajYJitRcmNM", "titulo": "Episodio 09 I Dones", "descripcion": "Herramientas espirituales para servir y edificar el cuerpo de Cristo.", "fecha": "2024-02-26" },
+    { "id": "TrbgzzYroR8", "titulo": "Episodio 10 | El Prójimo", "descripcion": "Amar y servir a quienes nos rodean, reflejando el amor de Cristo.", "fecha": "2024-03-05" }
+  ],
+  "playlistId": "PL9eGAPSt61HBxiNwoXIG0xpaWzf0aNTuC"
+}

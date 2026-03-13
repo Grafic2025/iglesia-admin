@@ -11,6 +11,7 @@ export function middleware(request: NextRequest) {
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api/autenticacion') ||
+        pathname.startsWith('/api/videos-config') ||
         pathname.startsWith('/favicon.ico') ||
         pathname.startsWith('/videos_config.json') ||
         pathname.startsWith('/ver.html') ||
@@ -45,6 +46,6 @@ export const config = {
          * - _next/image (archivos de optimización de imágenes)
          * - favicon.ico (archivo de favicon)
          */
-        '/((?!api/autenticacion|videos_config.json|ver.html|_next/static|_next/image|favicon.ico|.*\\.).*)',
+        '/((?!api/autenticacion|api/videos-config|videos_config.json|ver.html|_next/static|_next/image|favicon.ico|.*\\.).*)',
     ],
 };
