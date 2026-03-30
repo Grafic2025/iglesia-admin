@@ -8,6 +8,12 @@ export function usarAdminAuth() {
     const [intentosInicioSesion, establecerIntentosInicioSesion] = useState(0);
     const [inicioSesionBloqueado, establecerInicioSesionBloqueado] = useState(false);
     const [temporizadorBloqueo, establecerTemporizadorBloqueo] = useState(0);
+    const [modoRecuperacion, establecerModoRecuperacion] = useState(false);
+    const [pasoRecuperacion, establecerPasoRecuperacion] = useState(1); // 1: Email, 2: Código/Nueva Clave
+    const [emailRecuperacion, establecerEmailRecuperacion] = useState('');
+    const [codigoRecuperacion, establecerCodigoRecuperacion] = useState('');
+    const [nuevaContrasena, establecerNuevaContrasena] = useState('');
+    const [cargandoRecuperacion, establecerCargandoRecuperacion] = useState(false);
 
     useEffect(() => {
         const estaAutenticado = localStorage.getItem('administrador_autenticacion');
@@ -96,6 +102,49 @@ export function usarAdminAuth() {
         establecerContrasena('');
     };
 
+    const solicitarCodigo = async (e: React.FormEvent) => {
+        e.preventDefault();
+        establecerCargandoRecuperacion(true);
+        try {
+            const res = await fetch('/api/autenticacion/recuperar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailRecuperacion })
+            });
+            const data = await res.json();
+            if (data.success) {
+                establecerPasoRecuperacion(2);
+                alert('Código de seguridad enviado a tu email (Si lo registraste)');
+            } else throw new Error(data.error);
+        } catch (error: any) {
+            alert('Error: ' + error.message);
+        } finally {
+            establecerCargandoRecuperacion(false);
+        }
+    };
+
+    const resetearPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        establecerCargandoRecuperacion(true);
+        try {
+            const res = await fetch('/api/autenticacion/recuperar', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailRecuperacion, codigo: codigoRecuperacion, nuevaPassword: nuevaContrasena })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('¡Contraseña actualizada con éxito! Ya puedes entrar.');
+                establecerModoRecuperacion(false);
+                establecerPasoRecuperacion(1);
+            } else throw new Error(data.error);
+        } catch (error: any) {
+            alert('Error: ' + error.message);
+        } finally {
+            establecerCargandoRecuperacion(false);
+        }
+    };
+
     return {
         autorizado,
         usuario,
@@ -105,7 +154,14 @@ export function usarAdminAuth() {
         inicioSesionBloqueado,
         temporizadorBloqueo,
         manejarInicioSesion,
-        manejarCerrarSesion
+        manejarCerrarSesion,
+        // Recuperación
+        modoRecuperacion, establecerModoRecuperacion,
+        pasoRecuperacion, establecerPasoRecuperacion,
+        emailRecuperacion, establecerEmailRecuperacion,
+        codigoRecuperacion, establecerCodigoRecuperacion,
+        nuevaContrasena, establecerNuevaContrasena,
+        solicitarCodigo, resetearPassword, cargandoRecuperacion
     };
 }
 

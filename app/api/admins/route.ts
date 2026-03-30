@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
     try {
         const payload = await request.json();
-        const { id, usuario, password, rol, menus_permitidos } = payload;
+        const { id, usuario, email, password, rol, menus_permitidos } = payload;
 
         if (password) {
             payload.password_hash = await bcrypt.hash(password, 10);
@@ -19,6 +19,7 @@ export async function POST(request: Request) {
                 .from('admin_usuarios')
                 .update({ 
                     usuario, 
+                    email,
                     rol, 
                     menus_permitidos,
                     ...(payload.password_hash ? { password_hash: payload.password_hash } : {})
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
                 .from('admin_usuarios')
                 .insert([{
                     usuario,
+                    email,
                     password_hash: payload.password_hash,
                     rol,
                     menus_permitidos

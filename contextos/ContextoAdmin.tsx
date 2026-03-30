@@ -18,6 +18,18 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
                 handleLogin={administrador.manejarInicioSesion}
                 loginLocked={administrador.inicioSesionBloqueado}
                 lockTimer={administrador.temporizadorBloqueo}
+                modoRecuperacion={administrador.modoRecuperacion}
+                setModoRecuperacion={administrador.establecerModoRecuperacion}
+                pasoRecuperacion={administrador.pasoRecuperacion}
+                emailRecuperacion={administrador.emailRecuperacion}
+                setEmailRecuperacion={administrador.establecerEmailRecuperacion}
+                codigoRecuperacion={administrador.codigoRecuperacion}
+                setCodigoRecuperacion={administrador.establecerCodigoRecuperacion}
+                nuevaContrasena={administrador.nuevaContrasena}
+                setNuevaContrasena={administrador.establecerNuevaContrasena}
+                solicitarCodigo={administrador.solicitarCodigo}
+                resetearPassword={administrador.resetearPassword}
+                cargandoRecuperacion={administrador.cargandoRecuperacion}
             />
         );
     }

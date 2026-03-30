@@ -23,7 +23,19 @@ export async function POST(request: Request) {
         }
 
         // Verificación de contraseña segura con bcrypt
-        const passwordCorrecta = await bcrypt.compare(password, user.password_hash);
+        let passwordCorrecta = false;
+        
+        // Primero intentamos con bcrypt
+        try {
+            passwordCorrecta = await bcrypt.compare(password, user.password_hash);
+        } catch (e) {
+            // Si falla bcrypt (ej: no es un hash), no hacemos nada
+        }
+
+        // Fallback para contraseñas antiguas en texto plano
+        if (!passwordCorrecta && password === user.password_hash) {
+            passwordCorrecta = true;
+        }
         
         if (passwordCorrecta) {
             // Set rigorous HTTP-only cookie for middleware validation

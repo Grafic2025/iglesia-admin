@@ -7,6 +7,7 @@ interface AdminUser {
     id: string;
     usuario: string;
     rol: string;
+    email?: string;
     menus_permitidos: string[];
 }
 
@@ -38,6 +39,7 @@ export default function AdminsPage() {
     const [formPassword, setFormPassword] = useState('');
     const [formRol, setFormRol] = useState('editor');
     const [formMenus, setFormMenus] = useState<string[]>([]);
+    const [formEmail, setFormEmail] = useState('');
 
     useEffect(() => {
         const info = localStorage.getItem('admin_user_info');
@@ -55,7 +57,7 @@ export default function AdminsPage() {
         setLoading(true);
         const { data, error } = await supabase
             .from('admin_usuarios')
-            .select('id, usuario, rol, menus_permitidos');
+            .select('id, usuario, rol, email, menus_permitidos');
         
         if (!error && data) setUsuarios(data);
         setLoading(false);
@@ -75,6 +77,7 @@ export default function AdminsPage() {
         const payload: any = {
             usuario: formUsuario,
             rol: formRol,
+            email: formEmail,
             menus_permitidos: formMenus
         };
 
@@ -125,12 +128,14 @@ export default function AdminsPage() {
         if (user) {
             setEditingUser(user);
             setFormUsuario(user.usuario);
+            setFormEmail(user.email || '');
             setFormPassword('');
             setFormRol(user.rol);
             setFormMenus(user.menus_permitidos || []);
         } else {
             setEditingUser(null);
             setFormUsuario('');
+            setFormEmail('');
             setFormPassword('');
             setFormRol('editor');
             setFormMenus([]);
@@ -180,6 +185,7 @@ export default function AdminsPage() {
                                         {u.rol}
                                     </span>
                                 </div>
+                                {u.email && <p className="text-[10px] text-white/30 truncate max-w-[150px]">{u.email}</p>}
                             </div>
                         </div>
 
@@ -231,6 +237,17 @@ export default function AdminsPage() {
                                     />
                                 </div>
                                 <div>
+                                    <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-2 px-1">Email de Recuperación</label>
+                                    <input 
+                                        required 
+                                        value={formEmail} 
+                                        onChange={e => setFormEmail(e.target.value)} 
+                                        type="email" 
+                                        placeholder="ejemplo@correo.com"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
+                                    />
+                                </div>
+                                <div className="col-span-2 md:col-span-1">
                                     <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-2 px-1">Contraseña {editingUser && '(Dejar vacío p/ no cambiar)'}</label>
                                     <input 
                                         required={!editingUser} 
