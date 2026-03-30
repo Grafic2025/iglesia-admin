@@ -53,13 +53,13 @@ const ModalSelectorPlantilla: React.FC<ModalSelectorPlantillaProps> = ({ onSelec
                         <button
                             key={t.name}
                             onClick={() => onSelectTemplate(t)}
-                            className="w-full flex items-center justify-between p-5 bg-[#222] border border-[#333] rounded-2xl hover:border-[var(--accent)] hover:bg-[var(--accent)10] group transition-all"
+                            className="w-full flex items-center justify-between p-5 bg-[#222] border border-[#333] rounded-2xl hover:border-accent hover:bg-[var(--accent)10] group transition-all"
                         >
                             <div className="text-left">
                                 <p className="text-white font-bold text-lg">{t.name}</p>
                                 <p className="text-[rgba(255,255,255,0.5)] text-xs font-bold uppercase tracking-wider">{t.plan.length} momentos definidos</p>
                             </div>
-                            <ChevronRight className="text-[#333] group-hover:text-[var(--accent)]" />
+                            <ChevronRight className="text-[#333] group-hover:text-accent" />
                         </button>
                     ))}
                 </div>

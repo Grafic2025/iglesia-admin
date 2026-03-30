@@ -31,7 +31,7 @@ const ListaNoticias: React.FC<ListaNoticiasProps> = ({ noticias, syncYouTube, on
                     <div key={n.id} className="bg-[#1e1e1e] p-3 rounded-2xl border border-[#2a2a2a] flex items-center gap-4 group hover:border-[#FFB40050] transition-all">
                         <div className="relative shrink-0">
                             <img src={n.imagen_url} className="w-12 h-12 rounded-xl object-cover bg-[#151515] border border-[#2a2a2a] shadow-inner" alt="" />
-                            {n.activa && <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[var(--accent)] border-2 border-[#1e1e1e] shadow-sm" />}
+                            {n.activa && <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-accent border-2 border-[#1e1e1e] shadow-sm" />}
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                             <div className="text-white text-sm font-bold truncate group-hover:text-[#FFB400] transition-colors uppercase tracking-wide">{n.titulo}</div>

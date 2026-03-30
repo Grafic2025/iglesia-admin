@@ -11,7 +11,7 @@ const GraficoAsistencia: React.FC<GraficoAsistenciaProps> = ({ data, onBarClick 
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
             <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
-                <LucideBarChart size={18} className="text-[var(--accent)]" /> Tendencia: Últimos 7 Días
+                <LucideBarChart size={18} className="text-accent" /> Tendencia: Últimos 7 Días
             </h3>
             <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height={250}>

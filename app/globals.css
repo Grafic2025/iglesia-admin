@@ -3,14 +3,14 @@
 :root {
   --background: #ffffff;
   --foreground: #000000;
-  --accent: var(--accent);
+  --accent: #A8D500;
+  --color-accent: var(--accent);
   --accent-foreground: #000000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-accent: var(--accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -26,14 +26,13 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
-  font-weight: 500; /* Bolder by default for visibility */
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   overflow: hidden;
 }
 
-/* Scrollbar personalizada para toda la app admin */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -52,13 +51,11 @@ body {
   background: #444;
 }
 
-/* Para Firefox */
 * {
   scrollbar-width: thin;
   scrollbar-color: #333 #121212;
 }
 
-/* Ocultar scrollbar pero mantener funcionalidad */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

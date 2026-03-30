@@ -29,7 +29,7 @@ const CabeceraAdmin: React.FC = () => {
                 >
                     <Menu size={24} />
                 </button>
-                <div className="hidden sm:block h-10 w-1.5 bg-[var(--accent)] rounded-full shadow-[0_0_15px_rgba(168,213,0,0.3)]"></div>
+                <div className="hidden sm:block h-10 w-1.5 bg-accent rounded-full shadow-[0_0_15px_rgba(168,213,0,0.3)]"></div>
                 <div>
                     <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
@@ -51,7 +51,7 @@ const CabeceraAdmin: React.FC = () => {
                             <>
                                 <button
                                     onClick={exportarCSV}
-                                    className="bg-[var(--accent)] hover:bg-[#c5ff00] text-black px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-[var(--accent)]/20"
+                                    className="bg-accent hover:bg-[#c5ff00] text-black px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-[var(--accent)]/20"
                                 >
                                     Exportar Hoy
                                 </button>

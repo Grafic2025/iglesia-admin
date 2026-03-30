@@ -24,7 +24,7 @@ const VistaConfigAgenda = ({ supabase, horariosDisponibles, fetchHorarios, regis
             <div className="bg-[#1E1E1E] p-8 rounded-3xl border border-[#333]">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="p-3 bg-[var(--accent)15] rounded-2xl">
-                        <Clock className="text-[var(--accent)]" size={24} />
+                        <Clock className="text-accent" size={24} />
                     </div>
                     <div>
                         <h2 className="text-white text-xl font-bold">Horarios de Reunión</h2>
@@ -38,11 +38,11 @@ const VistaConfigAgenda = ({ supabase, horariosDisponibles, fetchHorarios, regis
                             type="time"
                             value={newHorario}
                             onChange={(e) => setNewHorario(e.target.value)}
-                            className="flex-1 bg-[#252525] border border-[#333] rounded-2xl px-6 py-4 text-white outline-none focus:border-[var(--accent)] transition-all [color-scheme:dark]"
+                            className="flex-1 bg-[#252525] border border-[#333] rounded-2xl px-6 py-4 text-white outline-none focus:border-accent transition-all [color-scheme:dark]"
                         />
                         <button
                             onClick={handleAdd}
-                            className="bg-[var(--accent)] text-black font-black px-8 py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95 flex items-center gap-2"
+                            className="bg-accent text-black font-black px-8 py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95 flex items-center gap-2"
                         >
                             <Plus size={20} /> AGREGAR
                         </button>
@@ -52,7 +52,7 @@ const VistaConfigAgenda = ({ supabase, horariosDisponibles, fetchHorarios, regis
                         {horariosDisponibles.sort().map((h) => (
                             <div key={h} className="group flex items-center justify-between p-4 bg-[#252525] rounded-2xl border border-[#333] hover:border-[var(--accent)50] transition-all">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-2 h-2 rounded-full bg-[var(--accent)]"></div>
+                                    <div className="w-2 h-2 rounded-full bg-accent"></div>
                                     <span className="text-white font-bold text-lg">{h} HS</span>
                                 </div>
                                 <button

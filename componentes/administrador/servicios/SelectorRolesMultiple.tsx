@@ -30,7 +30,7 @@ const SelectorRolesMultiple: React.FC<SelectorRolesMultipleProps> = ({ roleCateg
                     e.stopPropagation();
                     setIsOpen(!isOpen);
                 }}
-                className="bg-black/20 hover:bg-black/40 transition-colors text-[var(--accent)] text-[10px] uppercase font-bold px-2 py-1.5 rounded-lg border border-[var(--accent)]/30 cursor-pointer flex items-center justify-between min-w-[140px] max-w-[200px]"
+                className="bg-black/20 hover:bg-black/40 transition-colors text-accent text-[10px] uppercase font-bold px-2 py-1.5 rounded-lg border border-accent/30 cursor-pointer flex items-center justify-between min-w-[140px] max-w-[200px]"
             >
                 <span className="truncate">{displayText}</span>
                 <ChevronDown size={12} className="shrink-0 ml-1" />
@@ -55,7 +55,7 @@ const SelectorRolesMultiple: React.FC<SelectorRolesMultipleProps> = ({ roleCateg
                                                 onChange([...selectedRoles.filter(sr => sr !== 'Servidor'), r]);
                                             }
                                         }}
-                                        className={`px-3 py-2 text-[10px] font-bold uppercase cursor-pointer flex items-center justify-between transition-colors ${isSelected ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-white hover:bg-[#222]'
+                                        className={`px-3 py-2 text-[10px] font-bold uppercase cursor-pointer flex items-center justify-between transition-colors ${isSelected ? 'bg-accent/10 text-accent' : 'text-white hover:bg-[#222]'
                                             }`}
                                     >
                                         <span className="truncate">{r}</span>

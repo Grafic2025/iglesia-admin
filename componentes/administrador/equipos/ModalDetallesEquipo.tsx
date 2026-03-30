@@ -34,10 +34,10 @@ const ModalDetallesEquipo: React.FC<ModalDetallesEquipoProps> = ({
 
                 <div className="p-6 max-h-[60vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-4">
-                        <h4 className="text-white font-bold text-sm uppercase tracking-widest text-[var(--accent)]">Lista de Miembros</h4>
+                        <h4 className="text-white font-bold text-sm uppercase tracking-widest text-accent">Lista de Miembros</h4>
                         <button
                             onClick={onAddMember}
-                            className="bg-[var(--accent)] text-black text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2"
+                            className="bg-accent text-black text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2"
                         >
                             <UserPlus size={14} /> ASIGNAR MIEMBRO
                         </button>
@@ -59,7 +59,7 @@ const ModalDetallesEquipo: React.FC<ModalDetallesEquipoProps> = ({
                                         </div>
                                         <div>
                                             <p className="text-white font-bold text-sm">{tm.miembros.nombre} {tm.miembros.apellido}</p>
-                                            <p className="text-[var(--accent)] text-[10px] font-bold uppercase tracking-wider">{tm.rol}</p>
+                                            <p className="text-accent text-[10px] font-bold uppercase tracking-wider">{tm.rol}</p>
                                         </div>
                                     </div>
                                     <button

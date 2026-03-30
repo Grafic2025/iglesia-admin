@@ -19,7 +19,7 @@ export const EstadisticasMiembros = ({ stats }: EstadisticasMiembrosProps) => {
                 <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-bold uppercase mt-1">Miembros Activos</p>
             </div>
             <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">
-                <p className="text-2xl font-bold text-[var(--accent)]">{totalServidores}</p>
+                <p className="text-2xl font-bold text-accent">{totalServidores}</p>
                 <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-bold uppercase mt-1">Servidores</p>
             </div>
             <div className="bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] text-center">

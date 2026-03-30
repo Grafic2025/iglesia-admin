@@ -36,7 +36,7 @@ const TarjetaEquipo: React.FC<TarjetaEquipoProps> = ({ team, onSelect, onToggleB
                 {team.bloqueado && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black">BLOQUEADO</span>}
             </h4>
             <p className="text-[rgba(255,255,255,0.7)] text-sm mb-4">{team.miembros} Voluntarios</p>
-            <div className="text-[var(--accent)] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="text-accent text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {team.bloqueado ? 'EQUIPO EN MANTENIMIENTO' : 'VER VOLUNTARIOS'} <Plus size={12} />
             </div>
         </div>

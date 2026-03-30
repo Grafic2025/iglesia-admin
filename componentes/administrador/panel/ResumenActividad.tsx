@@ -12,7 +12,7 @@ const ResumenActividad: React.FC<ResumenActividadProps> = ({ oracionesActivas, n
         <div className="grid grid-cols-1 gap-6">
             <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
                 <h3 className="text-white/90 text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest">
-                    <Users2 size={18} className="text-[var(--accent)]" /> Resumen de Actividad
+                    <Users2 size={18} className="text-accent" /> Resumen de Actividad
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="p-4 bg-[#111] rounded-2xl border border-[#222] text-center">
@@ -25,7 +25,7 @@ const ResumenActividad: React.FC<ResumenActividadProps> = ({ oracionesActivas, n
                     </div>
                     <div className="p-4 bg-[#111] rounded-2xl border border-[#222] text-center">
                         <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-black uppercase tracking-widest mb-1">Asistencia Hoy</p>
-                        <p className="text-3xl font-black text-[var(--accent)]">{asistenciaHoy}</p>
+                        <p className="text-3xl font-black text-accent">{asistenciaHoy}</p>
                     </div>
                 </div>
             </div>

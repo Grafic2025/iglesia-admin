@@ -50,7 +50,7 @@ const PremiosMiembros: React.FC<PremiosMiembrosProps> = ({ premiosPendientes, pr
                                                 <span className="text-[10px] font-bold" style={{ color: rl.color }}>🔥 {m.racha}</span>
                                             </div>
                                             {yaEntregado ? (
-                                                <span className="text-[var(--accent)]">✅</span>
+                                                <span className="text-accent">✅</span>
                                             ) : (
                                                 <button
                                                     onClick={() => marcarComoEntregado(m.id, rl.level, `${m.nombre} ${m.apellido}`)}

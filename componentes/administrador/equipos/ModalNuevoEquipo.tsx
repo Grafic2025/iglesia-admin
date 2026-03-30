@@ -31,7 +31,7 @@ const ModalNuevoEquipo: React.FC<ModalNuevoEquipoProps> = ({
                             value={newTeamName}
                             onChange={(e) => setNewTeamName(e.target.value)}
                             placeholder="Ej: Staff, Bienvenida..."
-                            className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                            className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                         />
                     </div>
                     <div>
@@ -41,7 +41,7 @@ const ModalNuevoEquipo: React.FC<ModalNuevoEquipoProps> = ({
                                 <button
                                     key={emoji}
                                     onClick={() => setNewTeamIcon(emoji)}
-                                    className={`p-3 text-2xl rounded-xl border transition-all ${newTeamIcon === emoji ? 'bg-[var(--accent)] border-[var(--accent)]' : 'bg-[#222] border-[#333] hover:border-[rgba(255,255,255,0.5)]'}`}
+                                    className={`p-3 text-2xl rounded-xl border transition-all ${newTeamIcon === emoji ? 'bg-accent border-accent' : 'bg-[#222] border-[#333] hover:border-[rgba(255,255,255,0.5)]'}`}
                                 >
                                     {emoji}
                                 </button>
@@ -58,7 +58,7 @@ const ModalNuevoEquipo: React.FC<ModalNuevoEquipoProps> = ({
                         <button
                             onClick={onCreate}
                             disabled={!newTeamName.trim()}
-                            className="flex-1 bg-[var(--accent)] text-black font-bold py-3 rounded-xl hover:shadow-[0_0_15px_rgba(168,213,0,0.3)] disabled:opacity-50 transition-all"
+                            className="flex-1 bg-accent text-black font-bold py-3 rounded-xl hover:shadow-[0_0_15px_rgba(168,213,0,0.3)] disabled:opacity-50 transition-all"
                         >
                             CREAR
                         </button>

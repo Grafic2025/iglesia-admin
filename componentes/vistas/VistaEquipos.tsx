@@ -72,13 +72,13 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual, reg
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Users2 className="text-[var(--accent)]" /> EQUIPOS Y VOLUNTARIOS
+                        <Users2 className="text-accent" /> EQUIPOS Y VOLUNTARIOS
                     </h2>
                     <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Gestión de servidores y cronogramas de servicio</p>
                 </div>
                 <button
                     onClick={() => setShowModalNuevoEquipo(true)}
-                    className="bg-[var(--accent)] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
+                    className="bg-accent text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
                 >
                     <Plus size={18} /> NUEVO EQUIPO
                 </button>

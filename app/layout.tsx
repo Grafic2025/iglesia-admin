@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-[var(--accent)] selection:text-black`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased selection:bg-accent selection:text-black`}
       >
         <Proveedores>
           <AdminProvider>

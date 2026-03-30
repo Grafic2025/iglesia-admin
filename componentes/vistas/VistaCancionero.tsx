@@ -41,13 +41,13 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Music className="text-[var(--accent)]" /> CANCIONERO
+                        <Music className="text-accent" /> CANCIONERO
                     </h2>
                     <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Librería de canciones, acordes y recursos musicales</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-[var(--accent)] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
+                    className="bg-accent text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
                 >
                     <Plus size={18} /> NUEVA CANCIÓN
                 </button>
@@ -61,7 +61,7 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
                             placeholder="Buscar por título o artista..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full bg-[#252525] border border-[#333] rounded-xl pl-10 pr-4 py-2.5 text-white outline-none focus:border-[var(--accent)] transition-all"
+                            className="w-full bg-[#252525] border border-[#333] rounded-xl pl-10 pr-4 py-2.5 text-white outline-none focus:border-accent transition-all"
                         />
                     </div>
                     <select

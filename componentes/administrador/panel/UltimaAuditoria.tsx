@@ -17,12 +17,12 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
     return (
         <div className="bg-[#1a1a1a] border border-white/5 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden h-full">
             {/* Fondo decorativo */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[var(--accent)]/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-64 h-64 bg-accent/[0.02] rounded-full blur-[80px] pointer-events-none"></div>
             
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-[var(--accent)]/10 rounded-2xl border border-[var(--accent)]/20 shadow-[0_0_20px_rgba(var(--accent-rgb),0.1)]">
-                        <History size={24} className="text-[var(--accent)]" />
+                    <div className="p-3 bg-accent/10 rounded-2xl border border-accent/20 shadow-[0_0_20px_rgba(var(--accent-rgb),0.1)]">
+                        <History size={24} className="text-accent" />
                     </div>
                     <div>
                         <h3 className="text-xl font-black tracking-tight text-white uppercase italic leading-none">Actividad Reciente</h3>
@@ -46,15 +46,15 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
                     logsAuditoria.map((log) => (
                         <div 
                             key={log.id} 
-                            className="group flex items-start gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 hover:border-[var(--accent)]/30 rounded-2xl transition-all duration-300"
+                            className="group flex items-start gap-4 p-4 bg-white/[0.02] hover:bg-white/[0.05] border border-white/5 hover:border-accent/30 rounded-2xl transition-all duration-300"
                         >
-                            <div className="mt-1 p-2 bg-white/5 rounded-lg group-hover:bg-[var(--accent)]/20 group-hover:text-[var(--accent)] transition-colors">
+                            <div className="mt-1 p-2 bg-white/5 rounded-lg group-hover:bg-accent/20 group-hover:text-accent transition-colors">
                                 <User size={14} className="opacity-60" />
                             </div>
                             
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-xs font-black text-[var(--accent)] uppercase tracking-wider truncate">
+                                    <span className="text-xs font-black text-accent uppercase tracking-wider truncate">
                                         {log.accion}
                                     </span>
                                     <div className="flex items-center gap-1 text-[10px] text-white/20 font-medium whitespace-nowrap">

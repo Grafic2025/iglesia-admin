@@ -39,7 +39,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 value={titulo}
                                 onChange={(e) => setTitulo(e.target.value)}
                                 placeholder="Ej: La Bondad de Dios"
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             />
                         </div>
                         <div className="col-span-2">
@@ -49,7 +49,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 value={artista}
                                 onChange={(e) => setArtista(e.target.value)}
                                 placeholder="Ej: Bethel Music"
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             />
                         </div>
                         <div>
@@ -57,7 +57,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             <select
                                 value={tono}
                                 onChange={(e) => setTono(e.target.value)}
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             >
                                 {keys.map(k => <option key={k} value={k}>{k}</option>)}
                             </select>
@@ -69,7 +69,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 value={bpm}
                                 onChange={(e) => setBpm(e.target.value)}
                                 placeholder="Ej: 72"
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             />
                         </div>
                         <div className="col-span-2">
@@ -79,7 +79,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 value={youtubeUrl}
                                 onChange={(e) => setYoutubeUrl(e.target.value)}
                                 placeholder="https://youtube.com/watch?v=..."
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             />
                         </div>
                         <div className="col-span-2">
@@ -89,7 +89,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 value={pdfUrl}
                                 onChange={(e) => setPdfUrl(e.target.value)}
                                 placeholder="Link a Drive, Dropbox o URL del PDF..."
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent"
                             />
                         </div>
                         <div className="col-span-2">
@@ -109,7 +109,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                                 onChange={(e) => setAcordes(e.target.value)}
                                 placeholder="[C] Dios de [F] amor..."
                                 rows={6}
-                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)] font-mono text-sm"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-accent font-mono text-sm"
                             />
                         </div>
                     </div>
@@ -124,7 +124,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                     </button>
                     <button
                         onClick={onSave}
-                        className="flex-1 bg-[var(--accent)] text-black font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all"
+                        className="flex-1 bg-accent text-black font-bold py-4 rounded-2xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all"
                     >
                         {currentSong ? 'GUARDAR CAMBIOS' : 'CREAR CANCIÓN'}
                     </button>

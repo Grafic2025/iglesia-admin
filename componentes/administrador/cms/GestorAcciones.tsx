@@ -146,7 +146,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h3 className="text-white font-black text-xl flex items-center gap-2 tracking-tight">
-                        <GripVertical className="text-[var(--accent)]" /> Accesos Directos
+                        <GripVertical className="text-accent" /> Accesos Directos
                         <span className="text-[rgba(255,255,255,0.5)] font-medium text-sm">(Menú App)</span>
                     </h3>
                     <p className="text-[rgba(255,255,255,0.6)] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
@@ -154,13 +154,13 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
                         onClick={restoreDefaults}
-                        className="flex-1 sm:flex-none bg-[#222] text-[var(--accent)] px-3 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#2a2a2a] transition-all border border-[var(--accent)]/10"
+                        className="flex-1 sm:flex-none bg-[#222] text-accent px-3 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#2a2a2a] transition-all border border-accent/10"
                     >
                         <RefreshCw size={14} /> TRAER TARJETAS ACTUALES
                     </button>
                     <button
                         onClick={openAdd}
-                        className="flex-1 sm:flex-none bg-[var(--accent)] text-black px-4 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#b0f000] transition-all shadow-lg shadow-[var(--accent)20]"
+                        className="flex-1 sm:flex-none bg-accent text-black px-4 py-2 rounded-xl text-[10px] font-black flex items-center justify-center gap-2 hover:bg-[#b0f000] transition-all shadow-lg shadow-[var(--accent)20]"
                     >
                         <Plus size={16} /> AGREGAR NUEVA
                     </button>
@@ -171,7 +171,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                 {acciones.length === 0 && (
                     <div className="col-span-full py-16 text-center border-2 border-dashed border-[#222] rounded-3xl bg-[#1a1a1a]/50">
                         <p className="text-[#444] italic mb-4 text-sm font-medium">No hay tarjetas personalizadas aún.</p>
-                        <button onClick={restoreDefaults} className="bg-[var(--accent)] text-black px-4 py-2 rounded-lg text-[10px] font-black hover:scale-105 transition-transform">CARGAR VALORES POR DEFECTO</button>
+                        <button onClick={restoreDefaults} className="bg-accent text-black px-4 py-2 rounded-lg text-[10px] font-black hover:scale-105 transition-transform">CARGAR VALORES POR DEFECTO</button>
                     </div>
                 )}
                 {acciones.map((a, index) => (
@@ -184,11 +184,11 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                     <ImageIcon size={18} className="text-[#333]" />
                                 )}
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                    <span className="text-[var(--accent)] font-black text-[9px] uppercase tracking-tighter">{a.icono}</span>
+                                    <span className="text-accent font-black text-[9px] uppercase tracking-tighter">{a.icono}</span>
                                 </div>
                             </div>
                             <div className="flex-1 min-w-0 pr-2">
-                                <h4 className="text-white font-bold text-sm uppercase tracking-wide group-hover:text-[var(--accent)] transition-colors leading-tight">{a.titulo}</h4>
+                                <h4 className="text-white font-bold text-sm uppercase tracking-wide group-hover:text-accent transition-colors leading-tight">{a.titulo}</h4>
                                 <div className="flex items-center gap-1.5 opacity-60 mt-0.5">
                                     <LinkIcon size={10} className="text-[rgba(255,255,255,0.7)] shrink-0" />
                                     <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold tracking-widest uppercase truncate">{a.pantalla}</p>
@@ -202,7 +202,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                     <button
                                         onClick={() => onPromote(a)}
                                         title="Promocionar a Noticia"
-                                        className="p-1.5 text-[var(--accent)] hover:bg-[var(--accent)15] rounded-lg transition-colors"
+                                        className="p-1.5 text-accent hover:bg-[var(--accent)15] rounded-lg transition-colors"
                                     >
                                         <Megaphone size={14} />
                                     </button>
@@ -221,7 +221,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
 
             <div className="bg-[var(--accent)10] p-4 rounded-3xl border border-[var(--accent)20] flex gap-3">
                 <div className="w-8 h-8 rounded-full bg-[var(--accent)20] flex items-center justify-center shrink-0">
-                    <Info className="text-[var(--accent)]" size={16} />
+                    <Info className="text-accent" size={16} />
                 </div>
                 <p className="text-[10px] text-[rgba(255,255,255,0.7)] leading-normal font-medium">
                     <strong className="text-white">Tip Estético:</strong> Estos botones se muestran de a dos en la App. Mantén los títulos cortos y las URLs de imagen de buena calidad (Unsplash recomendado) para que el inicio de tu App luzca increíble.
@@ -243,7 +243,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                 value={titulo}
                                 onChange={e => setTitulo(e.target.value)}
                                 placeholder="Ej: Agenda de Eventos"
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent"
                             />
                         </div>
 
@@ -254,7 +254,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                     value={icono}
                                     onChange={e => setIcono(e.target.value)}
                                     placeholder="Ej: calendar"
-                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]"
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent"
                                 />
                             </div>
                             <div>
@@ -262,7 +262,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                 <select
                                     value={esMci ? 'mci' : 'fa'}
                                     onChange={e => setEsMci(e.target.value === 'mci')}
-                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]"
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent"
                                 >
                                     <option value="fa">FontAwesome</option>
                                     <option value="mci">MaterialCommunityIcons</option>
@@ -276,7 +276,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                 value={pantalla}
                                 onChange={e => setPantalla(e.target.value)}
                                 placeholder="Ej: Agenda o https://..."
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent"
                             />
                         </div>
 
@@ -286,7 +286,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                 value={imagenUrl}
                                 onChange={e => setImagenUrl(e.target.value)}
                                 placeholder="https://images.unsplash.com/..."
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[var(--accent)]"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-accent"
                             />
                         </div>
 
@@ -295,7 +295,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                             <button
                                 onClick={saveAction}
                                 disabled={saving || !titulo || !icono || !pantalla}
-                                className="flex-1 py-3 bg-[var(--accent)] text-black font-bold rounded-xl shadow-lg shadow-[var(--accent)30] disabled:opacity-50"
+                                className="flex-1 py-3 bg-accent text-black font-bold rounded-xl shadow-lg shadow-[var(--accent)30] disabled:opacity-50"
                             >
                                 {saving ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
                             </button>

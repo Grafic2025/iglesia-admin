@@ -26,9 +26,9 @@ const TablaMiembros = ({
                         return (
                             <tr key={a.id} className="hover:bg-white/[0.03] transition-all group cursor-pointer relative" onClick={() => setSelectedMember(a)}>
                                 <td className="px-6 py-4">
-                                    <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-[var(--accent)] opacity-0 group-hover:opacity-100 transition-opacity rounded-r-full"></div>
+                                    <div className="absolute left-0 top-1/4 bottom-1/4 w-1 bg-accent opacity-0 group-hover:opacity-100 transition-opacity rounded-r-full"></div>
                                     <div className="font-black text-white text-sm">{a.miembros?.nombre} {a.miembros?.apellido}</div>
-                                    {esNuevo && <span className="mt-1 inline-block bg-[var(--accent)] text-black text-[9px] font-black px-2 py-0.5 rounded-full tracking-tighter">NUEVO</span>}
+                                    {esNuevo && <span className="mt-1 inline-block bg-accent text-black text-[9px] font-black px-2 py-0.5 rounded-full tracking-tighter">NUEVO</span>}
                                 </td>
                                 <td className="px-6 py-4">
                                     <span className={`text-[10px] font-black px-3 py-1 rounded-full border ${a.horario_reunion === 'Extraoficial' ? 'bg-[#FFB400]/20 border-[#FFB400]/40 text-[#FFB400]' : 'bg-white/5 border-white/10 text-white/60'
@@ -39,10 +39,10 @@ const TablaMiembros = ({
                                 <td className="px-6 py-4 text-white/80 text-sm font-bold text-center">{a.hora_entrada}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center justify-center gap-1.5">
-                                        <span className={a.racha >= 4 ? 'text-[var(--accent)]' : 'text-white/40'}>
+                                        <span className={a.racha >= 4 ? 'text-accent' : 'text-white/40'}>
                                             {a.racha >= 4 ? '🔥' : '📍'}
                                         </span>
-                                        <span className={`font-black text-sm ${a.racha >= 4 ? 'text-[var(--accent)]' : 'text-white/60'}`}>
+                                        <span className={`font-black text-sm ${a.racha >= 4 ? 'text-accent' : 'text-white/60'}`}>
                                             {a.racha}
                                         </span>
                                     </div>
@@ -52,7 +52,7 @@ const TablaMiembros = ({
                                         {a.miembros?.token_notificacion && (
                                             <button
                                                 onClick={() => enviarNotificacionIndividual(a.miembros.token_notificacion, `${a.miembros.nombre} ${a.miembros.apellido}`)}
-                                                className="p-2.5 rounded-xl bg-white/5 text-[var(--accent)] hover:bg-[var(--accent)] hover:text-black transition-all border border-white/5 shadow-lg"
+                                                className="p-2.5 rounded-xl bg-white/5 text-accent hover:bg-accent hover:text-black transition-all border border-white/5 shadow-lg"
                                                 title="Enviar mensaje personal"
                                             >
                                                 <Send size={16} />
@@ -60,7 +60,7 @@ const TablaMiembros = ({
                                         )}
                                         <button
                                             onClick={() => toggleServerStatus(a.miembro_id, `${a.miembros.nombre} ${a.miembros.apellido}`, a.miembros?.es_servidor)}
-                                            className={`p-2.5 rounded-xl border transition-all shadow-lg ${a.miembros?.es_servidor ? 'bg-[var(--accent)] text-black border-[var(--accent)]/50' : 'bg-white/5 text-white/30 border-white/5 hover:text-[var(--accent)] hover:border-[var(--accent)]/30'}`}
+                                            className={`p-2.5 rounded-xl border transition-all shadow-lg ${a.miembros?.es_servidor ? 'bg-accent text-black border-accent/50' : 'bg-white/5 text-white/30 border-white/5 hover:text-accent hover:border-accent/30'}`}
                                             title={a.miembros?.es_servidor ? "Quitar Acceso Servidor" : "Dar Acceso Servidor"}
                                         >
                                             <UserCircle size={16} />

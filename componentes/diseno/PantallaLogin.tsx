@@ -70,7 +70,7 @@ const PantallaLogin = ({
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
                             placeholder="Tu nombre de usuario"
-                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-bold"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold"
                             disabled={loginLocked}
                         />
                     </div>
@@ -83,7 +83,7 @@ const PantallaLogin = ({
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/50 transition-all font-bold"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all font-bold"
                             disabled={loginLocked}
                         />
                     </div>
@@ -92,7 +92,7 @@ const PantallaLogin = ({
                         disabled={loginLocked}
                         className={`w-full p-4 rounded-xl font-black text-lg transition-all transform active:scale-95 ${loginLocked
                             ? 'bg-gray-800 text-white/20 cursor-not-allowed border border-white/5'
-                            : 'bg-[var(--accent)] hover:bg-[#bbf000] text-black shadow-[0_4px_20px_-5px_rgba(168,213,0,0.4)]'
+                            : 'bg-accent hover:bg-[#bbf000] text-black shadow-[0_4px_20px_-5px_rgba(168,213,0,0.4)]'
                             }`}
                     >
                         {loginLocked ? `Bloqueado (${lockTimer}s)` : 'Entrar al Panel'}
@@ -103,7 +103,7 @@ const PantallaLogin = ({
                     <div className="mt-6 text-center">
                         <button 
                             onClick={() => setModoRecuperacion(true)}
-                            className="text-white/50 hover:text-[var(--accent)] text-xs font-bold uppercase tracking-widest transition-colors"
+                            className="text-white/50 hover:text-accent text-xs font-bold uppercase tracking-widest transition-colors"
                         >
                             ¿Olvidaste tu contraseña?
                         </button>
@@ -133,13 +133,13 @@ const PantallaLogin = ({
                                         value={emailRecuperacion}
                                         onChange={(e) => setEmailRecuperacion?.(e.target.value)}
                                         placeholder="ejemplo@correo.com"
-                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white outline-none focus:border-[var(--accent)]"
+                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white outline-none focus:border-accent"
                                     />
                                 </div>
                                 <button 
                                     disabled={cargandoRecuperacion}
                                     type="submit"
-                                    className="w-full py-4 bg-[var(--accent)] text-black font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-transform"
+                                    className="w-full py-4 bg-accent text-black font-black uppercase tracking-widest rounded-xl hover:scale-105 transition-transform"
                                 >
                                     {cargandoRecuperacion ? 'Enviando...' : 'Solicitar Código'}
                                 </button>
@@ -155,7 +155,7 @@ const PantallaLogin = ({
                                         value={codigoRecuperacion}
                                         onChange={(e) => setCodigoRecuperacion?.(e.target.value)}
                                         placeholder="123456"
-                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white text-center text-2xl font-black tracking-[10px] outline-none focus:border-[var(--accent)]"
+                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white text-center text-2xl font-black tracking-[10px] outline-none focus:border-accent"
                                     />
                                 </div>
                                 <div>
@@ -166,7 +166,7 @@ const PantallaLogin = ({
                                         value={nuevaContrasena}
                                         onChange={(e) => setNuevaContrasena?.(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white outline-none focus:border-[var(--accent)]"
+                                        className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white outline-none focus:border-accent"
                                     />
                                 </div>
                                 <button 

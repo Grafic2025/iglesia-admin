@@ -63,7 +63,7 @@ export default function BuscadorGlobal() {
         <div className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] px-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="w-full max-w-xl bg-[#111] border border-white/10 rounded-3xl shadow-[0_30px_100px_rgba(0,0,0,0.8)] overflow-hidden animate-in zoom-in-95 duration-200">
                 <div className="flex items-center gap-4 px-6 py-5 border-b border-white/5">
-                    <Search className="text-[var(--accent)]" size={20} />
+                    <Search className="text-accent" size={20} />
                     <input
                         ref={inputRef}
                         value={busqueda}
@@ -84,10 +84,10 @@ export default function BuscadorGlobal() {
                                 key={item.id}
                                 onClick={() => manejarNavegacion(item.path)}
                                 onMouseEnter={() => setIndice(i)}
-                                className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${i === indice ? 'bg-[var(--accent)] text-black shadow-lg shadow-[var(--accent)]/20' : 'text-white/60 hover:bg-white/5'}`}
+                                className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${i === indice ? 'bg-accent text-black shadow-lg shadow-[var(--accent)]/20' : 'text-white/60 hover:bg-white/5'}`}
                             >
                                 <div className="flex items-center gap-4">
-                                    <div className={i === indice ? 'text-black' : 'text-[var(--accent)]'}>
+                                    <div className={i === indice ? 'text-black' : 'text-accent'}>
                                         {item.icon}
                                     </div>
                                     <div>

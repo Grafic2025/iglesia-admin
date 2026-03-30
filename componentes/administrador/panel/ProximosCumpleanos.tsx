@@ -48,7 +48,7 @@ const ProximosCumpleanos = ({ cumpleanos }: ProximosCumpleanosProps) => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <p className="text-white font-bold text-sm truncate">{m.nombre} {m.apellido}</p>
-                                    <p className="text-[10px] text-[var(--accent)] uppercase font-black tracking-wider">
+                                    <p className="text-[10px] text-accent uppercase font-black tracking-wider">
                                         {fechaStr}
                                     </p>
                                 </div>

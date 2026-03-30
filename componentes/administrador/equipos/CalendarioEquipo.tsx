@@ -20,7 +20,7 @@ const CalendarioEquipo: React.FC<CalendarioEquipoProps> = ({
         <div className="lg:col-span-1 bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden">
             <div className="p-4 bg-[#222] border-b border-[#333] flex items-center justify-between">
                 <h3 className="text-white font-bold text-sm uppercase tracking-widest flex items-center gap-2">
-                    <CalendarIcon size={16} className="text-[var(--accent)]" /> Calendario
+                    <CalendarIcon size={16} className="text-accent" /> Calendario
                 </h3>
                 <div className="flex gap-2">
                     <button onClick={() => {
@@ -53,7 +53,7 @@ const CalendarioEquipo: React.FC<CalendarioEquipoProps> = ({
                                 key={day}
                                 onClick={() => daySchedule && onSelectDate(daySchedule)}
                                 className={`aspect-square flex items-center justify-center text-[10px] rounded-lg border transition-all ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] z-10' : ''
-                                    } ${daySchedule ? 'bg-[var(--accent)] text-black font-bold border-transparent hover:scale-110' : 'text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[rgba(255,255,255,0.5)]'
+                                    } ${daySchedule ? 'bg-accent text-black font-bold border-transparent hover:scale-110' : 'text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[rgba(255,255,255,0.5)]'
                                     }`}
                             >
                                 {day}

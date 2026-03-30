@@ -15,11 +15,11 @@ const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose
             <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] shadow-2xl overflow-hidden text-left" onClick={(e) => e.stopPropagation()}>
                 <div className="p-6 border-b border-[#333] flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-[#252525] rounded-full flex items-center justify-center border-2 border-[var(--accent)] overflow-hidden">
+                        <div className="w-14 h-14 bg-[#252525] rounded-full flex items-center justify-center border-2 border-accent overflow-hidden">
                             {member.miembros?.foto_url ? (
                                 <img src={member.miembros.foto_url} alt="" className="w-full h-full object-cover" />
                             ) : (
-                                <User className="text-[var(--accent)]" size={24} />
+                                <User className="text-accent" size={24} />
                             )}
                         </div>
                         <div>
@@ -32,7 +32,7 @@ const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose
                 <div className="p-8 space-y-6">
                     <div className="grid grid-cols-3 gap-4">
                         <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
-                            <p className="text-3xl font-black text-[var(--accent)]">{member.racha >= 4 ? '🔥' : ''}{member.racha}</p>
+                            <p className="text-3xl font-black text-accent">{member.racha >= 4 ? '🔥' : ''}{member.racha}</p>
                             <p className="text-white/60 text-[10px] font-black uppercase tracking-tighter mt-1">Racha</p>
                         </div>
                         <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
@@ -45,7 +45,7 @@ const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose
                         </div>
                     </div>
                     <div className="flex gap-4">
-                        <div className={`flex-1 p-4 rounded-2xl text-center text-xs font-black uppercase tracking-widest border transition-all ${member.miembros?.es_servidor ? 'bg-[var(--accent)]/10 text-[var(--accent)] border-[var(--accent)]/30 shadow-[0_0_20px_rgba(168,213,0,0.1)]' : 'bg-white/5 text-white/30 border-white/5'}`}>
+                        <div className={`flex-1 p-4 rounded-2xl text-center text-xs font-black uppercase tracking-widest border transition-all ${member.miembros?.es_servidor ? 'bg-accent/10 text-accent border-accent/30 shadow-[0_0_20px_rgba(168,213,0,0.1)]' : 'bg-white/5 text-white/30 border-white/5'}`}>
                             {member.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
                         </div>
                         {resetearPin && (

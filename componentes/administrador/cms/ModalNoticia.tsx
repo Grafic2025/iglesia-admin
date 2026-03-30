@@ -36,16 +36,16 @@ const ModalNoticia: React.FC<ModalNoticiaProps> = ({
                     </div>
                     <div>
                         <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Título</label>
-                        <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={60} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]" />
+                        <input value={titulo} onChange={e => setTitulo(e.target.value)} maxLength={60} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent" />
                     </div>
                     <div>
                         <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Descripción (Opcional)</label>
-                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} maxLength={150} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)] h-20 resize-none" />
+                        <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} maxLength={150} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent h-20 resize-none" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Categoría</label>
-                            <select value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]">
+                            <select value={categoria} onChange={e => setCategoria(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent">
                                 <option>Aviso</option>
                                 <option>Evento</option>
                                 <option>Serie</option>
@@ -56,17 +56,17 @@ const ModalNoticia: React.FC<ModalNoticiaProps> = ({
                         </div>
                         <div>
                             <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Vence el: (Opcional)</label>
-                            <input type="date" value={venceEl} onChange={e => setVenceEl(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)] [color-scheme:dark]" />
+                            <input type="date" value={venceEl} onChange={e => setVenceEl(e.target.value)} className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent [color-scheme:dark]" />
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Link Externo (URL)</label>
-                            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]" />
+                            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent" />
                         </div>
                         <div>
                             <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Pantalla App (Ej: Sumarme a un Grupo)</label>
-                            <input value={screen} onChange={e => setScreen(e.target.value)} placeholder="Nombre de la pantalla" className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-[var(--accent)]" />
+                            <input value={screen} onChange={e => setScreen(e.target.value)} placeholder="Nombre de la pantalla" className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white outline-none focus:border-accent" />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -77,24 +77,24 @@ const ModalNoticia: React.FC<ModalNoticiaProps> = ({
                         {isNew && setNotificar && (
                             <div className="flex items-center gap-2 ml-4 bg-[var(--accent)10] px-3 py-1.5 rounded-lg border border-[var(--accent)30]">
                                 <input type="checkbox" checked={notificar} onChange={e => setNotificar(e.target.checked)} className="accent-[var(--accent)] w-4 h-4" />
-                                <span className="text-[var(--accent)] text-xs font-bold uppercase tracking-tight">Notificar a la Iglesia</span>
+                                <span className="text-accent text-xs font-bold uppercase tracking-tight">Notificar a la Iglesia</span>
                             </div>
                         )}
                     </div>
                     <div>
                         <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Imagen</label>
                         <div className="flex gap-2">
-                            <input value={imagenUrl} onChange={e => setImagenUrl(e.target.value)} placeholder="https://..." className="flex-1 bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-[var(--accent)]" />
+                            <input value={imagenUrl} onChange={e => setImagenUrl(e.target.value)} placeholder="https://..." className="flex-1 bg-[#252525] border border-[#333] rounded-xl px-4 py-2 text-white text-xs outline-none focus:border-accent" />
                             <label className="bg-[#333] p-2 rounded-xl cursor-pointer hover:bg-[#444] transition-all">
-                                <Plus size={20} className="text-[var(--accent)]" />
+                                <Plus size={20} className="text-accent" />
                                 <input type="file" onChange={handleUpload} className="hidden" accept="image/*" />
                             </label>
                         </div>
-                        {isUploading && <p className="text-[var(--accent)] text-[10px] mt-1 italic animate-pulse">Subiendo imagen...</p>}
+                        {isUploading && <p className="text-accent text-[10px] mt-1 italic animate-pulse">Subiendo imagen...</p>}
                     </div>
                     <div className="pt-4 flex gap-3">
                         <button onClick={onClose} className="flex-1 py-3 text-[rgba(255,255,255,0.7)] font-bold bg-[#333] rounded-xl">CANCELAR</button>
-                        <button onClick={onSave} className="flex-1 py-3 bg-[var(--accent)] text-black font-bold rounded-xl shadow-lg shadow-[var(--accent)30]">GUARDAR</button>
+                        <button onClick={onSave} className="flex-1 py-3 bg-accent text-black font-bold rounded-xl shadow-lg shadow-[var(--accent)30]">GUARDAR</button>
                     </div>
                 </div>
 
@@ -113,7 +113,7 @@ const ModalNoticia: React.FC<ModalNoticiaProps> = ({
                             </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 flex flex-col justify-end">
-                            <div className="bg-[var(--accent)] px-2 py-0.5 rounded text-[8px] font-black text-black self-start mb-1 uppercase tracking-wider">
+                            <div className="bg-accent px-2 py-0.5 rounded text-[8px] font-black text-black self-start mb-1 uppercase tracking-wider">
                                 {categoria}
                             </div>
                             <h5 className="text-white font-bold text-sm leading-tight">{titulo || 'Título de la Noticia'}</h5>
@@ -122,7 +122,7 @@ const ModalNoticia: React.FC<ModalNoticiaProps> = ({
                     </div>
                     <div className="mt-8 bg-[#1E1E1E] p-4 rounded-2xl border border-[#333] w-full">
                         <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-[var(--accent)20] flex items-center justify-center text-[var(--accent)] font-bold text-xs italic">
+                            <div className="w-8 h-8 rounded-full bg-[var(--accent)20] flex items-center justify-center text-accent font-bold text-xs italic">
                                 {titulo?.[0] || '?'}
                             </div>
                             <div className="text-left">
