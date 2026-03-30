@@ -20,7 +20,7 @@ const FiltrosMiembros = ({
                 <select
                     value={filtroHorario}
                     onChange={(e) => handleFiltro(e.target.value)}
-                    className="bg-accent text-black font-black px-6 py-3 rounded-2xl outline-none cursor-pointer shadow-lg shadow-[var(--accent)]/20 hover:scale-105 transition-transform"
+                    className="bg-accent text-black font-black px-6 py-3 rounded-2xl outline-none cursor-pointer shadow-lg shadow-accent/20 hover:scale-105 transition-transform"
                 >
                     <option value="Todas">Todas las Reuniones</option>
                     {horariosDisponibles.map((h: string) => (

@@ -84,7 +84,7 @@ export default function BuscadorGlobal() {
                                 key={item.id}
                                 onClick={() => manejarNavegacion(item.path)}
                                 onMouseEnter={() => setIndice(i)}
-                                className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${i === indice ? 'bg-accent text-black shadow-lg shadow-[var(--accent)]/20' : 'text-white/60 hover:bg-white/5'}`}
+                                className={`flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all ${i === indice ? 'bg-accent text-black shadow-lg shadow-accent/20' : 'text-white/60 hover:bg-white/5'}`}
                             >
                                 <div className="flex items-center gap-4">
                                     <div className={i === indice ? 'text-black' : 'text-accent'}>

@@ -175,7 +175,7 @@ export default function AdminsPage() {
                         </div>
 
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 flex items-center justify-center text-accent">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center text-accent">
                                 <Key size={24} />
                             </div>
                             <div>

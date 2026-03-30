@@ -4,11 +4,11 @@
   --background: #ffffff;
   --foreground: #000000;
   --accent: #A8D500;
-  --color-accent: var(--accent);
   --accent-foreground: #000000;
 }
 
 @theme inline {
+  --color-accent: var(--accent);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

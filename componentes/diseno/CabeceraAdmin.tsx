@@ -51,7 +51,7 @@ const CabeceraAdmin: React.FC = () => {
                             <>
                                 <button
                                     onClick={exportarCSV}
-                                    className="bg-accent hover:bg-[#c5ff00] text-black px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-[var(--accent)]/20"
+                                    className="bg-accent hover:bg-[#c5ff00] text-black px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-accent/20"
                                 >
                                     Exportar Hoy
                                 </button>
