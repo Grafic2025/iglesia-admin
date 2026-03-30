@@ -16,6 +16,9 @@ import RetencionMensual from '../administrador/panel/RetencionMensual';
 import TareasPendientes from '../administrador/panel/TareasPendientes';
 import RadarAusencias from '../administrador/panel/RadarAusencias';
 import TermometroServidores from '../administrador/panel/TermometroServidores';
+import { TarjetaEsqueleto, SeccionEsqueleto } from '../diseno/CargandoEsqueleto';
+import { generarReporteAsistenciaPDF } from '../../libreria/generarPDF';
+import { FileText, Download, TrendingUp } from 'lucide-react';
 
 import { usarDashboard } from '../../ganchos/usarDashboard';
 
@@ -33,6 +36,9 @@ interface VistaPanelProps {
     ausentes: any[];
     servidoresQuemados: any[];
     logsAuditoria?: any[];
+    loading?: boolean;
+    fechaSeleccionada: string;
+    establecerFechaSeleccionada: (f: string) => void;
 }
 
 const VistaPanel = ({
@@ -48,7 +54,10 @@ const VistaPanel = ({
     tasaRetencion,
     ausentes,
     servidoresQuemados,
-    logsAuditoria = []
+    logsAuditoria = [],
+    loading = false,
+    fechaSeleccionada,
+    establecerFechaSeleccionada
 }: VistaPanelProps) => {
     const {
         rangoCrecimiento,
@@ -65,13 +74,40 @@ const VistaPanel = ({
         COLORES
     } = usarDashboard({ asistencias, asistencias7dias, crecimientoAnual, miembros });
 
+    if (loading) {
+        return (
+            <div className="space-y-6">
+                <div className="h-48 bg-[#1a1a1a] border border-white/5 rounded-3xl animate-pulse"></div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <TarjetaEsqueleto />
+                    <TarjetaEsqueleto />
+                    <TarjetaEsqueleto />
+                    <TarjetaEsqueleto />
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="h-64 bg-[#1a1a1a] border border-white/5 rounded-3xl animate-pulse"></div>
+                    <div className="h-64 bg-[#1a1a1a] border border-white/5 rounded-3xl animate-pulse"></div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
-            <ResumenActividad
-                oracionesActivas={oracionesActivas}
-                nuevosMes={nuevosMes}
-                asistenciaHoy={conteoHoy}
-            />
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <ResumenActividad
+                    oracionesActivas={oracionesActivas}
+                    nuevosMes={nuevosMes}
+                    asistenciaHoy={conteoHoy}
+                />
+                <button 
+                    onClick={() => generarReporteAsistenciaPDF(asistencias, fechaSeleccionada)}
+                    className="group bg-white/5 hover:bg-[#A8D500] text-white hover:text-black border border-white/10 hover:border-transparent px-6 py-3 rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 shadow-xl"
+                >
+                    <FileText size={18} className="transition-transform group-hover:scale-110" />
+                    Generar Reporte PDF
+                </button>
+            </div>
 
             {/* Tarjetas de Estadísticas */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -111,7 +147,10 @@ const VistaPanel = ({
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <GraficoAsistencia data={asistencias7dias} />
+                <GraficoAsistencia 
+                    data={asistencias7dias} 
+                    onBarClick={(fecha) => establecerFechaSeleccionada(fecha)}
+                />
 
                 <GraficoCrecimiento
                     data={crecimientoFiltrado}

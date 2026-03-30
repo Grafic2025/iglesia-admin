@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { supabaseAdmin } from '@/libreria/supabase';
+import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
     try {
@@ -21,8 +22,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, error: 'Usuario no encontrado' }, { status: 401 });
         }
 
-        // Verificación de contraseña (simple por ahora según el plan)
-        if (password === user.password_hash) {
+        // Verificación de contraseña segura con bcrypt
+        const passwordCorrecta = await bcrypt.compare(password, user.password_hash);
+        
+        if (passwordCorrecta) {
             // Set rigorous HTTP-only cookie for middleware validation
             const cookieStore = await cookies();
             cookieStore.set('administrador_autenticacion_token', user.id, {

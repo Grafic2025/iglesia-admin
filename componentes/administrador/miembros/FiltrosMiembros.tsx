@@ -15,12 +15,12 @@ const FiltrosMiembros = ({
                     placeholder="🔍 Buscar por nombre o apellido..."
                     value={busqueda}
                     onChange={(e) => handleBusqueda(e.target.value)}
-                    className="flex-1 bg-[#252525] text-white px-4 py-2.5 rounded-xl border border-[#444] outline-none focus:border-[#A8D500] transition-all"
+                    className="flex-1 bg-white/5 text-white px-5 py-3 rounded-2xl border border-white/10 outline-none focus:border-[#A8D500]/50 transition-all font-bold placeholder:text-white/20"
                 />
                 <select
                     value={filtroHorario}
                     onChange={(e) => handleFiltro(e.target.value)}
-                    className="bg-[#A8D500] text-black font-bold px-4 py-2.5 rounded-xl outline-none cursor-pointer"
+                    className="bg-[#A8D500] text-black font-black px-6 py-3 rounded-2xl outline-none cursor-pointer shadow-lg shadow-[#A8D500]/20 hover:scale-105 transition-transform"
                 >
                     <option value="Todas">Todas las Reuniones</option>
                     {horariosDisponibles.map((h: string) => (
@@ -28,7 +28,7 @@ const FiltrosMiembros = ({
                     ))}
                     <option value="Extraoficial">Extraoficiales</option>
                 </select>
-                <span className="text-[rgba(255,255,255,0.5)] text-xs font-bold whitespace-nowrap">{registrosCount} registros</span>
+                <span className="text-white/40 text-[10px] font-black uppercase tracking-widest whitespace-nowrap bg-white/5 px-4 py-3 rounded-2xl border border-white/5">{registrosCount} registros</span>
             </div>
         </div>
     );

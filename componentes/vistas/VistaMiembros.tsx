@@ -29,6 +29,7 @@ import { usarVistaMiembros } from '../../ganchos/usarVistaMiembros';
 import FiltrosMiembros from '../administrador/miembros/FiltrosMiembros';
 import TablaMiembros from '../administrador/miembros/TablaMiembros';
 import PaginacionMiembros from '../administrador/miembros/PaginacionMiembros';
+import { SeccionEsqueleto, FilaTablaEsqueleto } from '../diseno/CargandoEsqueleto';
 
 const VistaMiembros = ({
     busqueda, setBusqueda, filtroHorario, setFiltroHorario,
@@ -75,17 +76,11 @@ const VistaMiembros = ({
 
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
                 {loading ? (
-                    <div className="p-6 space-y-4 animate-pulse">
-                        {[...Array(5)].map((_, i) => (
-                            <div key={i} className="flex gap-4">
-                                <div className="w-12 h-12 bg-[#2a2a2a] rounded-full"></div>
-                                <div className="flex-1 space-y-2 py-1">
-                                    <div className="h-4 bg-[#2a2a2a] rounded w-1/4"></div>
-                                    <div className="h-3 bg-[#2a2a2a] rounded w-1/3"></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    <table className="w-full">
+                        <tbody className="divide-y divide-white/5">
+                            {[...Array(8)].map((_, i) => <FilaTablaEsqueleto key={i} />)}
+                        </tbody>
+                    </table>
                 ) : (
                     <TablaMiembros
                         paginatedData={paginatedData}

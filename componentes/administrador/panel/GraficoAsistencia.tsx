@@ -4,9 +4,10 @@ import { LucideBarChart } from 'lucide-react';
 
 interface GraficoAsistenciaProps {
     data: any[];
+    onBarClick?: (date: string) => void;
 }
 
-const GraficoAsistencia: React.FC<GraficoAsistenciaProps> = ({ data }) => {
+const GraficoAsistencia: React.FC<GraficoAsistenciaProps> = ({ data, onBarClick }) => {
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
             <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
@@ -14,16 +15,47 @@ const GraficoAsistencia: React.FC<GraficoAsistenciaProps> = ({ data }) => {
             </h3>
             <div className="h-[250px]">
                 <ResponsiveContainer width="100%" height={250}>
-                    <ReLineBarChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="dia" stroke="rgba(255,255,255,0.7)" fontSize={10} />
-                        <YAxis stroke="rgba(255,255,255,0.7)" fontSize={10} />
-                        <Tooltip
-                            contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }}
-                            itemStyle={{ color: '#A8D500' }}
+                    <ReLineBarChart 
+                        data={data}
+                        onClick={(e: any) => {
+                            if (e && e.activePayload && onBarClick) {
+                                onBarClick(e.activePayload[0].payload.fecha);
+                            }
+                        }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                        <XAxis 
+                            dataKey="dia" 
+                            stroke="rgba(255,255,255,0.4)" 
+                            fontSize={10} 
+                            tickLine={false}
+                            axisLine={false}
+                            dy={10}
                         />
-                        <Bar dataKey="total" fill="#A8D500" radius={[4, 4, 0, 0]}>
-                            <LabelList dataKey="total" position="top" fill="#A8D500" fontSize={10} fontWeight="bold" />
+                        <YAxis 
+                            stroke="rgba(255,255,255,0.4)" 
+                            fontSize={10} 
+                            tickLine={false}
+                            axisLine={false}
+                        />
+                        <Tooltip
+                            cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                            contentStyle={{ 
+                                background: 'rgba(20,20,20,0.9)', 
+                                border: '1px solid rgba(255,255,255,0.1)', 
+                                borderRadius: '16px',
+                                backdropFilter: 'blur(10px)',
+                                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+                            }}
+                            itemStyle={{ color: '#A8D500', fontWeight: 'bold' }}
+                        />
+                        <Bar 
+                            dataKey="total" 
+                            fill="#A8D500" 
+                            radius={[6, 6, 0, 0]}
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                        >
+                            <LabelList dataKey="total" position="top" fill="#A8D500" fontSize={11} fontWeight="black" offset={10} />
                         </Bar>
                     </ReLineBarChart>
                 </ResponsiveContainer>

@@ -23,42 +23,42 @@ const ModalPerfilMiembro: React.FC<ModalPerfilMiembroProps> = ({ member, onClose
                             )}
                         </div>
                         <div>
-                            <h3 className="text-white font-bold text-lg">{member.miembros?.nombre} {member.miembros?.apellido}</h3>
-                            <p className="text-[rgba(255,255,255,0.7)] text-xs">ID: {member.miembro_id?.slice(0, 8)}...</p>
+                            <h3 className="text-white font-black text-xl leading-tight">{member.miembros?.nombre} {member.miembros?.apellido}</h3>
+                            <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">ID: {member.miembro_id?.slice(0, 8)}...</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white p-2"><X /></button>
+                    <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-2"><X /></button>
                 </div>
-                <div className="p-6 space-y-4">
-                    <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-[#222] p-4 rounded-xl text-center">
-                            <p className="text-2xl font-bold text-[#A8D500]">{member.racha >= 4 ? '🔥' : ''} {member.racha}</p>
-                            <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-black uppercase mt-1">Racha</p>
+                <div className="p-8 space-y-6">
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                            <p className="text-3xl font-black text-[#A8D500]">{member.racha >= 4 ? '🔥' : ''}{member.racha}</p>
+                            <p className="text-white/60 text-[10px] font-black uppercase tracking-tighter mt-1">Racha</p>
                         </div>
-                        <div className="bg-[#222] p-4 rounded-xl text-center">
-                            <p className="text-2xl font-bold text-white">{member.hora_entrada || '-'}</p>
-                            <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-black uppercase mt-1">Hora hoy</p>
+                        <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                            <p className="text-2xl font-black text-white">{member.hora_entrada || '-'}</p>
+                            <p className="text-white/60 text-[10px] font-black uppercase tracking-tighter mt-1">Hora hoy</p>
                         </div>
-                        <div className="bg-[#222] p-4 rounded-xl text-center">
-                            <p className="text-2xl font-bold text-white text-xs">{member.horario_reunion}</p>
-                            <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-black uppercase mt-1">Reunión</p>
+                        <div className="bg-white/5 p-4 rounded-2xl text-center border border-white/5">
+                            <p className="text-xs font-black text-white uppercase">{member.horario_reunion}</p>
+                            <p className="text-white/60 text-[10px] font-black uppercase tracking-tighter mt-1">Reunión</p>
                         </div>
                     </div>
-                    <div className="flex gap-3">
-                        <div className={`flex-1 p-3 rounded-xl text-center text-sm font-bold ${member.miembros?.es_servidor ? 'bg-[#A8D50020] text-[#A8D500] border border-[#A8D50030]' : 'bg-[#222] text-[rgba(255,255,255,0.5)]'}`}>
+                    <div className="flex gap-4">
+                        <div className={`flex-1 p-4 rounded-2xl text-center text-xs font-black uppercase tracking-widest border transition-all ${member.miembros?.es_servidor ? 'bg-[#A8D500]/10 text-[#A8D500] border-[#A8D500]/30 shadow-[0_0_20px_rgba(168,213,0,0.1)]' : 'bg-white/5 text-white/30 border-white/5'}`}>
                             {member.miembros?.es_servidor ? '✅ Servidor Activo' : '⛔ No es Servidor'}
                         </div>
                         {resetearPin && (
                             <button
                                 onClick={() => resetearPin(member.miembro_id, `${member.miembros?.nombre} ${member.miembros?.apellido}`)}
-                                className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-xs font-black uppercase hover:bg-red-500/20 transition-colors"
+                                className="px-5 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 text-xs font-black uppercase tracking-widest hover:bg-red-500/20 transition-all active:scale-95 shadow-[0_10px_30px_rgba(239,68,68,0.1)]"
                             >
                                 Resetear PIN
                             </button>
                         )}
                     </div>
                     {member.miembros?.created_at && (
-                        <p className="text-[rgba(255,255,255,0.5)] text-xs text-center border-t border-[#333] pt-4">
+                        <p className="text-white/40 text-[10px] font-black uppercase tracking-[2px] text-center border-t border-white/5 pt-6">
                             Miembro desde {new Date(member.miembros.created_at).toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                     )}

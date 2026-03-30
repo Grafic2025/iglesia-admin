@@ -20,6 +20,9 @@ export default function DashboardPage() {
       ausentes={administrador.ausentes || []}
       servidoresQuemados={administrador.servidoresQuemados || []}
       logsAuditoria={administrador.logsAuditoria}
+      loading={administrador.asistenciasCargando || administrador.miembrosCargando}
+      fechaSeleccionada={administrador.fechaSeleccionada}
+      establecerFechaSeleccionada={administrador.establecerFechaSeleccionada}
     />
   );
 }

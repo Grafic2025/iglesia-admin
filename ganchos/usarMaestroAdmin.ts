@@ -116,11 +116,20 @@ export const usarAdminMaster = () => {
         }
     }, [miembros, asistencias, panel.calcularPremios, panel.calcularTasaRetencion]);
 
-    // 4. Suscripciones en tiempo real
+    // 4. Suscripciones en tiempo real mejoradas
     useEffect(() => {
         if (autenticacion.autorizado) {
             const canales = [
-                supabase.channel('cambios-asistencias').on('postgres_changes', { event: '*', schema: 'public', table: 'asistencias' }, () => obtenerAsistencias()).subscribe(),
+                supabase.channel('asistencias-live').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'asistencias' }, (p) => {
+                    obtenerAsistencias();
+                    panel.establecerEstadoNotificacion({ mostrar: true, mensaje: '📍 Nueva asistencia marcada', error: false });
+                    setTimeout(() => panel.establecerEstadoNotificacion({ mostrar: false, mensaje: '', error: false }), 4000);
+                }).subscribe(),
+                supabase.channel('miembros-live').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'miembros' }, (p) => {
+                    obtenerMiembros();
+                    panel.establecerEstadoNotificacion({ mostrar: true, mensaje: `👤 ¡Nuevo miembro: ${p.new.nombre}!`, error: false });
+                    setTimeout(() => panel.establecerEstadoNotificacion({ mostrar: false, mensaje: '', error: false }), 4000);
+                }).subscribe(),
                 supabase.channel('cambios-programas').on('postgres_changes', { event: '*', schema: 'public', table: 'cronogramas' }, () => panel.obtenerCronogramas()).subscribe(),
                 supabase.channel('cambios-logs').on('postgres_changes', { event: '*', schema: 'public', table: 'notificacion_logs' }, () => obtenerLogs()).subscribe()
             ];
@@ -129,7 +138,7 @@ export const usarAdminMaster = () => {
                 canales.forEach((ch: any) => supabase.removeChannel(ch));
             };
         }
-    }, [autenticacion.autorizado, obtenerAsistencias, panel.obtenerCronogramas, obtenerLogs]);
+    }, [autenticacion.autorizado, obtenerAsistencias, obtenerMiembros, panel.obtenerCronogramas, obtenerLogs]);
 
     return {
         // Hooks de origen

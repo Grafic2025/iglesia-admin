@@ -79,23 +79,27 @@ export default function AdminsPage() {
         };
 
         if (formPassword) {
-            payload.password_hash = formPassword; // Hash simple por ahora
+            payload.password = formPassword;
         }
 
-        let error;
         if (editingUser) {
-            const { error: err } = await supabase.from('admin_usuarios').update(payload).eq('id', editingUser.id);
-            error = err;
-        } else {
-            const { error: err } = await supabase.from('admin_usuarios').insert([payload]);
-            error = err;
+            payload.id = editingUser.id;
         }
 
-        if (error) {
-            alert('Error al guardar: ' + error.message);
-        } else {
+        try {
+            const res = await fetch('/api/admins', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            
+            if (!data.success) throw new Error(data.error);
+
             setModalAbierto(false);
             obtenerUsuarios();
+        } catch (err: any) {
+            alert('Error al guardar: ' + err.message);
         }
     };
 
@@ -103,9 +107,18 @@ export default function AdminsPage() {
         if (id === currentUser?.id) return alert('No puedes eliminarte a ti mismo');
         if (!confirm('¿Seguro quieres eliminar este acceso?')) return;
         
-        const { error } = await supabase.from('admin_usuarios').delete().eq('id', id);
-        if (error) alert('Error: ' + error.message);
-        else obtenerUsuarios();
+        try {
+            const res = await fetch('/api/admins', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error);
+            obtenerUsuarios();
+        } catch (err: any) {
+            alert('Error: ' + err.message);
+        }
     };
 
     const abrirModal = (user: AdminUser | null = null) => {

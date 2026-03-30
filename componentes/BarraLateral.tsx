@@ -18,6 +18,7 @@ import {
     ClipboardList,
     Video,
     X,
+    Palette,
 } from 'lucide-react';
 
 import { usePathname } from 'next/navigation';
@@ -67,6 +68,13 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
         return userInfo.menus?.includes(item.id);
     });
 
+    React.useEffect(() => {
+        const savedColor = localStorage.getItem('admin_theme_color');
+        if (savedColor) {
+            document.documentElement.style.setProperty('--accent', savedColor);
+        }
+    }, []);
+
     return (
         <>
             {/* Overlay para móviles */}
@@ -114,6 +122,32 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
                         );
                     })}
                 </nav>
+
+                <div className="px-6 py-4 border-t border-white/5">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Palette size={14} className="text-white/30" />
+                        <span className="text-[10px] uppercase font-black tracking-widest text-white/30">Personalización</span>
+                    </div>
+                    <div className="flex gap-2">
+                        {[
+                            { name: 'IDS', color: '#A8D500' },
+                            { name: 'Oro', color: '#FFB400' },
+                            { name: 'Cielo', color: '#00D9FF' },
+                            { name: 'Rosa', color: '#FF007A' }
+                        ].map((t) => (
+                            <button
+                                key={t.name}
+                                onClick={() => {
+                                    document.documentElement.style.setProperty('--accent', t.color);
+                                    localStorage.setItem('admin_theme_color', t.color);
+                                }}
+                                className="w-6 h-6 rounded-full border border-white/10 hover:scale-125 transition-transform"
+                                style={{ backgroundColor: t.color }}
+                                title={t.name}
+                            />
+                        ))}
+                    </div>
+                </div>
 
                 <div className="p-4 border-t border-[#333]">
                     <button
