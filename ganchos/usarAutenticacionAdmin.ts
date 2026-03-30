@@ -17,7 +17,7 @@ export function usarAdminAuth() {
         }
     }, []);
 
-    // Sistema de bloqueo por inactividad (5 min)
+    // Sistema de bloqueo por inactividad (15 min)
     useEffect(() => {
         if (!autorizado) return;
 
@@ -27,8 +27,8 @@ export function usarAdminAuth() {
             temporizadorInactividad = setTimeout(() => {
                 // Bloqueo por inactividad
                 manejarCerrarSesion();
-                alert('Sesión bloqueada por inactividad de 5 minutos.');
-            }, 5 * 60 * 1000); // 5 minutos
+                alert('Sesión bloqueada por inactividad de 15 minutos.');
+            }, 15 * 60 * 1000); // 15 minutos
         };
 
         const eventos = ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'];

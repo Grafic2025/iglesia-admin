@@ -33,43 +33,23 @@ export async function GET(req: Request) {
         let videoId = '';
         let videoTitle = '';
 
+        // Extraer el último video sin importar el título
         for (const entry of entryMatches) {
             const vId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
             const title = entry.match(/<title>([^<]+)<\/title>/)?.[1];
 
-            if (!vId || !title) continue;
+            if (vId && title) {
+                // Excluímos explicitamente los shorts si es necesario, 
+                // pero si quieren "el último video", tomamos el primero que no sea un short explícito.
+                if (title.toLowerCase().includes('short')) continue;
 
-            const isKnownShortPattern =
-                title.toLowerCase().includes('#shorts') ||
-                title.toLowerCase().includes('short') ||
-                title.toLowerCase().includes('episodio'); // los podcasts no van acá
-
-            const isSermonPattern =
-                title.includes('|') ||
-                title.toLowerCase().includes('esenciales') ||
-                title.toLowerCase().includes('culto');
-
-            if (!isKnownShortPattern && isSermonPattern) {
                 videoId = vId;
                 videoTitle = title;
                 break;
             }
         }
 
-        if (!videoId) {
-            // Si el filtro anterior falló, buscamos cualquier cosa que no tenga la palabra 'short' explícita
-            for (const entry of entryMatches) {
-                const vId = entry.match(/<yt:videoId>([^<]+)<\/yt:videoId>/)?.[1];
-                const title = entry.match(/<title>([^<]+)<\/title>/)?.[1];
-                if (vId && title && !title.toLowerCase().includes('short')) {
-                    videoId = vId;
-                    videoTitle = title;
-                    break;
-                }
-            }
-        }
-
-        if (!videoId) throw new Error('No se pudo encontrar un mensaje adecuado (prédica) en el feed');
+        if (!videoId) throw new Error('No se pudo encontrar un video en el feed');
 
         const { error } = await supabaseAdmin.from('noticias').upsert({
             id: '00000000-0000-0000-0000-000000000001',
