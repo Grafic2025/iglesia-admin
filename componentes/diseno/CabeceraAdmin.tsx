@@ -25,7 +25,7 @@ const CabeceraAdmin: React.FC = () => {
             <div className="flex items-center gap-4">
                 <button
                     onClick={alternarMenuLateral}
-                    className="lg:hidden p-2 text-[#888] hover:text-white"
+                    className="lg:hidden p-2 text-white/50 hover:text-white"
                 >
                     <Menu size={24} />
                 </button>
@@ -34,7 +34,7 @@ const CabeceraAdmin: React.FC = () => {
                     <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
                     </h2>
-                    <p className="text-[10px] md:text-xs text-gray-500 font-medium uppercase tracking-widest leading-none">Iglesia del Salvador</p>
+                    <p className="text-[10px] md:text-xs text-white/40 font-bold uppercase tracking-widest leading-none">Iglesia del Salvador</p>
                 </div>
             </div>
 
@@ -61,7 +61,7 @@ const CabeceraAdmin: React.FC = () => {
                                         establecerFinExportacion(fechaSeleccionada);
                                         establecerMostrarModalExportacion(true);
                                     }}
-                                    className="bg-[#2a2a2a] hover:bg-[#333] text-gray-300 px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
+                                    className="bg-[#2a2a2a] hover:bg-[#333] text-white px-5 py-2 rounded-lg text-sm font-bold transition-all border border-white/5"
                                 >
                                     Rango...
                                 </button>
@@ -72,7 +72,7 @@ const CabeceraAdmin: React.FC = () => {
 
                 <button
                     onClick={manejarCerrarSesion}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-[#A8D500]/10 text-gray-400 hover:text-[#A8D500] transition-all border border-white/5"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 hover:bg-[#A8D500]/10 text-white/60 hover:text-[#A8D500] transition-all border border-white/5"
                 >
                     <LogOut size={18} />
                     <span className="text-sm font-bold">Salir</span>

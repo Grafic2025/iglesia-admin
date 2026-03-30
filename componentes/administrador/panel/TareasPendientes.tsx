@@ -28,7 +28,7 @@ const TareasPendientes = ({ bautismos, ayuda }: TareasPendientesProps) => {
                     </div>
                     <div>
                         <h3 className="text-white font-bold tracking-widest text-sm uppercase">Atención Pastoral</h3>
-                        <p className="text-[#888] text-[10px] uppercase font-bold">Solicitudes Pendientes</p>
+                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">Solicitudes Pendientes</p>
                     </div>
                 </div>
             </div>
@@ -36,8 +36,8 @@ const TareasPendientes = ({ bautismos, ayuda }: TareasPendientesProps) => {
             <div className="flex-1 flex flex-col gap-3 justify-center">
                 {(!hasBautismos && !hasAyuda) ? (
                     <div className="flex flex-col items-center justify-center opacity-50 py-6 text-center">
-                        <HeartHandshake size={32} className="text-[#555] mb-2" />
-                        <p className="text-[#888] text-xs font-bold uppercase">No hay solicitudes nuevas</p>
+                        <HeartHandshake size={32} className="text-[rgba(255,255,255,0.5)] mb-2" />
+                        <p className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase">No hay solicitudes nuevas</p>
                     </div>
                 ) : (
                     <>
@@ -47,7 +47,7 @@ const TareasPendientes = ({ bautismos, ayuda }: TareasPendientesProps) => {
                                     <div className="p-2 bg-red-500/10 text-red-400 rounded-lg group-hover:scale-110 transition-transform"><HeartHandshake size={18} /></div>
                                     <div>
                                         <p className="text-white text-sm font-bold">Acompañamiento</p>
-                                        <p className="text-[#888] text-[10px] uppercase font-bold">{ayuda.length} solicitudes esperando</p>
+                                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">{ayuda.length} solicitudes esperando</p>
                                     </div>
                                 </div>
                                 <span className="bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-md">{ayuda.length}</span>
@@ -59,7 +59,7 @@ const TareasPendientes = ({ bautismos, ayuda }: TareasPendientesProps) => {
                                     <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg group-hover:scale-110 transition-transform"><Droplet size={18} /></div>
                                     <div>
                                         <p className="text-white text-sm font-bold">Bautismos</p>
-                                        <p className="text-[#888] text-[10px] uppercase font-bold">{bautismos.length} candidatos inscritos</p>
+                                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">{bautismos.length} candidatos inscritos</p>
                                     </div>
                                 </div>
                                 <span className="bg-blue-500 text-white text-[10px] font-black px-2 py-1 rounded-md">{bautismos.length}</span>

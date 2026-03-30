@@ -12,7 +12,7 @@ const TablaMiembros = ({
         <div className="overflow-x-auto">
             <table className="w-full text-left">
                 <thead>
-                    <tr className="bg-[#252525] text-[#888] text-xs uppercase tracking-wider">
+                    <tr className="bg-[#252525] text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-wider">
                         <th className="px-6 py-4">Miembro</th>
                         <th className="px-6 py-4">Reunión</th>
                         <th className="px-6 py-4">Hora</th>
@@ -35,13 +35,13 @@ const TablaMiembros = ({
                                         {a.horario_reunion}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-[#888] text-sm">{a.hora_entrada}</td>
+                                <td className="px-6 py-4 text-[rgba(255,255,255,0.7)] text-sm">{a.hora_entrada}</td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-1.5">
-                                        <span className={a.racha >= 4 ? 'text-[#A8D500]' : 'text-[#888]'}>
+                                        <span className={a.racha >= 4 ? 'text-[#A8D500]' : 'text-[rgba(255,255,255,0.7)]'}>
                                             {a.racha >= 4 ? '🔥' : '📍'}
                                         </span>
-                                        <span className={`font-bold ${a.racha >= 4 ? 'text-[#A8D500]' : 'text-[#888]'}`}>
+                                        <span className={`font-bold ${a.racha >= 4 ? 'text-[#A8D500]' : 'text-[rgba(255,255,255,0.7)]'}`}>
                                             {a.racha}
                                         </span>
                                     </div>
@@ -59,7 +59,7 @@ const TablaMiembros = ({
                                         )}
                                         <button
                                             onClick={() => toggleServerStatus(a.miembro_id, `${a.miembros.nombre} ${a.miembros.apellido}`, a.miembros?.es_servidor)}
-                                            className={`p-2 rounded-full transition-all ${a.miembros?.es_servidor ? 'bg-[#A8D500] text-black' : 'bg-[#333] text-[#555] hover:text-[#A8D500]'}`}
+                                            className={`p-2 rounded-full transition-all ${a.miembros?.es_servidor ? 'bg-[#A8D500] text-black' : 'bg-[#333] text-[rgba(255,255,255,0.5)] hover:text-[#A8D500]'}`}
                                             title={a.miembros?.es_servidor ? "Quitar Acceso Servidor" : "Dar Acceso Servidor"}
                                         >
                                             <UserCircle size={16} />

@@ -13,7 +13,7 @@ const VistaSolicitudes: React.FC<VistaSolicitudesProps> = ({ bautismos, ayuda, m
         <div className="space-y-8 animate-in fade-in duration-500 w-full min-h-full pb-32">
             <div>
                 <h2 className="text-2xl font-bold text-white mb-2">Centro de Solicitudes</h2>
-                <p className="text-[#888] text-sm">Gestiona los pedidos de bautismo y ayuda recibidos desde la App.</p>
+                <p className="text-[rgba(255,255,255,0.7)] text-sm">Gestiona los pedidos de bautismo y ayuda recibidos desde la App.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -31,7 +31,7 @@ const VistaSolicitudes: React.FC<VistaSolicitudesProps> = ({ bautismos, ayuda, m
                     <div className="space-y-4">
                         {bautismos.length === 0 ? (
                             <div className="py-20 text-center border-2 border-dashed border-[#333] rounded-2xl">
-                                <p className="text-[#555] italic">No hay solicitudes nuevas de bautismo</p>
+                                <p className="text-[rgba(255,255,255,0.5)] italic">No hay solicitudes nuevas de bautismo</p>
                             </div>
                         ) : (
                             bautismos.map((b) => {
@@ -42,11 +42,11 @@ const VistaSolicitudes: React.FC<VistaSolicitudesProps> = ({ bautismos, ayuda, m
                                             <div>
                                                 <div className="text-white text-lg font-bold">{m ? `${m.nombre} ${m.apellido}` : b.miembro_id}</div>
                                                 <div className="flex flex-wrap gap-3 mt-3">
-                                                    <div className="flex items-center gap-1.5 text-xs text-[#888]">
+                                                    <div className="flex items-center gap-1.5 text-xs text-[rgba(255,255,255,0.7)]">
                                                         <Calendar size={12} className="text-[#00D9FF]" />
                                                         {b.edad} años
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-xs text-[#888]">
+                                                    <div className="flex items-center gap-1.5 text-xs text-[rgba(255,255,255,0.7)]">
                                                         <Info size={12} className="text-[#00D9FF]" />
                                                         Grupo: <span className="text-white font-medium">{b.pertenece_grupo}</span>
                                                     </div>
@@ -60,7 +60,7 @@ const VistaSolicitudes: React.FC<VistaSolicitudesProps> = ({ bautismos, ayuda, m
                                                 <Phone size={18} />
                                             </a>
                                         </div>
-                                        <div className="mt-4 pt-4 border-t border-[#333] text-[10px] text-[#555] font-black uppercase tracking-tighter">
+                                        <div className="mt-4 pt-4 border-t border-[#333] text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase tracking-tighter">
                                             CELULAR: {b.celular}
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@ const VistaSolicitudes: React.FC<VistaSolicitudesProps> = ({ bautismos, ayuda, m
                     <div className="space-y-4">
                         {ayuda.length === 0 ? (
                             <div className="py-20 text-center border-2 border-dashed border-[#333] rounded-2xl">
-                                <p className="text-[#555] italic">Todo en orden, no hay pedidos de ayuda</p>
+                                <p className="text-[rgba(255,255,255,0.5)] italic">Todo en orden, no hay pedidos de ayuda</p>
                             </div>
                         ) : (
                             ayuda.map((a) => {

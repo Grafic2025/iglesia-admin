@@ -64,7 +64,7 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                                                         return foto ? (
                                                             <img src={foto} className="w-full h-full object-cover" alt="" />
                                                         ) : (
-                                                            <span className="text-[10px] text-[#555] font-black">{s.nombre?.[0]}</span>
+                                                            <span className="text-[10px] text-[rgba(255,255,255,0.5)] font-black">{s.nombre?.[0]}</span>
                                                         );
                                                     })()}
                                                 </div>
@@ -91,7 +91,7 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                                             </div>
                                             <button
                                                 onClick={() => setAssignedStaff(assignedStaff.filter(item => item.miembro_id !== s.miembro_id))}
-                                                className="text-[#555] hover:text-red-500 p-1"
+                                                className="text-[rgba(255,255,255,0.5)] hover:text-red-500 p-1"
                                                 title="Eliminar de todo el plan"
                                             >
                                                 <X size={14} />
@@ -111,7 +111,7 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                 })}
                 <button
                     onClick={onAddStaff}
-                    className="w-full p-4 border-2 border-dashed border-[#333] rounded-xl text-[#555] hover:border-[#3B82F6] hover:text-[#3B82F6] transition-all flex items-center justify-center gap-2 font-bold text-xs"
+                    className="w-full p-4 border-2 border-dashed border-[#333] rounded-xl text-[rgba(255,255,255,0.5)] hover:border-[#3B82F6] hover:text-[#3B82F6] transition-all flex items-center justify-center gap-2 font-bold text-xs"
                 >
                     <Plus size={16} /> ASIGNAR PERSONA
                 </button>

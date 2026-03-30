@@ -38,7 +38,7 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
             <div className="p-6 space-y-4">
                 {filteredList.length === 0 ? (
                     <div className="text-center py-10">
-                        <p className="text-[#555] italic text-sm">No hay servicios próximos para mostrar.</p>
+                        <p className="text-[rgba(255,255,255,0.5)] italic text-sm">No hay servicios próximos para mostrar.</p>
                         <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
                     </div>
                 ) : (
@@ -58,7 +58,7 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                                         <p className="text-white font-black text-sm uppercase">
                                             {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long' })}
                                         </p>
-                                        <p className="text-[#888] text-[10px] font-bold">{s.horario}</p>
+                                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold">{s.horario}</p>
                                     </div>
                                 </div>
 

@@ -48,7 +48,7 @@ const VistaGente = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndivid
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <UserPlus className="text-[#00D9FF]" /> Base de Datos de Miembros
                     </h2>
-                    <p className="text-[#888] text-sm italic">Gestioná toda la gente de la iglesia y sus permisos</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Gestioná toda la gente de la iglesia y sus permisos</p>
                 </div>
                 <div className="flex gap-2">
                     <button
@@ -60,7 +60,7 @@ const VistaGente = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndivid
                     </button>
                     <button
                         onClick={() => { setShowArchived(!showArchived); setPage(1); }}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${showArchived ? 'bg-[#FFB400] text-black' : 'bg-[#222] text-[#888] border border-[#333] hover:text-white'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${showArchived ? 'bg-[#FFB400] text-black' : 'bg-[#222] text-[rgba(255,255,255,0.7)] border border-[#333] hover:text-white'}`}
                     >
                         <Archive size={14} />
                         {showArchived ? 'VER ACTIVOS' : 'VER ARCHIVADOS'}
@@ -98,7 +98,7 @@ const VistaGente = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndivid
                     <>
                         {paginatedList.length === 0 && (
                             <div className="bg-[#1E1E1E] p-10 rounded-2xl border border-[#333] text-center">
-                                <span className="text-[#555] italic">{showArchived ? 'No hay miembros archivados.' : 'No se encontraron miembros con esos filtros.'}</span>
+                                <span className="text-[rgba(255,255,255,0.5)] italic">{showArchived ? 'No hay miembros archivados.' : 'No se encontraron miembros con esos filtros.'}</span>
                             </div>
                         )}
 
@@ -120,7 +120,7 @@ const VistaGente = ({ miembros, hoyArg, fetchMiembros, enviarNotificacionIndivid
             {/* Pagination Section */}
             {totalPages > 1 && (
                 <div className="flex items-center justify-between pt-2">
-                    <span className="text-[#555] text-xs font-bold">Página {page} de {totalPages}</span>
+                    <span className="text-[rgba(255,255,255,0.5)] text-xs font-bold">Página {page} de {totalPages}</span>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setPage(p => Math.max(1, p - 1))}

@@ -21,7 +21,7 @@ const PremiosMiembros: React.FC<PremiosMiembrosProps> = ({ premiosPendientes, pr
     return (
         <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] mb-6">
             <h3 className="text-[#9333EA] text-lg font-bold mb-2">🎁 Premios Pendientes</h3>
-            <p className="text-[#888] text-sm mb-6">Metas alcanzadas en los últimos 30 días</p>
+            <p className="text-[rgba(255,255,255,0.7)] text-sm mb-6">Metas alcanzadas en los últimos 30 días</p>
 
             <div className="space-y-6">
                 {rewardLevels.map((rl) => (
@@ -44,7 +44,7 @@ const PremiosMiembros: React.FC<PremiosMiembrosProps> = ({ premiosPendientes, pr
                                                 }`}
                                         >
                                             <div className="flex flex-col">
-                                                <span className={`${yaEntregado ? 'text-[#555]' : 'text-white'} text-sm font-medium`}>
+                                                <span className={`${yaEntregado ? 'text-[rgba(255,255,255,0.5)]' : 'text-white'} text-sm font-medium`}>
                                                     {m.nombre} {m.apellido}
                                                 </span>
                                                 <span className="text-[10px] font-bold" style={{ color: rl.color }}>🔥 {m.racha}</span>

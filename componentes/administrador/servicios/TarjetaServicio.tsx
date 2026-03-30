@@ -28,10 +28,10 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
             <p className="text-[#A8D500] font-bold text-xs mb-3">{service.horario}</p>
 
             <div className="flex gap-4 mt-4 border-t border-[#333] pt-4">
-                <div className="flex items-center gap-1 text-[#888] text-[10px] font-bold">
+                <div className="flex items-center gap-1 text-[rgba(255,255,255,0.7)] text-[10px] font-bold">
                     <Music size={12} /> {service.orden_canciones?.length || 0} CANCIONES
                 </div>
-                <div className="flex items-center gap-1 text-[#888] text-[10px] font-bold">
+                <div className="flex items-center gap-1 text-[rgba(255,255,255,0.7)] text-[10px] font-bold">
                     <Users2 size={12} /> {service.equipo_ids?.length || 0} PERSONAS
                 </div>
             </div>
@@ -78,7 +78,7 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
                 </button>
                 <button
                     onClick={() => onToggleChat(service)}
-                    className={`p-2 rounded-lg border transition-all ${service.chat_activo ? 'bg-[#A8D500] text-black border-[#A8D500]' : 'bg-transparent text-[#888] border-[#333] hover:border-[#A8D500] hover:text-[#A8D500]'}`}
+                    className={`p-2 rounded-lg border transition-all ${service.chat_activo ? 'bg-[#A8D500] text-black border-[#A8D500]' : 'bg-transparent text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D500] hover:text-[#A8D500]'}`}
                     title={service.chat_activo ? "Cerrar Chat" : "Abrir Chat"}
                 >
                     <MessageSquare size={14} />

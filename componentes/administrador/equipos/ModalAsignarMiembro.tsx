@@ -29,11 +29,11 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
             <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] shadow-2xl overflow-hidden">
                 <div className="p-6 border-b border-[#333] flex items-center justify-between">
                     <h3 className="text-white font-bold">Asignar a {selectedTeam?.nombre}</h3>
-                    <button onClick={onClose} className="text-[#888] hover:text-white"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white"><X /></button>
                 </div>
                 <div className="p-6 space-y-4">
                     <div>
-                        <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Rol / Función</label>
+                        <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Rol / Función</label>
                         <input
                             type="text"
                             placeholder="Ej: Ginterfaztarra, Sonido, Proyección..."
@@ -50,7 +50,7 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
                                             <button
                                                 key={r}
                                                 onClick={() => setAssignRole(r)}
-                                                className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D50050]'
                                                     }`}
                                             >{r}</button>
                                         ))}
@@ -61,9 +61,9 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
                     </div>
 
                     <div>
-                        <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Buscar Servidor</label>
+                        <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Buscar Servidor</label>
                         <div className="relative mb-4">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" size={18} />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={18} />
                             <input
                                 type="text"
                                 placeholder="Nombre del miembro..."

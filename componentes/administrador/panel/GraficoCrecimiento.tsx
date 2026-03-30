@@ -21,7 +21,7 @@ const GraficoCrecimiento: React.FC<GraficoCrecimientoProps> = ({ data, growthRan
                         <button
                             key={r.clave}
                             onClick={() => setGrowthRange(r.clave)}
-                            className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${growthRange === r.clave ? 'bg-[#00D9FF] text-black' : 'text-[#555] hover:text-white'}`}
+                            className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase transition-all ${growthRange === r.clave ? 'bg-[#00D9FF] text-black' : 'text-[rgba(255,255,255,0.5)] hover:text-white'}`}
                         >
                             {r.clave}
                         </button>
@@ -32,8 +32,8 @@ const GraficoCrecimiento: React.FC<GraficoCrecimientoProps> = ({ data, growthRan
                 <ResponsiveContainer width="100%" height={250}>
                     <ReLineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="mes" stroke="#888" fontSize={10} />
-                        <YAxis stroke="#888" fontSize={10} />
+                        <XAxis dataKey="mes" stroke="rgba(255,255,255,0.7)" fontSize={10} />
+                        <YAxis stroke="rgba(255,255,255,0.7)" fontSize={10} />
                         <Tooltip
                             contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }}
                             itemStyle={{ color: '#00D9FF' }}

@@ -56,7 +56,7 @@ const VistaCMS = ({
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 px-2">
                 <div>
                     <h2 className="text-3xl font-black text-white tracking-tighter">Gestión de Contenido</h2>
-                    <p className="text-[#666] text-sm font-medium">Administra las noticias del carrusel y los accesos directos de la App.</p>
+                    <p className="text-[rgba(255,255,255,0.6)] text-sm font-medium">Administra las noticias del carrusel y los accesos directos de la App.</p>
                 </div>
             </div>
 

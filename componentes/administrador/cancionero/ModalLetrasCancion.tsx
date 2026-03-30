@@ -26,12 +26,12 @@ const ModalLetrasCancion: React.FC<ModalLetrasCancionProps> = ({
                         <div className="flex items-center gap-2 bg-[#222] p-1 rounded-xl border border-[#333]">
                             <button onClick={() => setTransposedOffset(p => p - 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">-</button>
                             <div className="px-4 py-1 text-center">
-                                <p className="text-[10px] text-[#555] font-black uppercase">Tono</p>
+                                <p className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase">Tono</p>
                                 <p className="text-[#A8D500] font-black text-sm">{transposeChord(currentSong.tono, transposedOffset)}</p>
                             </div>
                             <button onClick={() => setTransposedOffset(p => p + 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">+</button>
                         </div>
-                        <button onClick={onClose} className="p-3 text-[#888] hover:text-white rounded-full bg-[#222]"><X size={24} /></button>
+                        <button onClick={onClose} className="p-3 text-[rgba(255,255,255,0.7)] hover:text-white rounded-full bg-[#222]"><X size={24} /></button>
                     </div>
                 </div>
                 <div className="flex-1 p-8 overflow-y-auto font-mono custom-scrollbar">
@@ -48,8 +48,8 @@ const ModalLetrasCancion: React.FC<ModalLetrasCancionProps> = ({
                     </pre>
                 </div>
                 <div className="p-6 border-t border-[#333] bg-[#111] flex justify-between items-center">
-                    <p className="text-[#555] text-xs italic">* Los acordes en verde se transponen automáticamente</p>
-                    <button onClick={() => window.print()} className="text-[#888] hover:text-white flex items-center gap-2 text-sm font-bold">
+                    <p className="text-[rgba(255,255,255,0.5)] text-xs italic">* Los acordes en verde se transponen automáticamente</p>
+                    <button onClick={() => window.print()} className="text-[rgba(255,255,255,0.7)] hover:text-white flex items-center gap-2 text-sm font-bold">
                         <FileText size={16} /> IMPRIMIR LETRA
                     </button>
                 </div>

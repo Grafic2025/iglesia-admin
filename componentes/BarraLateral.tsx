@@ -83,10 +83,10 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
                         <h1 className="text-[#A8D500] text-2xl font-black tracking-tighter italic">IDS <span className="text-white">DIGITAL</span></h1>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="w-2 h-2 rounded-full bg-[#A8D500] animate-pulse"></span>
-                            <p className="text-[#666] text-[10px] uppercase font-bold tracking-widest">Panel de Control</p>
+                            <p className="text-[rgba(255,255,255,0.6)] text-[10px] uppercase font-bold tracking-widest">Panel de Control</p>
                         </div>
                     </div>
-                    <button onClick={administrador.alternarMenuLateral} className="lg:hidden text-[#888]">
+                    <button onClick={administrador.alternarMenuLateral} className="lg:hidden text-[rgba(255,255,255,0.7)]">
                         <X size={20} />
                     </button>
                 </div>
@@ -101,8 +101,8 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
                                 href={item.id === 'panel' ? '/' : `/${item.id}`}
                                 onClick={() => administrador.establecerEstaMenuLateralAbierto(false)}
                                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)]'
-                                    : 'text-[#aaa] hover:bg-[#252525] hover:text-white'
+                                    ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)] font-bold'
+                                    : 'text-white/50 hover:bg-[#252525] hover:text-white font-bold'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">

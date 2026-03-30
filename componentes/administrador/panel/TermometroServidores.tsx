@@ -22,7 +22,7 @@ const TermometroServidores = ({ servidoresQuemados }: TermometroServidoresProps)
                     </div>
                     <div>
                         <h3 className="text-white font-bold tracking-widest text-sm uppercase">Termómetro de Servidores</h3>
-                        <p className="text-[#888] text-[10px] uppercase font-bold">Riesgo de Burnout</p>
+                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">Riesgo de Burnout</p>
                     </div>
                 </div>
             </div>
@@ -30,15 +30,15 @@ const TermometroServidores = ({ servidoresQuemados }: TermometroServidoresProps)
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
                 {servidoresQuemados.length === 0 ? (
                     <div className="h-full flex items-center justify-center flex-col text-center opacity-50 p-4">
-                        <Activity size={32} className="text-[#555] mb-2" />
-                        <p className="text-[#888] text-xs font-bold uppercase">Equipo descansado</p>
+                        <Activity size={32} className="text-[rgba(255,255,255,0.5)] mb-2" />
+                        <p className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase">Equipo descansado</p>
                     </div>
                 ) : (
                     servidoresQuemados.map((s) => (
                         <div key={s.id} className="group relative flex items-center justify-between bg-[#151515] p-3 rounded-xl border border-white/5">
                             <div className="flex-1 min-w-0 pr-4">
                                 <p className="text-white font-bold text-sm truncate">{s.nombre} {s.apellido}</p>
-                                <p className="text-[10px] text-[#888] uppercase font-bold tracking-wider truncate">
+                                <p className="text-[10px] text-[rgba(255,255,255,0.7)] uppercase font-bold tracking-wider truncate">
                                     Rol: <span className="text-white">{s.rol}</span>
                                 </p>
                             </div>
@@ -53,7 +53,7 @@ const TermometroServidores = ({ servidoresQuemados }: TermometroServidoresProps)
                 )}
             </div>
             <div className="mt-4 pt-4 border-t border-[#333]">
-                <p className="text-[10px] text-[#888] leading-tight italic">
+                <p className="text-[10px] text-[rgba(255,255,255,0.7)] leading-tight italic">
                     <strong className="text-white">Tip:</strong> Otorga fines de semana libres a las personas que superen las 3 semanas consecutivas de servicio para cuidar su salud espiritual.
                 </p>
             </div>

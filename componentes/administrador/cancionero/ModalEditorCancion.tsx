@@ -25,7 +25,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
             <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-left">
                 <div className="p-6 border-b border-[#333] flex items-center justify-between shrink-0">
                     <h3 className="text-white font-bold text-xl">{currentSong ? 'Editar Canción' : 'Nueva Canción'}</h3>
-                    <button onClick={onClose} className="text-[#888] hover:text-white p-2 hover:bg-white/5 rounded-full transition-all">
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white p-2 hover:bg-white/5 rounded-full transition-all">
                         <X size={24} />
                     </button>
                 </div>
@@ -33,7 +33,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                 <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0 custom-scrollbar">
                     <div className="grid grid-cols-2 gap-4">
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Título de la Canción</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Título de la Canción</label>
                             <input
                                 type="text"
                                 value={titulo}
@@ -43,7 +43,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Artista / Banda</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Artista / Banda</label>
                             <input
                                 type="text"
                                 value={artista}
@@ -53,7 +53,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Tono Principal</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Tono Principal</label>
                             <select
                                 value={tono}
                                 onChange={(e) => setTono(e.target.value)}
@@ -63,7 +63,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             </select>
                         </div>
                         <div>
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">BPM</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">BPM</label>
                             <input
                                 type="text"
                                 value={bpm}
@@ -73,7 +73,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">YouTube URL</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">YouTube URL</label>
                             <input
                                 type="text"
                                 value={youtubeUrl}
@@ -83,7 +83,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Link a Partitura / PDF</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Link a Partitura / PDF</label>
                             <input
                                 type="text"
                                 value={pdfUrl}
@@ -93,7 +93,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase text-[#1DB954]">Spotify URL / URI</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase text-[#1DB954]">Spotify URL / URI</label>
                             <input
                                 type="text"
                                 value={spotifyUrl}
@@ -103,7 +103,7 @@ const ModalEditorCancion: React.FC<ModalEditorCancionProps> = ({
                             />
                         </div>
                         <div className="col-span-2">
-                            <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Letra y Acordes (Formato: [Chord] Letra)</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Letra y Acordes (Formato: [Chord] Letra)</label>
                             <textarea
                                 value={acordes}
                                 onChange={(e) => setAcordes(e.target.value)}

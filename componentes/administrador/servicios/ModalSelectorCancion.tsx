@@ -23,10 +23,10 @@ const ModalSelectorCancion: React.FC<ModalSelectorCancionProps> = ({
             <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] p-6 max-h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center mb-4 text-left">
                     <h3 className="text-white font-bold uppercase tracking-widest">Seleccionar Canciones</h3>
-                    <button onClick={onClose} className="text-[#888]"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)]"><X /></button>
                 </div>
                 <div className="relative mb-4">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={16} />
                     <input
                         type="text"
                         placeholder="Buscar canción por título o artista..."
@@ -47,7 +47,7 @@ const ModalSelectorCancion: React.FC<ModalSelectorCancionProps> = ({
                         >
                             <div className="flex-1">
                                 <p className="font-bold text-sm">{s.titulo}</p>
-                                <p className={`text-[10px] ${selectedSongIds.includes(s.id) ? 'text-black/60' : 'text-[#555]'}`}>{s.artista} • {s.tono}</p>
+                                <p className={`text-[10px] ${selectedSongIds.includes(s.id) ? 'text-black/60' : 'text-[rgba(255,255,255,0.5)]'}`}>{s.artista} • {s.tono}</p>
                             </div>
                             {selectedSongIds.includes(s.id) && <X size={14} />}
                         </button>

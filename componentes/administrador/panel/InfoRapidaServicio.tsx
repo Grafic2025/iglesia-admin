@@ -14,13 +14,13 @@ const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, ne
                     <CalendarDays size={24} className="text-[#A8D500]" />
                 </div>
                 <div>
-                    <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest">Último Servicio con Asistencia</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase tracking-widest">Último Servicio con Asistencia</p>
                     {lastServiceDate ? (
                         <p className="text-white font-bold text-lg">
                             {lastServiceDate.dia} — <span className="text-[#A8D500]">{lastServiceDate.total} personas</span>
                         </p>
                     ) : (
-                        <p className="text-[#555] text-sm italic">Sin datos recientes</p>
+                        <p className="text-[rgba(255,255,255,0.5)] text-sm italic">Sin datos recientes</p>
                     )}
                 </div>
             </div>
@@ -29,7 +29,7 @@ const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, ne
                     <Clock size={24} className="text-[#00D9FF]" />
                 </div>
                 <div>
-                    <p className="text-[#888] text-[10px] font-bold uppercase tracking-widest">Próximo Domingo</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase tracking-widest">Próximo Domingo</p>
                     <p className="text-white font-bold text-lg min-h-[28px]">
                         {nextSundayString}
                     </p>

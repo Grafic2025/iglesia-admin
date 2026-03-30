@@ -66,7 +66,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                         </h3>
                         <div className="flex gap-3 ml-4">
                             <div className="flex flex-col">
-                                <label className="text-[10px] text-[#555] font-black uppercase mb-1">Fecha</label>
+                                <label className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase mb-1">Fecha</label>
                                 <input
                                     type="date"
                                     value={fecha}
@@ -75,7 +75,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                 />
                             </div>
                             <div className="flex flex-col">
-                                <label className="text-[10px] text-[#555] font-black uppercase mb-1">Horario(s)</label>
+                                <label className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase mb-1">Horario(s)</label>
                                 <div className="flex flex-wrap gap-2 items-center">
                                     {HORARIOS_DISPONIBLES.map(h => {
                                         const selected = horario.split(', ').filter(Boolean).includes(h);
@@ -89,7 +89,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                                 }}
                                                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${selected
                                                     ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_10px_rgba(168,213,0,0.3)]'
-                                                    : 'bg-[#222] text-[#888] border-[#333] hover:border-[#A8D50050]'
+                                                    : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D50050]'
                                                     }`}
                                             >
                                                 {h}
@@ -138,7 +138,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                             </div>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-[#888] hover:text-white"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white"><X /></button>
                 </div>
 
                 {!selectedSchedule && assignedStaff.length === 0 && (
@@ -175,19 +175,19 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                     return s ? (
                                         <div key={id} className="flex items-center justify-between p-3 bg-[#1A1A1A] rounded-xl border border-[#333]">
                                             <div className="flex items-center gap-3">
-                                                <span className="text-[#555] font-black">{idx + 1}</span>
+                                                <span className="text-[rgba(255,255,255,0.5)] font-black">{idx + 1}</span>
                                                 <div>
                                                     <p className="text-white font-bold text-sm">{s.titulo}</p>
-                                                    <p className="text-[#555] text-[10px]">{s.artista} • {s.tono}</p>
+                                                    <p className="text-[rgba(255,255,255,0.5)] text-[10px]">{s.artista} • {s.tono}</p>
                                                 </div>
                                             </div>
-                                            <button onClick={() => onToggleSong(id)} className="text-[#555] hover:text-red-500"><X size={14} /></button>
+                                            <button onClick={() => onToggleSong(id)} className="text-[rgba(255,255,255,0.5)] hover:text-red-500"><X size={14} /></button>
                                         </div>
                                     ) : null;
                                 })}
                                 <button
                                     onClick={onShowSongPicker}
-                                    className="p-4 border-2 border-dashed border-[#333] rounded-xl text-[#555] hover:border-[#A8D500] hover:text-[#A8D500] transition-all flex items-center justify-center gap-2 font-bold text-xs"
+                                    className="p-4 border-2 border-dashed border-[#333] rounded-xl text-[rgba(255,255,255,0.5)] hover:border-[#A8D500] hover:text-[#A8D500] transition-all flex items-center justify-center gap-2 font-bold text-xs"
                                 >
                                     <Plus size={16} /> SELECCIONAR CANCIONES
                                 </button>

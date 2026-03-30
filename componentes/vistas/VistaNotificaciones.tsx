@@ -62,7 +62,7 @@ const VistaNotificaciones = ({
                     </h3>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Título</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase mb-1 block">Título</label>
                             <input
                                 placeholder="Iglesia del Salvador"
                                 value={tituloPush}
@@ -71,7 +71,7 @@ const VistaNotificaciones = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Mensaje</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase mb-1 block">Mensaje</label>
                             <textarea
                                 placeholder="Escribe el mensaje aquí..."
                                 value={mensajePush}
@@ -81,7 +81,7 @@ const VistaNotificaciones = ({
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[#888] text-xs font-bold uppercase mb-1 block">URL Imagen (Opcional)</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase mb-1 block">URL Imagen (Opcional)</label>
                                 <input
                                     placeholder="https://ejemplo.com/imagen.jpg"
                                     value={imageUrlPush}
@@ -90,7 +90,7 @@ const VistaNotificaciones = ({
                                 />
                             </div>
                             <div>
-                                <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Abrir al tocar</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase mb-1 block">Abrir al tocar</label>
                                 <select
                                     value={typePush}
                                     onChange={(e) => setTypePush(e.target.value)}
@@ -104,7 +104,7 @@ const VistaNotificaciones = ({
                             </div>
                         </div>
                         <div>
-                            <label className="text-[#888] text-xs font-bold uppercase mb-1 block">Segmento / Destinatarios</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase mb-1 block">Segmento / Destinatarios</label>
                             <select
                                 value={filtroHorario}
                                 onChange={(e) => {
@@ -133,7 +133,7 @@ const VistaNotificaciones = ({
                         <button
                             onClick={enviarNotificacion}
                             disabled={enviando}
-                            className={`w-full py-4 rounded-xl font-bold transition-all active:scale-[0.98] ${enviando ? 'bg-[#333] text-[#888]' : 'bg-[#A8D500] text-black shadow-[0_4px_15px_rgba(168,213,0,0.3)]'
+                            className={`w-full py-4 rounded-xl font-bold transition-all active:scale-[0.98] ${enviando ? 'bg-[#333] text-[rgba(255,255,255,0.7)]' : 'bg-[#A8D500] text-black shadow-[0_4px_15px_rgba(168,213,0,0.3)]'
                                 }`}
                         >
                             {enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN AHORA'}
@@ -148,7 +148,7 @@ const VistaNotificaciones = ({
 
                 {/* Phone Preview */}
                 <div className="hidden xl:flex flex-col items-center justify-center p-6 bg-[#1E1E1E] rounded-2xl border border-[#333]">
-                    <h3 className="text-[#888] text-[10px] font-bold uppercase mb-6 tracking-widest">Vista Previa (Teléfono)</h3>
+                    <h3 className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-6 tracking-widest">Vista Previa (Teléfono)</h3>
                     <div className="relative w-[280px] h-[550px] bg-[#000] rounded-[50px] border-[8px] border-[#333] overflow-hidden shadow-2xl">
                         {/* Speaker/Camera Notch */}
                         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-6 bg-[#333] rounded-b-2xl z-10"></div>
@@ -163,7 +163,7 @@ const VistaNotificaciones = ({
                                     <span className="text-[10px] text-white">⛪</span>
                                 </div>
                                 <span className="text-[10px] font-bold text-black uppercase">{tituloPush || 'Nombre App'}</span>
-                                <span className="text-[10px] text-gray-500 ml-auto">ahora</span>
+                                <span className="text-[10px] text-white/60 ml-auto">ahora</span>
                             </div>
                             <p className="text-sm font-bold text-black mb-1">{tituloPush || 'Iglesia del Salvador'}</p>
                             <p className="text-xs text-black leading-tight line-clamp-3 overflow-hidden mb-2">{mensajePush || 'Tu mensaje aparecerá aquí...'}</p>
@@ -174,7 +174,7 @@ const VistaNotificaciones = ({
 
                         {/* Time/Date on phone removed as requested */}
                     </div>
-                    <p className="text-[10px] text-[#555] mt-6 italic">Así es como el usuario verá la notificación push.</p>
+                    <p className="text-[10px] text-[rgba(255,255,255,0.5)] mt-6 italic">Así es como el usuario verá la notificación push.</p>
                 </div>
 
                 {/* Scheduler Section (Moved to col-span-1) */}
@@ -182,7 +182,7 @@ const VistaNotificaciones = ({
                     <h3 className="text-[#FFB400] text-lg font-bold flex items-center gap-2 mb-2">
                         <Clock size={20} /> Programación Automática
                     </h3>
-                    <p className="text-[#888] text-xs mb-6">Usa <span className="text-white font-bold">VERSICULO</span> para envíos bíblicos diarios</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-xs mb-6">Usa <span className="text-white font-bold">VERSICULO</span> para envíos bíblicos diarios</p>
 
                     <div className="space-y-4 mb-8">
                         <div className="flex flex-col gap-3">
@@ -222,12 +222,12 @@ const VistaNotificaciones = ({
                         {cronogramas.map((p) => (
                             <div key={p.id} className="bg-[#252525] p-3 rounded-xl border border-[#333] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-2 h-2 rounded-full ${p.ultimo_estado === 'Exitoso' ? 'bg-[#A8D500]' : 'bg-[#555]'}`} />
+                                    <div className={`w-2 h-2 rounded-full ${p.ultimo_estado === 'Exitoso' ? 'bg-[#A8D500]' : 'bg-[rgba(255,255,255,0.5)]'}`} />
                                     <div>
                                         <div className={`text-sm font-bold ${p.mensaje === 'VERSICULO' ? 'text-[#FFB400]' : 'text-white'}`}>
                                             {p.mensaje === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
                                         </div>
-                                        <div className="text-[10px] text-[#888]">{p.dia_semana} • {p.hora ? p.hora.substring(0, 5) : '--:--'} hs</div>
+                                        <div className="text-[10px] text-[rgba(255,255,255,0.7)]">{p.dia_semana} • {p.hora ? p.hora.substring(0, 5) : '--:--'} hs</div>
                                     </div>
                                 </div>
                                 <button onClick={() => eliminarProgramacion(p.id)} className="text-red-500 p-2 hover:bg-red-500/10 rounded-lg">
@@ -243,14 +243,14 @@ const VistaNotificaciones = ({
             <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
                     <h3 className="text-white text-lg font-bold flex items-center gap-2">
-                        <AlertCircle size={20} className="text-[#888]" /> Historial de Envío
-                        <span className="text-[10px] bg-[#333] text-[#888] px-2 py-1 rounded-full ml-2 font-bold">
+                        <AlertCircle size={20} className="text-[rgba(255,255,255,0.7)]" /> Historial de Envío
+                        <span className="text-[10px] bg-[#333] text-[rgba(255,255,255,0.7)] px-2 py-1 rounded-full ml-2 font-bold">
                             {filteredLogs.length} de {logs.length}
                         </span>
                     </h3>
                     <div className="flex gap-3 flex-wrap">
                         <div className="relative">
-                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
+                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" />
                             <input
                                 placeholder="Buscar por título, mensaje o fecha..."
                                 value={logSearch}
@@ -272,7 +272,7 @@ const VistaNotificaciones = ({
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="text-[#888] text-xs uppercase border-b border-[#333]">
+                            <tr className="text-[rgba(255,255,255,0.7)] text-xs uppercase border-b border-[#333]">
                                 <th className="px-4 py-3">Fecha</th>
                                 <th className="px-4 py-3">Título</th>
                                 <th className="px-4 py-3">Mensaje</th>
@@ -293,17 +293,17 @@ const VistaNotificaciones = ({
                                 ))
                             ) : paginatedLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-4 py-10 text-center text-[#555] italic">
+                                    <td colSpan={5} className="px-4 py-10 text-center text-[rgba(255,255,255,0.5)] italic">
                                         {logSearch ? 'No se encontraron resultados para tu búsqueda.' : 'Sin registros de envío.'}
                                     </td>
                                 </tr>
                             ) : (
                                 paginatedLogs.map((l) => (
                                     <tr key={l.id} className="text-sm hover:bg-[#222] transition-colors">
-                                        <td className="px-4 py-4 text-[#888]">{new Date(l.fecha).toLocaleDateString('es-AR')}</td>
+                                        <td className="px-4 py-4 text-[rgba(255,255,255,0.7)]">{new Date(l.fecha).toLocaleDateString('es-AR')}</td>
                                         <td className="px-4 py-4 text-white font-medium">{l.titulo}</td>
                                         <td className="px-4 py-4 text-[#aaa] max-w-xs truncate">{l.mensaje}</td>
-                                        <td className="px-4 py-4 text-[#888]">{l.destinatarios_count} pers.</td>
+                                        <td className="px-4 py-4 text-[rgba(255,255,255,0.7)]">{l.destinatarios_count} pers.</td>
                                         <td className={`px-4 py-4 font-bold ${l.estado === 'Exitoso' ? 'text-[#A8D500]' : 'text-red-500'}`}>{l.estado}</td>
                                     </tr>
                                 ))
@@ -315,7 +315,7 @@ const VistaNotificaciones = ({
                 {/* Pagination Controls */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#252525]">
-                        <span className="text-[#555] text-xs">Página {logPage} de {totalPages}</span>
+                        <span className="text-[rgba(255,255,255,0.5)] text-xs">Página {logPage} de {totalPages}</span>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setLogPage(p => Math.max(1, p - 1))}

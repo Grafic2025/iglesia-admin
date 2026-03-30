@@ -26,15 +26,15 @@ const RadarAusencias = ({ ausentes }: RadarAusenciasProps) => {
                 </div>
                 <div>
                     <h3 className="text-white font-bold tracking-widest text-sm uppercase">Radar de Ausencias</h3>
-                    <p className="text-[#888] text-[10px] uppercase font-bold">Riesgo de desconexión</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">Riesgo de desconexión</p>
                 </div>
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
                 {ausentes.length === 0 ? (
                     <div className="h-full flex items-center justify-center flex-col text-center opacity-50 p-4">
-                        <UserMinus size={32} className="text-[#555] mb-2" />
-                        <p className="text-[#888] text-xs font-bold uppercase">Nadie en riesgo alto</p>
+                        <UserMinus size={32} className="text-[rgba(255,255,255,0.5)] mb-2" />
+                        <p className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase">Nadie en riesgo alto</p>
                     </div>
                 ) : (
                     ausentes.map((m) => (
@@ -43,7 +43,7 @@ const RadarAusencias = ({ ausentes }: RadarAusenciasProps) => {
                                 {m.foto_perfil ? (
                                     <img src={m.foto_perfil} alt="Perfil" className="w-full h-full object-cover" />
                                 ) : (
-                                    <UserMinus size={16} className="text-[#555]" />
+                                    <UserMinus size={16} className="text-[rgba(255,255,255,0.5)]" />
                                 )}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -65,7 +65,7 @@ const RadarAusencias = ({ ausentes }: RadarAusenciasProps) => {
             </div>
             {ausentes.length > 0 && (
                 <div className="mt-4 text-center">
-                    <p className="text-[10px] text-[#555] italic">Basado en el registro de los últimos 30 días.</p>
+                    <p className="text-[10px] text-[rgba(255,255,255,0.5)] italic">Basado en el registro de los últimos 30 días.</p>
                 </div>
             )}
         </div>

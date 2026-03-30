@@ -22,7 +22,7 @@ export const FiltrosMiembros = ({
         <div className="space-y-4">
             <div className="flex flex-col md:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={20} />
                     <input
                         type="text"
                         placeholder="Buscar por nombre o apellido..."
@@ -36,14 +36,14 @@ export const FiltrosMiembros = ({
                         <button
                             key={f}
                             onClick={() => { setTimeFilter(f); setPage(1); }}
-                            className={`px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all ${timeFilter === f ? 'bg-[#00D9FF] text-black' : 'text-[#555] hover:text-white'}`}
+                            className={`px-4 py-3 rounded-xl text-xs font-bold uppercase transition-all ${timeFilter === f ? 'bg-[#00D9FF] text-black' : 'text-[rgba(255,255,255,0.5)] hover:text-white'}`}
                         >
                             {f === 'Todos' ? 'Todos' : f === 'Hoy' ? '📅 Hoy' : f === 'Semana' ? '📆 7 días' : '🗓️ 30 días'}
                         </button>
                     ))}
                 </div>
             </div>
-            <div className="text-[#555] text-xs font-bold pl-1">
+            <div className="text-[rgba(255,255,255,0.5)] text-xs font-bold pl-1">
                 {filteredCount} miembro{filteredCount !== 1 ? 's' : ''} encontrado{filteredCount !== 1 ? 's' : ''}
             </div>
         </div>

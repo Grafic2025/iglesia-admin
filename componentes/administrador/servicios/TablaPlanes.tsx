@@ -16,7 +16,7 @@ const TablaPlanes: React.FC<TablaPlanesProps> = ({ detailedRows, setDetailedRows
             <div className="bg-[#1A1A1A] rounded-2xl border border-[#333] overflow-hidden">
                 <table className="w-full text-xs">
                     <thead>
-                        <tr className="bg-[#222] text-[#555] font-black uppercase tracking-widest border-b border-[#333]">
+                        <tr className="bg-[#222] text-[rgba(255,255,255,0.5)] font-black uppercase tracking-widest border-b border-[#333]">
                             <th className="p-3 text-left w-20">Tiempo</th>
                             <th className="p-3 text-left">Actividad</th>
                             <th className="p-3 text-left">Resp.</th>
@@ -64,7 +64,7 @@ const TablaPlanes: React.FC<TablaPlanesProps> = ({ detailedRows, setDetailedRows
                 </table>
                 <button
                     onClick={addDetailedRow}
-                    className="w-full p-3 text-[#555] hover:text-[#A8D500] hover:bg-[#A8D50010] transition-all text-[10px] font-bold uppercase"
+                    className="w-full p-3 text-[rgba(255,255,255,0.5)] hover:text-[#A8D500] hover:bg-[#A8D50010] transition-all text-[10px] font-bold uppercase"
                 >
                     + Agregar Momento
                 </button>

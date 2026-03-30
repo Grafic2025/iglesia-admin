@@ -28,7 +28,7 @@ const VistaConfigAgenda = ({ supabase, horariosDisponibles, fetchHorarios, regis
                     </div>
                     <div>
                         <h2 className="text-white text-xl font-bold">Horarios de Reunión</h2>
-                        <p className="text-[#888] text-sm">Configura los turnos disponibles para asistencia y cronogramas</p>
+                        <p className="text-[rgba(255,255,255,0.7)] text-sm">Configura los turnos disponibles para asistencia y cronogramas</p>
                     </div>
                 </div>
 
@@ -57,7 +57,7 @@ const VistaConfigAgenda = ({ supabase, horariosDisponibles, fetchHorarios, regis
                                 </div>
                                 <button
                                     onClick={() => handleRemove(h)}
-                                    className="p-2 text-[#555] hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                    className="p-2 text-[rgba(255,255,255,0.5)] hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100"
                                 >
                                     <Trash2 size={18} />
                                 </button>

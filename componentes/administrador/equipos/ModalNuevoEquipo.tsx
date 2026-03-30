@@ -25,7 +25,7 @@ const ModalNuevoEquipo: React.FC<ModalNuevoEquipoProps> = ({
                 <h3 className="text-white font-bold text-xl mb-6">Crear Nuevo Equipo</h3>
                 <div className="space-y-4">
                     <div>
-                        <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Nombre del Equipo</label>
+                        <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Nombre del Equipo</label>
                         <input
                             type="text"
                             value={newTeamName}
@@ -35,13 +35,13 @@ const ModalNuevoEquipo: React.FC<ModalNuevoEquipoProps> = ({
                         />
                     </div>
                     <div>
-                        <label className="text-[#888] text-xs font-bold mb-2 block uppercase">Icono (Emoji)</label>
+                        <label className="text-[rgba(255,255,255,0.7)] text-xs font-bold mb-2 block uppercase">Icono (Emoji)</label>
                         <div className="grid grid-cols-5 gap-2">
                             {emojis.map(emoji => (
                                 <button
                                     key={emoji}
                                     onClick={() => setNewTeamIcon(emoji)}
-                                    className={`p-3 text-2xl rounded-xl border transition-all ${newTeamIcon === emoji ? 'bg-[#A8D500] border-[#A8D500]' : 'bg-[#222] border-[#333] hover:border-[#555]'}`}
+                                    className={`p-3 text-2xl rounded-xl border transition-all ${newTeamIcon === emoji ? 'bg-[#A8D500] border-[#A8D500]' : 'bg-[#222] border-[#333] hover:border-[rgba(255,255,255,0.5)]'}`}
                                 >
                                     {emoji}
                                 </button>

@@ -158,7 +158,7 @@ export default function VideosPage() {
                 <div>
                     <h2 className="text-[#c5ff00] text-xs font-black tracking-[4px] uppercase mb-1">Centro Multimedia</h2>
                     <h3 className="text-5xl font-black tracking-tighter">Videoteca Admin</h3>
-                    <p className="text-white/40 mt-3 max-w-2xl text-base">Contenido organizado en categorías interactivas.</p>
+                    <p className="text-white/70 mt-3 max-w-2xl text-base font-medium">Contenido organizado en categorías interactivas.</p>
                 </div>
                 <button onClick={() => setModalSeccionAbierto(true)} className="bg-[#c5ff00] text-black px-6 py-3 rounded-full font-black tracking-widest uppercase text-sm hover:scale-105 transition-transform flex items-center gap-2 shadow-[0_0_20px_rgba(197,255,0,0.3)]">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>

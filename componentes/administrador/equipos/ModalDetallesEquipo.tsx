@@ -26,10 +26,10 @@ const ModalDetallesEquipo: React.FC<ModalDetallesEquipoProps> = ({
                         <div className="text-3xl">{selectedTeam.icono}</div>
                         <div>
                             <h3 className="text-white font-bold text-xl">{selectedTeam.nombre}</h3>
-                            <p className="text-[#888] text-xs">{teamMembers.length} voluntarios en este equipo</p>
+                            <p className="text-[rgba(255,255,255,0.7)] text-xs">{teamMembers.length} voluntarios en este equipo</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-[#888] hover:text-white p-2"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white p-2"><X /></button>
                 </div>
 
                 <div className="p-6 max-h-[60vh] overflow-y-auto">
@@ -45,7 +45,7 @@ const ModalDetallesEquipo: React.FC<ModalDetallesEquipoProps> = ({
 
                     <div className="space-y-3">
                         {teamMembers.length === 0 ? (
-                            <p className="text-[#555] text-center py-10 italic text-sm">No hay voluntarios asignados aún.</p>
+                            <p className="text-[rgba(255,255,255,0.5)] text-center py-10 italic text-sm">No hay voluntarios asignados aún.</p>
                         ) : (
                             teamMembers.map((tm: any) => (
                                 <div key={tm.id} className="flex items-center justify-between p-4 bg-[#222] rounded-2xl border border-[#333] group">
@@ -54,7 +54,7 @@ const ModalDetallesEquipo: React.FC<ModalDetallesEquipoProps> = ({
                                             {tm.miembros.foto_url ? (
                                                 <img src={tm.miembros.foto_url} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <User className="text-[#555]" size={20} />
+                                                <User className="text-[rgba(255,255,255,0.5)]" size={20} />
                                             )}
                                         </div>
                                         <div>

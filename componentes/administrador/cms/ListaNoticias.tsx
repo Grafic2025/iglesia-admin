@@ -16,7 +16,7 @@ const ListaNoticias: React.FC<ListaNoticiasProps> = ({ noticias, syncYouTube, on
             <div className="flex items-center justify-between">
                 <h3 className="text-[#FFB400] text-xl font-black flex items-center gap-2 tracking-tight">
                     <ImageIcon size={22} /> CMS: Noticias
-                    <span className="text-[#555] font-medium text-sm">(Carrusel)</span>
+                    <span className="text-[rgba(255,255,255,0.5)] font-medium text-sm">(Carrusel)</span>
                 </h3>
                 <button
                     onClick={() => syncYouTube(true)}
@@ -35,7 +35,7 @@ const ListaNoticias: React.FC<ListaNoticiasProps> = ({ noticias, syncYouTube, on
                         </div>
                         <div className="flex-1 min-w-0 text-left">
                             <div className="text-white text-sm font-bold truncate group-hover:text-[#FFB400] transition-colors uppercase tracking-wide">{n.titulo}</div>
-                            <div className="text-[10px] text-[#555] flex items-center gap-2 font-bold mt-1">
+                            <div className="text-[10px] text-[rgba(255,255,255,0.5)] flex items-center gap-2 font-bold mt-1">
                                 <span className="bg-[#151515] px-2 py-0.5 rounded-md border border-white/5">{n.es_youtube ? '🔴 YOUTUBE' : '📰 NOTICIA'}</span>
                                 {n.categoria && <span className="text-[#FFB400] tracking-widest"># {n.categoria.toUpperCase()}</span>}
                             </div>
@@ -45,13 +45,13 @@ const ListaNoticias: React.FC<ListaNoticiasProps> = ({ noticias, syncYouTube, on
                                 <div className="flex flex-col">
                                     <button
                                         onClick={() => onMove(n.id, 'up')}
-                                        className="p-1 text-[#555] hover:text-[#FFB400] transition-colors"
+                                        className="p-1 text-[rgba(255,255,255,0.5)] hover:text-[#FFB400] transition-colors"
                                     >
                                         <ChevronUp size={14} />
                                     </button>
                                     <button
                                         onClick={() => onMove(n.id, 'down')}
-                                        className="p-1 text-[#555] hover:text-[#FFB400] transition-colors"
+                                        className="p-1 text-[rgba(255,255,255,0.5)] hover:text-[#FFB400] transition-colors"
                                     >
                                         <ChevronDown size={14} />
                                     </button>
@@ -69,7 +69,7 @@ const ListaNoticias: React.FC<ListaNoticiasProps> = ({ noticias, syncYouTube, on
                 ))}
                 <button
                     onClick={onAdd}
-                    className="w-full py-6 border-2 border-dashed border-[#222] text-[#555] rounded-3xl flex items-center justify-center gap-2 hover:border-[#FFB40050] hover:text-[#FFB400] hover:bg-[#FFB40005] transition-all font-black text-xs tracking-widest"
+                    className="w-full py-6 border-2 border-dashed border-[#222] text-[rgba(255,255,255,0.5)] rounded-3xl flex items-center justify-center gap-2 hover:border-[#FFB40050] hover:text-[#FFB400] hover:bg-[#FFB40005] transition-all font-black text-xs tracking-widest"
                 >
                     <PlusCircle size={20} /> AGREGAR CONTENIDO MANUAL
                 </button>

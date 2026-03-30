@@ -25,14 +25,14 @@ const UltimosMiembros = ({ miembros }: UltimosMiembrosProps) => {
                             <h4 className="text-[#eee] text-sm font-bold truncate leading-tight">
                                 {m.nombre} {m.apellido}
                             </h4>
-                            <p className="text-[#888] text-[10px] truncate leading-tight mt-0.5">
+                            <p className="text-[rgba(255,255,255,0.7)] text-[10px] truncate leading-tight mt-0.5">
                                 Se unió el {new Date(m.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })}
                             </p>
                         </div>
                     </div>
                 ))}
                 {miembros.length === 0 && (
-                    <p className="text-[#888] text-xs text-center py-4">No hay nuevos miembros recientes</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-xs text-center py-4">No hay nuevos miembros recientes</p>
                 )}
             </div>
         </div>

@@ -27,10 +27,10 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
             <div className="bg-[#1A1A1A] w-full max-w-lg rounded-3xl border border-[#333] p-6 max-h-[80vh] flex flex-col">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-white font-bold uppercase tracking-widest text-left">Asignar Servidor</h3>
-                    <button onClick={onClose} className="text-[#888]"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)]"><X /></button>
                 </div>
                 <div className="relative mb-4 text-left">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={16} />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={16} />
                     <input
                         type="text"
                         placeholder="Buscar por nombre o apellido..."
@@ -50,7 +50,7 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
                         >
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-[#333] rounded-full overflow-hidden flex items-center justify-center">
-                                    {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover" /> : <User size={20} className="text-[#555]" />}
+                                    {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover" /> : <User size={20} className="text-[rgba(255,255,255,0.5)]" />}
                                 </div>
                                 <div>
                                     <p className="font-bold text-sm">{m.nombre} {m.apellido}</p>
@@ -63,7 +63,7 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
                                             />
                                         </div>
                                     ) : (
-                                        <p className={`text-[10px] uppercase ${assignedStaff.some(s => s.miembro_id === m.id) ? 'text-white/60' : 'text-[#555]'}`}>Servidor</p>
+                                        <p className={`text-[10px] uppercase ${assignedStaff.some(s => s.miembro_id === m.id) ? 'text-white/60' : 'text-[rgba(255,255,255,0.5)]'}`}>Servidor</p>
                                     )}
                                 </div>
                             </div>

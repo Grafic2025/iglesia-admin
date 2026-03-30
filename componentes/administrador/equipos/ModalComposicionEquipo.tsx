@@ -31,13 +31,13 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
             <div className="fixed inset-0 bg-black/95 backdrop-blur-md z-[60] flex items-center justify-center p-4">
                 <div className="bg-[#151515] w-full max-w-2xl rounded-3xl border border-[#333] shadow-2xl overflow-hidden">
                     <div className="p-6 flex justify-end">
-                        <button onClick={onClose} className="text-[#888] hover:text-white p-2"><X size={24} /></button>
+                        <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white p-2"><X size={24} /></button>
                     </div>
                     <div className="text-center py-20">
                         <div className="w-20 h-20 bg-[#222] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#333]">
-                            <ShieldAlert className="text-[#555]" size={32} />
+                            <ShieldAlert className="text-[rgba(255,255,255,0.5)]" size={32} />
                         </div>
-                        <p className="text-[#555] font-bold italic">No hay personas asignadas para este día.</p>
+                        <p className="text-[rgba(255,255,255,0.5)] font-bold italic">No hay personas asignadas para este día.</p>
                     </div>
                 </div>
             </div>
@@ -58,11 +58,11 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                         <h3 className="text-white font-black text-[14px] uppercase tracking-widest flex items-center gap-3">
                             <Users2 className="text-[#A8D500]" size={18} /> Composición del Equipo
                         </h3>
-                        <p className="text-[#888] text-[10px] font-bold uppercase mt-1">
+                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mt-1">
                             {new Date(selectedDateSchedule.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} — {selectedDateSchedule.horario}
                         </p>
                     </div>
-                    <button onClick={onClose} className="text-[#888] hover:text-white p-2">
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)] hover:text-white p-2">
                         <X size={24} />
                     </button>
                 </div>
@@ -114,7 +114,7 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                                                         return foto ? (
                                                             <img src={foto} className="w-full h-full object-cover" alt="" />
                                                         ) : (
-                                                            <span className="text-xs text-[#555] font-black">{s.nombre?.[0]}</span>
+                                                            <span className="text-xs text-[rgba(255,255,255,0.5)] font-black">{s.nombre?.[0]}</span>
                                                         );
                                                     })()}
                                                     <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#1E1E1E] ${s.estado === 'confirmado' ? 'bg-[#A8D500]' : s.estado === 'rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />

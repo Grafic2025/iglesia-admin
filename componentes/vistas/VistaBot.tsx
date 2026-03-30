@@ -39,19 +39,19 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                         <div className="p-2 bg-[#A8D50015] rounded-xl"><Bot className="text-[#A8D500]" size={28} /></div>
                         IDS BOT: Área de Entrenamiento
                     </h2>
-                    <p className="text-[#888] text-sm mt-1">Gestiona el cerebro y el aprendizaje de la Inteligencia Del Salvador.</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm mt-1">Gestiona el cerebro y el aprendizaje de la Inteligencia Del Salvador.</p>
                 </div>
 
                 <div className="flex bg-[#1E1E1E] p-1.5 rounded-2xl border border-[#333]">
                     <button
                         onClick={() => setActiveTab('aprendizaje')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'aprendizaje' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[#888] hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'aprendizaje' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
                     >
                         <Sparkles size={14} /> LO QUE NO SÉ ({aprendizaje.length})
                     </button>
                     <button
                         onClick={() => setActiveTab('cerebro')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'cerebro' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[#888] hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'cerebro' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
                     >
                         <Brain size={14} /> MI CEREBRO ({cerebro.length})
                     </button>
@@ -59,7 +59,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
             </div>
 
             {loading ? (
-                <div className="py-20 text-center text-[#555] animate-pulse">Cargando datos del bot...</div>
+                <div className="py-20 text-center text-[rgba(255,255,255,0.5)] animate-pulse">Cargando datos del bot...</div>
             ) : (
                 <div className="grid grid-cols-1 gap-6">
                     {activeTab === 'aprendizaje' ? (
@@ -84,7 +84,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                                 </div>
                                                 <div>
                                                     <p className="text-white font-medium text-lg italic">"{a.pregunta}"</p>
-                                                    <p className="text-[#555] text-[10px] font-black uppercase mt-1 flex items-center gap-1.5">
+                                                    <p className="text-[rgba(255,255,255,0.5)] text-[10px] font-black uppercase mt-1 flex items-center gap-1.5">
                                                         <Clock size={10} /> {new Date(a.fecha).toLocaleString()}
                                                     </p>
                                                 </div>
@@ -127,7 +127,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                             <p className="text-white font-bold">{c.palabras_clave}</p>
                                         </div>
                                         <div>
-                                            <label className="text-[9px] font-black text-[#666] uppercase tracking-widest block mb-1">Respuesta del Bot</label>
+                                            <label className="text-[9px] font-black text-[rgba(255,255,255,0.6)] uppercase tracking-widest block mb-1">Respuesta del Bot</label>
                                             <p className="text-[#AAA] text-sm leading-relaxed">{c.respuesta}</p>
                                         </div>
                                         <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
@@ -164,18 +164,18 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
 
                         <div className="p-8 space-y-6">
                             <div>
-                                <label className="text-[#888] text-[10px] font-black uppercase tracking-widest mb-2 block">Palabras Clave (¿Qué preguntará el usuario?)</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-black uppercase tracking-widest mb-2 block">Palabras Clave (¿Qué preguntará el usuario?)</label>
                                 <input
                                     value={palabrasClave}
                                     onChange={e => setPalabrasClave(e.target.value)}
                                     placeholder="Ej: horario reunion, cuando empieza..."
                                     className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-4 text-white outline-none focus:border-[#A8D500] transition-all"
                                 />
-                                <p className="text-[#555] text-[10px] mt-2 italic font-medium">El bot buscará coincidencias entre estas palabras y lo que escriba el usuario.</p>
+                                <p className="text-[rgba(255,255,255,0.5)] text-[10px] mt-2 italic font-medium">El bot buscará coincidencias entre estas palabras y lo que escriba el usuario.</p>
                             </div>
 
                             <div>
-                                <label className="text-[#888] text-[10px] font-black uppercase tracking-widest mb-2 block">Respuesta del Bot</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-black uppercase tracking-widest mb-2 block">Respuesta del Bot</label>
                                 <textarea
                                     value={respuesta}
                                     onChange={e => setRespuesta(e.target.value)}

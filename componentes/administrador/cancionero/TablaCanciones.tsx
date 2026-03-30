@@ -14,7 +14,7 @@ const TablaCanciones: React.FC<TablaCancionesProps> = ({ songs, loading, onEdit,
         <div className="overflow-x-auto">
             <table className="w-full">
                 <thead>
-                    <tr className="bg-[#252525] text-[#888] text-xs uppercase tracking-widest border-b border-[#333]">
+                    <tr className="bg-[#252525] text-[rgba(255,255,255,0.7)] text-xs uppercase tracking-widest border-b border-[#333]">
                         <th className="px-6 py-4 text-left">Título / Artista</th>
                         <th className="px-6 py-4 text-center">Tono</th>
                         <th className="px-6 py-4 text-center">BPM</th>
@@ -23,38 +23,38 @@ const TablaCanciones: React.FC<TablaCancionesProps> = ({ songs, loading, onEdit,
                 </thead>
                 <tbody className="divide-y divide-[#252525]">
                     {loading ? (
-                        <tr><td colSpan={4} className="text-center py-10 text-[#555]">Cargando canciones...</td></tr>
+                        <tr><td colSpan={4} className="text-center py-10 text-[rgba(255,255,255,0.5)]">Cargando canciones...</td></tr>
                     ) : songs.length === 0 ? (
-                        <tr><td colSpan={4} className="text-center py-10 text-[#555]">No se encontraron canciones.</td></tr>
+                        <tr><td colSpan={4} className="text-center py-10 text-[rgba(255,255,255,0.5)]">No se encontraron canciones.</td></tr>
                     ) : (
                         songs.map((song) => (
                             <tr key={song.id} className="hover:bg-[#222] transition-colors group">
                                 <td className="px-6 py-4 text-left">
                                     <p className="text-white font-bold">{song.titulo}</p>
-                                    <p className="text-[#555] text-xs">{song.artista || 'Artista desconocido'}</p>
+                                    <p className="text-[rgba(255,255,255,0.5)] text-xs">{song.artista || 'Artista desconocido'}</p>
                                 </td>
                                 <td className="px-6 py-4 text-center">
                                     <span className="bg-[#A8D50020] text-[#A8D500] px-3 py-1 rounded-lg text-sm font-black border border-[#A8D50020]">
                                         {song.tono}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-center text-[#888] text-sm font-bold">
+                                <td className="px-6 py-4 text-center text-[rgba(255,255,255,0.7)] text-sm font-bold">
                                     {song.bpm || '--'}
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center justify-end gap-2">
                                         {song.youtube_url && (
-                                            <button onClick={() => window.open(song.youtube_url)} className="p-2 text-[#888] hover:text-[#FF0000] hover:bg-[#FF000010] rounded-lg transition-all" title="Ver YouTube">
+                                            <button onClick={() => window.open(song.youtube_url)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[#FF0000] hover:bg-[#FF000010] rounded-lg transition-all" title="Ver YouTube">
                                                 <Youtube size={16} />
                                             </button>
                                         )}
                                         {song.spotify_url && (
-                                            <button onClick={() => window.open(song.spotify_url)} className="p-2 text-[#888] hover:text-[#1DB954] hover:bg-[#1DB95410] rounded-lg transition-all" title="Escuchar en Spotify">
+                                            <button onClick={() => window.open(song.spotify_url)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[#1DB954] hover:bg-[#1DB95410] rounded-lg transition-all" title="Escuchar en Spotify">
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.84.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.6.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z" /></svg>
                                             </button>
                                         )}
                                         {song.pdf_url && (
-                                            <button onClick={() => window.open(song.pdf_url)} className="p-2 text-[#888] hover:text-[#3B82F6] hover:bg-[#3B82F610] rounded-lg transition-all" title="Ver Partitura">
+                                            <button onClick={() => window.open(song.pdf_url)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[#3B82F6] hover:bg-[#3B82F610] rounded-lg transition-all" title="Ver Partitura">
                                                 <File size={16} />
                                             </button>
                                         )}
@@ -64,10 +64,10 @@ const TablaCanciones: React.FC<TablaCancionesProps> = ({ songs, loading, onEdit,
                                                 <FileText size={16} /> ACORDES
                                             </button>
                                         )}
-                                        <button onClick={() => onEdit(song)} className="p-2 text-[#888] hover:text-[#A8D500] hover:bg-[#A8D50010] rounded-lg transition-all" title="Editar">
+                                        <button onClick={() => onEdit(song)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[#A8D500] hover:bg-[#A8D50010] rounded-lg transition-all" title="Editar">
                                             <Edit2 size={16} />
                                         </button>
-                                        <button onClick={() => onDelete(song.id)} className="p-2 text-[#888] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Eliminar">
+                                        <button onClick={() => onDelete(song.id)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Eliminar">
                                             <Trash2 size={16} />
                                         </button>
                                     </div>

@@ -20,12 +20,12 @@ const TarjetaAlerta: React.FC<TarjetaAlertaProps> = ({ m, onContact }) => {
             </div>
 
             <div className="bg-[#151515] p-3 rounded-xl border border-[#222] mb-4">
-                <div className="flex items-center justify-between text-[10px] uppercase font-black text-[#555]">
+                <div className="flex items-center justify-between text-[10px] uppercase font-black text-[rgba(255,255,255,0.5)]">
                     <span>Última vez visto</span>
                     <span>Zona</span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-white mt-1">
-                    <span className="flex items-center gap-1"><Calendar size={12} className="text-[#555]" /> {m.ultimoRegistro ? m.ultimoRegistro.toLocaleDateString() : 'Sin registros previos'}</span>
+                    <span className="flex items-center gap-1"><Calendar size={12} className="text-[rgba(255,255,255,0.5)]" /> {m.ultimoRegistro ? m.ultimoRegistro.toLocaleDateString() : 'Sin registros previos'}</span>
                     <span className="font-bold">{m.zona || 'S/D'}</span>
                 </div>
             </div>

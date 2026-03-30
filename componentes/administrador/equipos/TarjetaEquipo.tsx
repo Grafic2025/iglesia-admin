@@ -17,7 +17,7 @@ const TarjetaEquipo: React.FC<TarjetaEquipoProps> = ({ team, onSelect, onToggleB
             <div className="absolute top-4 right-4 flex gap-1">
                 <button
                     onClick={(e) => onToggleBlock(team, e)}
-                    className={`p-2 rounded-lg transition-all ${team.bloqueado ? 'bg-red-500 text-white' : 'text-[#555] hover:bg-[#333]'}`}
+                    className={`p-2 rounded-lg transition-all ${team.bloqueado ? 'bg-red-500 text-white' : 'text-[rgba(255,255,255,0.5)] hover:bg-[#333]'}`}
                     title={team.bloqueado ? "Desbloquear equipo" : "Bloquear equipo (Mantenimiento/Baja)"}
                 >
                     <ShieldAlert size={14} />
@@ -35,7 +35,7 @@ const TarjetaEquipo: React.FC<TarjetaEquipoProps> = ({ team, onSelect, onToggleB
                 {team.nombre}
                 {team.bloqueado && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black">BLOQUEADO</span>}
             </h4>
-            <p className="text-[#888] text-sm mb-4">{team.miembros} Voluntarios</p>
+            <p className="text-[rgba(255,255,255,0.7)] text-sm mb-4">{team.miembros} Voluntarios</p>
             <div className="text-[#A8D500] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {team.bloqueado ? 'EQUIPO EN MANTENIMIENTO' : 'VER VOLUNTARIOS'} <Plus size={12} />
             </div>

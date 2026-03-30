@@ -139,7 +139,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
         handleSaveList(newList);
     };
 
-    if (loading) return <div className="text-[#888] animate-pulse p-10">Cargando configuración...</div>;
+    if (loading) return <div className="text-[rgba(255,255,255,0.7)] animate-pulse p-10">Cargando configuración...</div>;
 
     return (
         <div className="bg-[#151515] p-6 rounded-3xl border border-[#222] space-y-6 text-left shadow-xl">
@@ -147,9 +147,9 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                 <div>
                     <h3 className="text-white font-black text-xl flex items-center gap-2 tracking-tight">
                         <GripVertical className="text-[#A8D500]" /> Accesos Directos
-                        <span className="text-[#555] font-medium text-sm">(Menú App)</span>
+                        <span className="text-[rgba(255,255,255,0.5)] font-medium text-sm">(Menú App)</span>
                     </h3>
-                    <p className="text-[#666] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
+                    <p className="text-[rgba(255,255,255,0.6)] text-xs">Gestiona los botones que aparecen en el inicio de la App</p>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
                     <button
@@ -190,8 +190,8 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                             <div className="flex-1 min-w-0 pr-2">
                                 <h4 className="text-white font-bold text-sm uppercase tracking-wide group-hover:text-[#A8D500] transition-colors leading-tight">{a.titulo}</h4>
                                 <div className="flex items-center gap-1.5 opacity-60 mt-0.5">
-                                    <LinkIcon size={10} className="text-[#888] shrink-0" />
-                                    <p className="text-[#888] text-[10px] font-bold tracking-widest uppercase truncate">{a.pantalla}</p>
+                                    <LinkIcon size={10} className="text-[rgba(255,255,255,0.7)] shrink-0" />
+                                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold tracking-widest uppercase truncate">{a.pantalla}</p>
                                 </div>
                             </div>
                         </div>
@@ -208,8 +208,8 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                     </button>
                                 )}
                                 <div className="w-px h-4 bg-[#333] mx-1" />
-                                <button onClick={() => move(index, 'up')} disabled={index === 0} className="p-1.5 text-[#888] hover:text-white disabled:opacity-0 transition-colors"><ChevronUp size={16} /></button>
-                                <button onClick={() => move(index, 'down')} disabled={index === acciones.length - 1} className="p-1.5 text-[#888] hover:text-white disabled:opacity-0 transition-colors"><ChevronDown size={16} /></button>
+                                <button onClick={() => move(index, 'up')} disabled={index === 0} className="p-1.5 text-[rgba(255,255,255,0.7)] hover:text-white disabled:opacity-0 transition-colors"><ChevronUp size={16} /></button>
+                                <button onClick={() => move(index, 'down')} disabled={index === acciones.length - 1} className="p-1.5 text-[rgba(255,255,255,0.7)] hover:text-white disabled:opacity-0 transition-colors"><ChevronDown size={16} /></button>
                                 <div className="w-px h-4 bg-[#333] mx-1" />
                                 <button onClick={() => openEdit(index)} className="p-1.5 text-blue-400 hover:bg-blue-400/15 rounded-lg transition-colors"><Edit2 size={14} /></button>
                                 <button onClick={() => deleteAction(index)} className="p-1.5 text-red-500 hover:bg-red-500/15 rounded-lg transition-colors"><Trash2 size={14} /></button>
@@ -223,7 +223,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                 <div className="w-8 h-8 rounded-full bg-[#A8D50020] flex items-center justify-center shrink-0">
                     <Info className="text-[#A8D500]" size={16} />
                 </div>
-                <p className="text-[10px] text-[#888] leading-normal font-medium">
+                <p className="text-[10px] text-[rgba(255,255,255,0.7)] leading-normal font-medium">
                     <strong className="text-white">Tip Estético:</strong> Estos botones se muestran de a dos en la App. Mantén los títulos cortos y las URLs de imagen de buena calidad (Unsplash recomendado) para que el inicio de tu App luzca increíble.
                 </p>
             </div>
@@ -234,11 +234,11 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                     <div className="bg-[#1E1E1E] border border-[#333] w-full max-w-lg rounded-3xl p-6 space-y-4 shadow-2xl text-left">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="text-white font-bold text-lg">{editIndex !== null ? 'Editar Tarjeta' : 'Nueva Tarjeta'}</h3>
-                            <button onClick={() => setModalOpen(false)} className="text-[#888]"><X size={20} /></button>
+                            <button onClick={() => setModalOpen(false)} className="text-[rgba(255,255,255,0.7)]"><X size={20} /></button>
                         </div>
 
                         <div>
-                            <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Título del botón</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Título del botón</label>
                             <input
                                 value={titulo}
                                 onChange={e => setTitulo(e.target.value)}
@@ -249,7 +249,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Icono (App Name)</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Icono (App Name)</label>
                                 <input
                                     value={icono}
                                     onChange={e => setIcono(e.target.value)}
@@ -258,7 +258,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                                 />
                             </div>
                             <div>
-                                <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Tipo de Icono</label>
+                                <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Tipo de Icono</label>
                                 <select
                                     value={esMci ? 'mci' : 'fa'}
                                     onChange={e => setEsMci(e.target.value === 'mci')}
@@ -271,7 +271,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                         </div>
 
                         <div>
-                            <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">Pantalla Destino (o Link)</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">Pantalla Destino (o Link)</label>
                             <input
                                 value={pantalla}
                                 onChange={e => setPantalla(e.target.value)}
@@ -281,7 +281,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                         </div>
 
                         <div>
-                            <label className="text-[#888] text-[10px] font-bold uppercase mb-1 block">URL de Imagen Fondo</label>
+                            <label className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mb-1 block">URL de Imagen Fondo</label>
                             <input
                                 value={imagenUrl}
                                 onChange={e => setImagenUrl(e.target.value)}
@@ -291,7 +291,7 @@ const GestorAcciones: React.FC<GestorAccionesProps> = ({ supabase, registrarAudi
                         </div>
 
                         <div className="pt-4 flex gap-3">
-                            <button onClick={() => setModalOpen(false)} className="flex-1 py-3 text-[#888] font-bold bg-[#333] rounded-xl">CANCELAR</button>
+                            <button onClick={() => setModalOpen(false)} className="flex-1 py-3 text-[rgba(255,255,255,0.7)] font-bold bg-[#333] rounded-xl">CANCELAR</button>
                             <button
                                 onClick={saveAction}
                                 disabled={saving || !titulo || !icono || !pantalla}

@@ -28,9 +28,9 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <History className="text-[#A8D500]" /> AUDITORÍA DE ACCIONES
                     </h2>
-                    <p className="text-[#888] text-sm italic">Registro de seguridad y trazabilidad de cambios en el sistema</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Registro de seguridad y trazabilidad de cambios en el sistema</p>
                 </div>
-                <span className="text-[10px] bg-[#252525] text-[#888] px-3 py-1.5 rounded-full font-bold border border-[#333]">
+                <span className="text-[10px] bg-[#252525] text-[rgba(255,255,255,0.7)] px-3 py-1.5 rounded-full font-bold border border-[#333]">
                     {filteredLogs.length} de {logs.length} registros
                 </span>
             </div>
@@ -38,7 +38,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
             {/* Filters bar */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" />
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" />
                     <input
                         type="text"
                         placeholder="Buscar por acción, detalle, administrador o fecha..."
@@ -48,7 +48,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                     />
                 </div>
                 <div className="relative">
-                    <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" />
+                    <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" />
                     <select
                         value={actionFilter}
                         onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
@@ -64,7 +64,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
             <div className="bg-[#1E1E1E] rounded-3xl border border-[#333] overflow-hidden">
                 <table className="w-full text-sm text-left">
                     <thead>
-                        <tr className="bg-[#151515] text-[#555] font-black uppercase tracking-widest border-b border-[#333]">
+                        <tr className="bg-[#151515] text-[rgba(255,255,255,0.5)] font-black uppercase tracking-widest border-b border-[#333]">
                             <th className="p-5">Fecha y Hora</th>
                             <th className="p-5">Usuario/Admin</th>
                             <th className="p-5">Acción</th>
@@ -74,7 +74,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                     <tbody className="divide-y divide-[#222]">
                         {paginatedLogs.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="p-10 text-center text-[#555] italic">
+                                <td colSpan={4} className="p-10 text-center text-[rgba(255,255,255,0.5)] italic">
                                     {search || actionFilter !== 'Todas'
                                         ? 'No se encontraron registros con esos filtros.'
                                         : 'No hay registros de auditoría aún.'}
@@ -91,7 +91,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                                             <div className="p-1.5 bg-[#A8D50015] rounded-lg">
                                                 <User size={14} className="text-[#A8D500]" />
                                             </div>
-                                            <span className="text-[#888] font-bold">{log.administrador_id}</span>
+                                            <span className="text-[rgba(255,255,255,0.7)] font-bold">{log.administrador_id}</span>
                                         </div>
                                     </td>
                                     <td className="p-5">
@@ -103,7 +103,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                                             {log.accion}
                                         </span>
                                     </td>
-                                    <td className="p-5 text-[#888] text-xs max-w-sm">
+                                    <td className="p-5 text-[rgba(255,255,255,0.7)] text-xs max-w-sm">
                                         {log.detalle}
                                     </td>
                                 </tr>
@@ -115,7 +115,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                 {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex items-center justify-between px-5 py-4 border-t border-[#252525] bg-[#151515]">
-                        <span className="text-[#555] text-xs font-bold">Página {page} de {totalPages}</span>
+                        <span className="text-[rgba(255,255,255,0.5)] text-xs font-bold">Página {page} de {totalPages}</span>
                         <div className="flex gap-2">
                             <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}

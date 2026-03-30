@@ -85,7 +85,7 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Calendar className="text-[#A8D500]" /> PLANIFICACIÓN (CRONOGRAMAS)
                     </h2>
-                    <p className="text-[#888] text-sm italic">Organiza los cultos, equipos y canciones del domingo</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Organiza los cultos, equipos y canciones del domingo</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
@@ -96,13 +96,13 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
             </div>
 
             <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60" size={18} />
                 <input
                     type="text"
                     placeholder="Buscar para ver asignar a: Músico, Vocalista, Sonido, Audiovisuales..."
                     value={musicianSearch}
                     onChange={(e) => setMusicianSearch(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-[#1e1e1e] border border-white/5 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-[#A8D500] transition-all font-medium"
+                    className="w-full pl-12 pr-4 py-3 bg-[#1e1e1e] border border-white/5 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-1 focus:ring-[#A8D500] transition-all font-medium"
                 />
             </div>
 

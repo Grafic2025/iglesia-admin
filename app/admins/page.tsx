@@ -133,7 +133,7 @@ export default function AdminsPage() {
                 <div>
                     <h2 className="text-[#A8D500] text-xs font-black tracking-[4px] uppercase mb-1">Seguridad de Sistema</h2>
                     <h1 className="text-5xl font-black tracking-tighter">Administrar Accesos</h1>
-                    <p className="text-white/40 mt-3 max-w-2xl text-base">Controla quién puede entrar al panel y qué información pueden ver.</p>
+                    <p className="text-white/70 mt-3 max-w-2xl text-base font-medium">Controla quién puede entrar al panel y qué información pueden ver.</p>
                 </div>
                 <button 
                     onClick={() => abrirModal()}
@@ -171,13 +171,13 @@ export default function AdminsPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <p className="text-[10px] text-white/30 uppercase font-bold tracking-widest mb-3">Menús Permitidos</p>
+                            <p className="text-[10px] text-white/60 uppercase font-bold tracking-widest mb-3">Menús Permitidos</p>
                             <div className="flex flex-wrap gap-2">
                                 {u.rol === 'superadmin' ? (
-                                    <span className="text-xs text-[#A8D500] font-bold">TODOS LOS ACCESOS (*)</span>
+                                    <span className="text-xs text-[#A8D500] font-black">TODOS LOS ACCESOS (*)</span>
                                 ) : (
                                     u.menus_permitidos?.map(m => (
-                                        <span key={m} className="text-[10px] bg-white/5 px-2 py-1 rounded-md text-white/70">
+                                        <span key={m} className="text-[10px] bg-white/10 px-2 py-1 rounded-md text-white font-bold border border-white/5">
                                             {MENU_OPTIONS.find(opt => opt.id === m)?.label || m}
                                         </span>
                                     ))

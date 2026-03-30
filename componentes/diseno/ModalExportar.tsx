@@ -33,7 +33,7 @@ const ModalExportar: React.FC<ModalExportarProps> = ({
                 </h3>
                 <div className="space-y-6">
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Inicio</label>
+                        <label className="block text-xs font-bold text-white/60 uppercase mb-2 tracking-widest px-1">Fecha Inicio</label>
                         <input
                             type="date"
                             value={exportStart}
@@ -42,7 +42,7 @@ const ModalExportar: React.FC<ModalExportarProps> = ({
                         />
                     </div>
                     <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest px-1">Fecha Fin</label>
+                        <label className="block text-xs font-bold text-white/60 uppercase mb-2 tracking-widest px-1">Fecha Fin</label>
                         <input
                             type="date"
                             value={exportEnd}

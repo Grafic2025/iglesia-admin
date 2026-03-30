@@ -74,7 +74,7 @@ const EquiposView = ({ supabase, setActiveTab, enviarNotificacionIndividual, reg
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Users2 className="text-[#A8D500]" /> EQUIPOS Y VOLUNTARIOS
                     </h2>
-                    <p className="text-[#888] text-sm italic">Gestión de servidores y cronogramas de servicio</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Gestión de servidores y cronogramas de servicio</p>
                 </div>
                 <button
                     onClick={() => setShowModalNuevoEquipo(true)}

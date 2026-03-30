@@ -28,14 +28,14 @@ export const ModalCrearMiembro = ({
                         <UserPlus className="text-[#00D9FF]" size={24} />
                         Nuevo Miembro
                     </h3>
-                    <button onClick={onClose} className="text-[#555] hover:text-white transition-colors">
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.5)] hover:text-white transition-colors">
                         <X size={24} />
                     </button>
                 </div>
 
                 <div className="space-y-4 mb-8">
                     <div>
-                        <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Nombre</label>
+                        <label className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase mb-1 block tracking-widest pl-1">Nombre</label>
                         <input
                             type="text"
                             value={member.nombre}
@@ -46,7 +46,7 @@ export const ModalCrearMiembro = ({
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Apellido</label>
+                        <label className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase mb-1 block tracking-widest pl-1">Apellido</label>
                         <input
                             type="text"
                             value={member.apellido}
@@ -56,7 +56,7 @@ export const ModalCrearMiembro = ({
                         />
                     </div>
                     <div>
-                        <label className="text-[10px] text-[#555] font-black uppercase mb-1 block tracking-widest pl-1">Celular / WhatsApp</label>
+                        <label className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase mb-1 block tracking-widest pl-1">Celular / WhatsApp</label>
                         <input
                             type="text"
                             value={member.celular}
@@ -71,7 +71,7 @@ export const ModalCrearMiembro = ({
                 <div className="flex gap-3">
                     <button
                         onClick={onClose}
-                        className="flex-1 py-4 bg-[#222] text-[#888] font-bold rounded-2xl border border-[#333] hover:text-white transition-all text-xs"
+                        className="flex-1 py-4 bg-[#222] text-[rgba(255,255,255,0.7)] font-bold rounded-2xl border border-[#333] hover:text-white transition-all text-xs"
                     >
                         CANCELAR
                     </button>

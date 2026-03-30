@@ -30,14 +30,14 @@ const VistaAlertas = ({ supabase, registrarAuditoria }: VistaAlertasProps) => {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <ShieldAlert className="text-red-500" /> ALERTAS PASTORALES
                     </h2>
-                    <p className="text-[#888] text-sm italic">Miembros que no han asistido en los últimos 30 días</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Miembros que no han asistido en los últimos 30 días</p>
                 </div>
             </div>
 
             <EstadisticasAlerta count={alertas.length} />
 
             <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#555]" size={20} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={20} />
                 <input
                     type="text"
                     placeholder="Buscar entre los miembros en alerta..."
@@ -50,7 +50,7 @@ const VistaAlertas = ({ supabase, registrarAuditoria }: VistaAlertasProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {alertas.length === 0 && (
                     <div className="col-span-2 text-center py-20 bg-[#1E1E1E] rounded-3xl border border-[#333]">
-                        <p className="text-[#555] italic">¡Excelente! No hay miembros con ausencias prolongadas detectadas.</p>
+                        <p className="text-[rgba(255,255,255,0.5)] italic">¡Excelente! No hay miembros con ausencias prolongadas detectadas.</p>
                     </div>
                 )}
                 {alertas.map(m => (

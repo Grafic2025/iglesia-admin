@@ -37,20 +37,20 @@ const PantallaLogin = ({
                 </h1>
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2 px-1">
+                        <label className="block text-sm font-bold text-white/70 mb-2 px-1 uppercase tracking-tight">
                             Usuario
                         </label>
                         <input
                             type="text"
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
-                            placeholder="Nombre de usuario"
-                            className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-medium"
+                            placeholder="Tu nombre de usuario"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-bold"
                             disabled={loginLocked}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-400 mb-2 px-1">
+                        <label className="block text-sm font-bold text-white/70 mb-2 px-1 uppercase tracking-tight">
                             Contraseña de Acceso
                         </label>
                         <input
@@ -58,15 +58,15 @@ const PantallaLogin = ({
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-medium"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/10 rounded-xl text-white placeholder-white/20 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-bold"
                             disabled={loginLocked}
                         />
                     </div>
                     <button
                         type="submit"
                         disabled={loginLocked}
-                        className={`w-full p-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 ${loginLocked
-                            ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-white/5'
+                        className={`w-full p-4 rounded-xl font-black text-lg transition-all transform active:scale-95 ${loginLocked
+                            ? 'bg-gray-800 text-white/20 cursor-not-allowed border border-white/5'
                             : 'bg-[#A8D500] hover:bg-[#bbf000] text-black shadow-[0_4px_20px_-5px_rgba(168,213,0,0.4)]'
                             }`}
                     >
@@ -74,7 +74,7 @@ const PantallaLogin = ({
                     </button>
                 </form>
                 {loginLocked && (
-                    <p className="text-center mt-6 text-amber-500 text-sm font-bold animate-pulse flex items-center justify-center gap-2">
+                    <p className="text-center mt-6 text-red-500 text-sm font-black animate-pulse flex items-center justify-center gap-2 uppercase tracking-widest">
                         ⚠️ Demasiados intentos fallidos.
                     </p>
                 )}

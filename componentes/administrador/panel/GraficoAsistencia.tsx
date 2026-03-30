@@ -16,8 +16,8 @@ const GraficoAsistencia: React.FC<GraficoAsistenciaProps> = ({ data }) => {
                 <ResponsiveContainer width="100%" height={250}>
                     <ReLineBarChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                        <XAxis dataKey="dia" stroke="#888" fontSize={10} />
-                        <YAxis stroke="#888" fontSize={10} />
+                        <XAxis dataKey="dia" stroke="rgba(255,255,255,0.7)" fontSize={10} />
+                        <YAxis stroke="rgba(255,255,255,0.7)" fontSize={10} />
                         <Tooltip
                             contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }}
                             itemStyle={{ color: '#A8D500' }}

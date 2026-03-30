@@ -43,7 +43,7 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
                         <Music className="text-[#A8D500]" /> CANCIONERO
                     </h2>
-                    <p className="text-[#888] text-sm italic">Librería de canciones, acordes y recursos musicales</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Librería de canciones, acordes y recursos musicales</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
@@ -56,7 +56,7 @@ const VistaCancionero = ({ supabase }: { supabase: any }) => {
             <div className="bg-[#1E1E1E] rounded-2xl border border-[#333] overflow-hidden">
                 <div className="p-4 border-b border-[#333] flex items-center gap-4">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]" size={18} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(255,255,255,0.5)]" size={18} />
                         <input
                             placeholder="Buscar por título o artista..."
                             value={searchQuery}

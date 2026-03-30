@@ -26,19 +26,19 @@ const CalendarioEquipo: React.FC<CalendarioEquipoProps> = ({
                     <button onClick={() => {
                         const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
                         setCurrentMonth(newDate);
-                    }} className="text-[#888] hover:text-white p-1">←</button>
+                    }} className="text-[rgba(255,255,255,0.7)] hover:text-white p-1">←</button>
                     <span className="text-white text-xs font-bold uppercase">
                         {currentMonth.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
                     </span>
                     <button onClick={() => {
                         const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
                         setCurrentMonth(newDate);
-                    }} className="text-[#888] hover:text-white p-1">→</button>
+                    }} className="text-[rgba(255,255,255,0.7)] hover:text-white p-1">→</button>
                 </div>
             </div>
             <div className="p-4">
                 <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                    {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map(d => <div key={d} className="text-[#555] text-[10px] font-black">{d}</div>)}
+                    {['D', 'L', 'M', 'M', 'J', 'V', 'S'].map(d => <div key={d} className="text-[rgba(255,255,255,0.5)] text-[10px] font-black">{d}</div>)}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                     {Array.from({ length: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay() }).map((_, i) => <div key={i}></div>)}
@@ -53,7 +53,7 @@ const CalendarioEquipo: React.FC<CalendarioEquipoProps> = ({
                                 key={day}
                                 onClick={() => daySchedule && onSelectDate(daySchedule)}
                                 className={`aspect-square flex items-center justify-center text-[10px] rounded-lg border transition-all ${isSelected ? 'ring-2 ring-white ring-offset-2 ring-offset-[#1E1E1E] z-10' : ''
-                                    } ${daySchedule ? 'bg-[#A8D500] text-black font-bold border-transparent hover:scale-110' : 'text-[#888] border-[#333] hover:border-[#555]'
+                                    } ${daySchedule ? 'bg-[#A8D500] text-black font-bold border-transparent hover:scale-110' : 'text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[rgba(255,255,255,0.5)]'
                                     }`}
                             >
                                 {day}

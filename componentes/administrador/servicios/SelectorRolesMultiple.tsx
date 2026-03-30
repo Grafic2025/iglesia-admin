@@ -40,7 +40,7 @@ const SelectorRolesMultiple: React.FC<SelectorRolesMultipleProps> = ({ roleCateg
                 <div className="absolute top-full left-0 mt-1 w-[200px] bg-[#1A1A1A] border border-[#333] rounded-xl shadow-2xl z-[70] max-h-60 overflow-y-auto custom-scrollbar" onClick={e => e.stopPropagation()}>
                     {roleCategories.map(cat => (
                         <div key={cat.name}>
-                            <div className="px-3 py-1.5 bg-[#111] border-y border-[#222] text-[#888] text-[9px] font-black uppercase tracking-widest sticky top-0 z-10">
+                            <div className="px-3 py-1.5 bg-[#111] border-y border-[#222] text-[rgba(255,255,255,0.7)] text-[9px] font-black uppercase tracking-widest sticky top-0 z-10">
                                 {cat.name}
                             </div>
                             {cat.roles.map((r: string) => {

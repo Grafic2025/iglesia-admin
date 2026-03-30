@@ -46,7 +46,7 @@ const ModalSelectorPlantilla: React.FC<ModalSelectorPlantillaProps> = ({ onSelec
             <div className="bg-[#1A1A1A] w-full max-w-md rounded-3xl border border-[#333] p-6 text-left">
                 <div className="flex justify-between items-center mb-6">
                     <h3 className="text-white font-bold uppercase tracking-widest">Elegir Plantilla</h3>
-                    <button onClick={onClose} className="text-[#888]"><X /></button>
+                    <button onClick={onClose} className="text-[rgba(255,255,255,0.7)]"><X /></button>
                 </div>
                 <div className="space-y-3">
                     {SERVICE_TEMPLATES.map(t => (
@@ -57,7 +57,7 @@ const ModalSelectorPlantilla: React.FC<ModalSelectorPlantillaProps> = ({ onSelec
                         >
                             <div className="text-left">
                                 <p className="text-white font-bold text-lg">{t.name}</p>
-                                <p className="text-[#555] text-xs font-bold uppercase tracking-wider">{t.plan.length} momentos definidos</p>
+                                <p className="text-[rgba(255,255,255,0.5)] text-xs font-bold uppercase tracking-wider">{t.plan.length} momentos definidos</p>
                             </div>
                             <ChevronRight className="text-[#333] group-hover:text-[#A8D500]" />
                         </button>

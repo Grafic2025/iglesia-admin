@@ -15,15 +15,15 @@ const ProximosCumpleanos = ({ cumpleanos }: ProximosCumpleanosProps) => {
                 </div>
                 <div>
                     <h3 className="text-white font-bold tracking-widest text-sm">PRÓXIMOS CUMPLEAÑOS</h3>
-                    <p className="text-[#888] text-[10px] uppercase font-bold">Esta semana</p>
+                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">Esta semana</p>
                 </div>
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
                 {cumpleanos.length === 0 ? (
                     <div className="h-full flex items-center justify-center flex-col text-center opacity-50 p-4">
-                        <Gift size={32} className="text-[#555] mb-2" />
-                        <p className="text-[#888] text-xs font-bold uppercase">No hay cumpleaños cercanos</p>
+                        <Gift size={32} className="text-[rgba(255,255,255,0.5)] mb-2" />
+                        <p className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase">No hay cumpleaños cercanos</p>
                     </div>
                 ) : (
                     cumpleanos.map((m, i) => {
@@ -43,7 +43,7 @@ const ProximosCumpleanos = ({ cumpleanos }: ProximosCumpleanosProps) => {
                                     {m.foto_perfil || m.foto_url ? (
                                         <img src={m.foto_perfil || m.foto_url} alt="Perfil" className="w-full h-full object-cover" />
                                     ) : (
-                                        <User size={16} className="text-[#555]" />
+                                        <User size={16} className="text-[rgba(255,255,255,0.5)]" />
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">

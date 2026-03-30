@@ -17,8 +17,8 @@ const GraficoDemografico: React.FC<GraficoDemograficoProps> = ({ data, COLORS })
                 <ResponsiveContainer width="100%" height={250}>
                     <ReLineBarChart data={data} layout="vertical">
                         <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                        <XAxis type="number" stroke="#888" fontSize={10} />
-                        <YAxis dataKey="nombre" type="category" stroke="#888" fontSize={10} width={120} />
+                        <XAxis type="number" stroke="rgba(255,255,255,0.7)" fontSize={10} />
+                        <YAxis dataKey="nombre" type="category" stroke="rgba(255,255,255,0.7)" fontSize={10} width={120} />
                         <Tooltip contentStyle={{ background: '#222', border: '1px solid #444', borderRadius: '12px' }} />
                         <Bar dataKey="valor" radius={[0, 4, 4, 0]}>
                             {data.map((entry, index) => (

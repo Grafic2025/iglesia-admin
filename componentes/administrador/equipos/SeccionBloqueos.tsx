@@ -13,7 +13,7 @@ const SeccionBloqueos: React.FC<SeccionBloqueosProps> = ({ blockouts }) => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {blockouts.length === 0 ? (
-                    <p className="text-[#555] italic text-sm p-3">No hay bloqueos registrados próximamente.</p>
+                    <p className="text-[rgba(255,255,255,0.5)] italic text-sm p-3">No hay bloqueos registrados próximamente.</p>
                 ) : (
                     blockouts.map(b => (
                         <div key={b.id} className="flex items-center justify-between p-3 bg-[#252525] rounded-xl border border-red-500/20">
@@ -22,7 +22,7 @@ const SeccionBloqueos: React.FC<SeccionBloqueosProps> = ({ blockouts }) => {
                                 <p className="text-red-400 text-[10px] font-bold uppercase">{b.reason}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-[#888] text-xs">{b.date}</p>
+                                <p className="text-[rgba(255,255,255,0.7)] text-xs">{b.date}</p>
                             </div>
                         </div>
                     ))

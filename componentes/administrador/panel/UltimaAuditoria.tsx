@@ -19,7 +19,7 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
                     </div>
                     <div>
                         <h3 className="text-white font-bold tracking-widest text-sm uppercase">Auditoría Reciente</h3>
-                        <p className="text-[#888] text-[10px] uppercase font-bold">Actividad de administradores</p>
+                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] uppercase font-bold">Actividad de administradores</p>
                     </div>
                 </div>
                 <Link href="/auditoria" className="text-[10px] text-[#A8D500] font-bold uppercase hover:underline">Ver Todo</Link>
@@ -28,8 +28,8 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
             <div className="flex-1 space-y-3">
                 {logsRecientes.length === 0 ? (
                     <div className="h-full flex items-center justify-center flex-col text-center opacity-50 p-4">
-                        <ShieldAlert size={32} className="text-[#555] mb-2" />
-                        <p className="text-[#888] text-xs font-bold uppercase">Sin registros</p>
+                        <ShieldAlert size={32} className="text-[rgba(255,255,255,0.5)] mb-2" />
+                        <p className="text-[rgba(255,255,255,0.7)] text-xs font-bold uppercase">Sin registros</p>
                     </div>
                 ) : (
                     logsRecientes.map((log) => {
@@ -45,11 +45,11 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-baseline justify-between gap-2">
                                         <p className="text-white font-bold text-xs truncate">{log.administrador_id}</p>
-                                        <p className="text-[#555] text-[9px] font-black uppercase whitespace-nowrap">
+                                        <p className="text-[rgba(255,255,255,0.5)] text-[9px] font-black uppercase whitespace-nowrap">
                                             {new Date(log.created_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                     </div>
-                                    <p className="text-[#888] text-[10px] leading-tight mt-1 line-clamp-2">
+                                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] leading-tight mt-1 line-clamp-2">
                                         <strong className="text-white/70">{log.accion}</strong> - {log.detalle}
                                     </p>
                                 </div>

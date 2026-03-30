@@ -28,7 +28,7 @@ const FiltrosMiembros = ({
                     ))}
                     <option value="Extraoficial">Extraoficiales</option>
                 </select>
-                <span className="text-[#555] text-xs font-bold whitespace-nowrap">{registrosCount} registros</span>
+                <span className="text-[rgba(255,255,255,0.5)] text-xs font-bold whitespace-nowrap">{registrosCount} registros</span>
             </div>
         </div>
     );
