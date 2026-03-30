@@ -18,3 +18,15 @@ export async function GET() {
         return NextResponse.json({ error: 'Config not found' }, { status: 404 });
     }
 }
+export async function POST(req: Request) {
+    try {
+        const body = await req.json();
+        const filePath = path.join(process.cwd(), 'public', 'videos_config.json');
+        
+        fs.writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf8');
+        
+        return NextResponse.json({ success: true, message: 'Config updated' });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to save config' }, { status: 500 });
+    }
+}
