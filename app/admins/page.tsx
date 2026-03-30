@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../libreria/supabase';
-import { Shield, UserPlus, Trash2, Key, CheckCircle2, Circle } from 'lucide-react';
+import { Shield, UserPlus, Trash2, Key, CheckCircle2, Circle, Edit2 } from 'lucide-react';
 
 interface AdminUser {
     id: string;
@@ -149,13 +149,13 @@ export default function AdminsPage() {
         <div className="animate-in fade-in duration-700 max-w-6xl mx-auto pb-20">
             <div className="flex items-center justify-between mb-12">
                 <div>
-                    <h2 className="text-[#A8D500] text-xs font-black tracking-[4px] uppercase mb-1">Seguridad de Sistema</h2>
+                    <h2 className="text-[var(--accent)] text-xs font-black tracking-[4px] uppercase mb-1">Seguridad de Sistema</h2>
                     <h1 className="text-5xl font-black tracking-tighter">Administrar Accesos</h1>
                     <p className="text-white/70 mt-3 max-w-2xl text-base font-medium">Controla quién puede entrar al panel y qué información pueden ver.</p>
                 </div>
                 <button 
                     onClick={() => abrirModal()}
-                    className="bg-[#A8D500] hover:bg-[#bbf000] text-black px-6 py-4 rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 shadow-[0_10px_30px_rgba(168,213,0,0.2)]"
+                    className="bg-[var(--accent)] hover:bg-[#bbf000] text-black px-6 py-4 rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 shadow-[0_10px_30px_rgba(168,213,0,0.2)]"
                 >
                     <UserPlus size={20} />
                     NUEVO USUARIO
@@ -165,23 +165,23 @@ export default function AdminsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {usuarios.map(u => (
                     <div key={u.id} className="bg-[#1a1a1a] border border-white/5 p-6 rounded-3xl relative group overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity flex gap-2">
-                            <button onClick={() => abrirModal(u)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl text-white">
-                                <Shield size={18} />
+                        <div className="absolute top-0 right-0 p-4 flex gap-2">
+                            <button onClick={() => abrirModal(u)} className="p-2 bg-white/5 hover:bg-[var(--accent)]/20 rounded-xl text-white/40 hover:text-[var(--accent)] transition-all">
+                                <Edit2 size={18} />
                             </button>
-                            <button onClick={() => eliminarUsuario(u.id)} className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-xl text-red-500">
+                            <button onClick={() => eliminarUsuario(u.id)} className="p-2 bg-red-500/5 hover:bg-red-500/20 rounded-xl text-white/20 hover:text-red-500 transition-all">
                                 <Trash2 size={18} />
                             </button>
                         </div>
 
                         <div className="flex items-center gap-4 mb-6">
-                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#A8D500]/20 to-[#A8D500]/5 flex items-center justify-center text-[#A8D500]">
+                            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--accent)]/20 to-[var(--accent)]/5 flex items-center justify-center text-[var(--accent)]">
                                 <Key size={24} />
                             </div>
                             <div>
                                 <h3 className="font-black text-xl text-white">{u.usuario}</h3>
                                 <div className="flex items-center gap-2">
-                                    <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md ${u.rol === 'superadmin' ? 'bg-[#A8D500] text-black' : 'bg-white/10 text-white/50'}`}>
+                                    <span className={`text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-md ${u.rol === 'superadmin' ? 'bg-[var(--accent)] text-black' : 'bg-white/10 text-white/50'}`}>
                                         {u.rol}
                                     </span>
                                 </div>
@@ -193,7 +193,7 @@ export default function AdminsPage() {
                             <p className="text-[10px] text-white/60 uppercase font-bold tracking-widest mb-3">Menús Permitidos</p>
                             <div className="flex flex-wrap gap-2">
                                 {u.rol === 'superadmin' ? (
-                                    <span className="text-xs text-[#A8D500] font-black">TODOS LOS ACCESOS (*)</span>
+                                    <span className="text-xs text-[var(--accent)] font-black">TODOS LOS ACCESOS (*)</span>
                                 ) : (
                                     u.menus_permitidos?.map(m => (
                                         <span key={m} className="text-[10px] bg-white/10 px-2 py-1 rounded-md text-white font-bold border border-white/5">
@@ -233,7 +233,7 @@ export default function AdminsPage() {
                                         onChange={e => setFormUsuario(e.target.value)} 
                                         type="text" 
                                         placeholder="Ej: juan.perez"
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[var(--accent)]/50 transition-colors placeholder:text-white/10"
                                     />
                                 </div>
                                 <div>
@@ -244,7 +244,7 @@ export default function AdminsPage() {
                                         onChange={e => setFormEmail(e.target.value)} 
                                         type="email" 
                                         placeholder="ejemplo@correo.com"
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[var(--accent)]/50 transition-colors placeholder:text-white/10"
                                     />
                                 </div>
                                 <div className="col-span-2 md:col-span-1">
@@ -255,7 +255,7 @@ export default function AdminsPage() {
                                         onChange={e => setFormPassword(e.target.value)} 
                                         type="password" 
                                         placeholder="••••••••"
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[var(--accent)]/50 transition-colors placeholder:text-white/10"
                                     />
                                 </div>
                             </div>
@@ -266,14 +266,14 @@ export default function AdminsPage() {
                                     <button 
                                         type="button"
                                         onClick={() => setFormRol('editor')}
-                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'editor' ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
+                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'editor' ? 'bg-[var(--accent)] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
                                     >
                                         Editor Estándar
                                     </button>
                                     <button 
                                         type="button"
                                         onClick={() => setFormRol('superadmin')}
-                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'superadmin' ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
+                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'superadmin' ? 'bg-[var(--accent)] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
                                     >
                                         Súper Admin
                                     </button>
@@ -288,7 +288,7 @@ export default function AdminsPage() {
                                             <div 
                                                 key={opt.id} 
                                                 onClick={() => toggleMenu(opt.id)}
-                                                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${formMenus.includes(opt.id) ? 'bg-[#A8D500]/10 border-[#A8D500]/30 text-[#A8D500] font-black' : 'bg-white/5 border-white/5 text-white/70 hover:border-white/20 font-bold'}`}
+                                                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${formMenus.includes(opt.id) ? 'bg-[var(--accent)]/10 border-[var(--accent)]/30 text-[var(--accent)] font-black' : 'bg-white/5 border-white/5 text-white/70 hover:border-white/20 font-bold'}`}
                                             >
                                                 <span className="text-sm tracking-tight">{opt.label}</span>
                                                 {formMenus.includes(opt.id) ? <CheckCircle2 size={18} /> : <Circle size={18} className="text-white/20" />}
@@ -300,7 +300,7 @@ export default function AdminsPage() {
 
                             <div className="pt-6 border-t border-white/10 flex gap-4">
                                 <button type="button" onClick={() => setModalAbierto(false)} className="flex-1 py-4 text-white/40 font-bold hover:text-white transition-colors">Cancelar</button>
-                                <button type="submit" className="flex-[2] py-4 bg-[#A8D500] text-black font-black uppercase tracking-widest rounded-2xl shadow-[0_10px_30px_rgba(168,213,0,0.2)] hover:scale-105 transition-transform">
+                                <button type="submit" className="flex-[2] py-4 bg-[var(--accent)] text-black font-black uppercase tracking-widest rounded-2xl shadow-[0_10px_30px_rgba(168,213,0,0.2)] hover:scale-105 transition-transform">
                                     {editingUser ? 'GUARDAR CAMBIOS' : 'CREAR USUARIO'}
                                 </button>
                             </div>

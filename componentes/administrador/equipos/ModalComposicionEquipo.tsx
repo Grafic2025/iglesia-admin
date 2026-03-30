@@ -56,7 +56,7 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                 <div className="p-6 border-b border-[#333] flex items-center justify-between bg-[#1A1A1A]">
                     <div>
                         <h3 className="text-white font-black text-[14px] uppercase tracking-widest flex items-center gap-3">
-                            <Users2 className="text-[#A8D500]" size={18} /> Composición del Equipo
+                            <Users2 className="text-[var(--accent)]" size={18} /> Composición del Equipo
                         </h3>
                         <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase mt-1">
                             {new Date(selectedDateSchedule.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })} — {selectedDateSchedule.horario}
@@ -100,8 +100,8 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                         return (
                             <div key={catName} className="space-y-4">
                                 <div className="flex items-center gap-4">
-                                    <h4 className="text-[#A8D500] text-[10px] font-black uppercase tracking-[0.3em]">{catName}</h4>
-                                    <div className="h-px bg-gradient-to-r from-[#A8D50030] to-transparent flex-1"></div>
+                                    <h4 className="text-[var(--accent)] text-[10px] font-black uppercase tracking-[0.3em]">{catName}</h4>
+                                    <div className="h-px bg-gradient-to-r from-[var(--accent)30] to-transparent flex-1"></div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {miembrosInCat.map((s: any, idx: number) => (
@@ -117,7 +117,7 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                                                             <span className="text-xs text-[rgba(255,255,255,0.5)] font-black">{s.nombre?.[0]}</span>
                                                         );
                                                     })()}
-                                                    <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#1E1E1E] ${s.estado === 'confirmado' ? 'bg-[#A8D500]' : s.estado === 'rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                                                    <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[#1E1E1E] ${s.estado === 'confirmado' ? 'bg-[var(--accent)]' : s.estado === 'rechazado' ? 'bg-red-500' : 'bg-yellow-500'}`} />
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between">
@@ -126,7 +126,7 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                                                             <span className="bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full animate-pulse">REEMPLAZO NECESARIO</span>
                                                         )}
                                                     </div>
-                                                    <p className="text-[#A8D500] text-[10px] font-black uppercase tracking-wider">{s.specificRol}</p>
+                                                    <p className="text-[var(--accent)] text-[10px] font-black uppercase tracking-wider">{s.specificRol}</p>
                                                 </div>
                                             </div>
 
@@ -147,7 +147,7 @@ const ModalComposicionEquipo: React.FC<ModalComposicionEquipoProps> = ({
                 <div className="p-6 border-t border-[#333] bg-[#1A1A1A] flex justify-end">
                     <button
                         onClick={onClose}
-                        className="px-8 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all uppercase tracking-widest text-xs"
+                        className="px-8 py-3 bg-[var(--accent)] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all uppercase tracking-widest text-xs"
                     >
                         Entendido
                     </button>

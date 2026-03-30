@@ -88,9 +88,9 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
             <div className={`flex flex-col h-full bg-[#0F0F0F] border-r border-[#222] w-64 fixed lg:static z-50 transition-transform duration-300 transform ${administrador.estaMenuLateralAbierto ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} `}>
                 <div className="p-8 flex items-center justify-between">
                     <div>
-                        <h1 className="text-[#A8D500] text-2xl font-black tracking-tighter italic">IDS <span className="text-white">DIGITAL</span></h1>
+                        <h1 className="text-[var(--accent)] text-2xl font-black tracking-tighter italic">IDS <span className="text-white">DIGITAL</span></h1>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="w-2 h-2 rounded-full bg-[#A8D500] animate-pulse"></span>
+                            <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-pulse"></span>
                             <p className="text-[rgba(255,255,255,0.6)] text-[10px] uppercase font-bold tracking-widest">Panel de Control</p>
                         </div>
                     </div>
@@ -109,12 +109,12 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
                                 href={item.id === 'panel' ? '/' : `/${item.id}`}
                                 onClick={() => administrador.establecerEstaMenuLateralAbierto(false)}
                                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                                    ? 'bg-[#A8D500] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)] font-bold'
+                                    ? 'bg-[var(--accent)] text-black shadow-[0_0_15px_rgba(168,213,0,0.3)] font-bold'
                                     : 'text-white/50 hover:bg-[#252525] hover:text-white font-bold'
                                     }`}
                             >
                                 <div className="flex items-center gap-3">
-                                    <Icon size={20} className={isActive ? 'text-black' : 'group-hover:text-[#A8D500]'} />
+                                    <Icon size={20} className={isActive ? 'text-black' : 'group-hover:text-[var(--accent)]'} />
                                     <span className="font-medium text-sm">{item.label}</span>
                                 </div>
                                 {isActive && <ChevronRight size={16} />}

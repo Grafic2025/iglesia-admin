@@ -57,7 +57,7 @@ const VistaNotificaciones = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Send Notification Form */}
                 <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                    <h3 className="text-[#A8D500] text-lg font-bold flex items-center gap-2 mb-6">
+                    <h3 className="text-[var(--accent)] text-lg font-bold flex items-center gap-2 mb-6">
                         <Bell size={20} /> Envío Inmediato
                     </h3>
                     <div className="space-y-4">
@@ -67,7 +67,7 @@ const VistaNotificaciones = ({
                                 placeholder="Iglesia del Salvador"
                                 value={tituloPush}
                                 onChange={(e) => setTituloPush(e.target.value)}
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[var(--accent)]"
                             />
                         </div>
                         <div>
@@ -76,7 +76,7 @@ const VistaNotificaciones = ({
                                 placeholder="Escribe el mensaje aquí..."
                                 value={mensajePush}
                                 onChange={(e) => setMensajePush(e.target.value)}
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-4 text-white outline-none focus:border-[#A8D500] h-32 resize-none"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-4 text-white outline-none focus:border-[var(--accent)] h-32 resize-none"
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -86,7 +86,7 @@ const VistaNotificaciones = ({
                                     placeholder="https://ejemplo.com/imagen.jpg"
                                     value={imageUrlPush}
                                     onChange={(e) => setImageUrlPush(e.target.value)}
-                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[var(--accent)]"
                                 />
                             </div>
                             <div>
@@ -94,7 +94,7 @@ const VistaNotificaciones = ({
                                 <select
                                     value={typePush}
                                     onChange={(e) => setTypePush(e.target.value)}
-                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                    className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[var(--accent)]"
                                 >
                                     <option value="General">Buzón de Mensajes</option>
                                     <option value="News">Noticias</option>
@@ -110,7 +110,7 @@ const VistaNotificaciones = ({
                                 onChange={(e) => {
                                     setFiltroHorario(e.target.value);
                                 }}
-                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[#A8D500]"
+                                className="w-full bg-[#252525] border border-[#333] rounded-xl px-4 py-2.5 text-white outline-none focus:border-[var(--accent)]"
                             >
                                 <option value="Todas">Toda la Iglesia</option>
                                 <option value="Lideres">Solo Líderes</option>
@@ -125,21 +125,21 @@ const VistaNotificaciones = ({
                                 ))}
                             </select>
                         </div>
-                        <div className="bg-[#A8D50015] border border-[#A8D50030] p-3 rounded-xl">
-                            <p className="text-[#A8D500] text-xs text-center font-medium">
+                        <div className="bg-[var(--accent)15] border border-[var(--accent)30] p-3 rounded-xl">
+                            <p className="text-[var(--accent)] text-xs text-center font-medium">
                                 Se enviará a: <span className="font-bold">{filtroHorario === 'Todas' ? 'Toda la Iglesia' : `Segmento ${filtroHorario}`}</span>
                             </p>
                         </div>
                         <button
                             onClick={enviarNotificacion}
                             disabled={enviando}
-                            className={`w-full py-4 rounded-xl font-bold transition-all active:scale-[0.98] ${enviando ? 'bg-[#333] text-[rgba(255,255,255,0.7)]' : 'bg-[#A8D500] text-black shadow-[0_4px_15px_rgba(168,213,0,0.3)]'
+                            className={`w-full py-4 rounded-xl font-bold transition-all active:scale-[0.98] ${enviando ? 'bg-[#333] text-[rgba(255,255,255,0.7)]' : 'bg-[var(--accent)] text-black shadow-[0_4px_15px_rgba(168,213,0,0.3)]'
                                 }`}
                         >
                             {enviando ? 'PROCESANDO...' : 'ENVIAR NOTIFICACIÓN AHORA'}
                         </button>
                         {notificacionStatus.show && (
-                            <div className={`mt-4 text-center font-bold ${notificacionStatus.error ? 'text-red-500' : 'text-[#A8D500]'}`}>
+                            <div className={`mt-4 text-center font-bold ${notificacionStatus.error ? 'text-red-500' : 'text-[var(--accent)]'}`}>
                                 {notificacionStatus.message}
                             </div>
                         )}
@@ -222,7 +222,7 @@ const VistaNotificaciones = ({
                         {cronogramas.map((p) => (
                             <div key={p.id} className="bg-[#252525] p-3 rounded-xl border border-[#333] flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className={`w-2 h-2 rounded-full ${p.ultimo_estado === 'Exitoso' ? 'bg-[#A8D500]' : 'bg-[rgba(255,255,255,0.5)]'}`} />
+                                    <div className={`w-2 h-2 rounded-full ${p.ultimo_estado === 'Exitoso' ? 'bg-[var(--accent)]' : 'bg-[rgba(255,255,255,0.5)]'}`} />
                                     <div>
                                         <div className={`text-sm font-bold ${p.mensaje === 'VERSICULO' ? 'text-[#FFB400]' : 'text-white'}`}>
                                             {p.mensaje === 'VERSICULO' ? '📖 Versículo Diario' : p.mensaje}
@@ -255,7 +255,7 @@ const VistaNotificaciones = ({
                                 placeholder="Buscar por título, mensaje o fecha..."
                                 value={logSearch}
                                 onChange={(e) => { setLogSearch(e.target.value); setLogPage(1); }}
-                                className="bg-[#252525] border border-[#333] rounded-xl pl-9 pr-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] w-72"
+                                className="bg-[#252525] border border-[#333] rounded-xl pl-9 pr-4 py-2 text-white text-sm outline-none focus:border-[var(--accent)] w-72"
                             />
                         </div>
                         <select
@@ -304,7 +304,7 @@ const VistaNotificaciones = ({
                                         <td className="px-4 py-4 text-white font-medium">{l.titulo}</td>
                                         <td className="px-4 py-4 text-[#aaa] max-w-xs truncate">{l.mensaje}</td>
                                         <td className="px-4 py-4 text-[rgba(255,255,255,0.7)]">{l.destinatarios_count} pers.</td>
-                                        <td className={`px-4 py-4 font-bold ${l.estado === 'Exitoso' ? 'text-[#A8D500]' : 'text-red-500'}`}>{l.estado}</td>
+                                        <td className={`px-4 py-4 font-bold ${l.estado === 'Exitoso' ? 'text-[var(--accent)]' : 'text-red-500'}`}>{l.estado}</td>
                                     </tr>
                                 ))
                             )}

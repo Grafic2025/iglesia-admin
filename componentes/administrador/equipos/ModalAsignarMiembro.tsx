@@ -39,18 +39,18 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
                             placeholder="Ej: Ginterfaztarra, Sonido, Proyección..."
                             value={assignRole}
                             onChange={(e) => setAssignRole(e.target.value)}
-                            className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[#A8D500] mb-3"
+                            className="w-full bg-[#222] border border-[#333] rounded-xl px-4 py-3 text-white outline-none focus:border-[var(--accent)] mb-3"
                         />
                         <div className="space-y-4 mb-2 max-h-[160px] overflow-y-auto pr-2 custom-scrollbar border-b border-[#333] pb-4">
                             {roleCategories.map(cat => (
                                 <div key={cat.name}>
-                                    <p className="text-[9px] text-[#A8D500] font-black uppercase mb-2 tracking-wider opacity-70">{cat.name}</p>
+                                    <p className="text-[9px] text-[var(--accent)] font-black uppercase mb-2 tracking-wider opacity-70">{cat.name}</p>
                                     <div className="flex flex-wrap gap-1.5 mb-2">
                                         {cat.roles.map((r: string) => (
                                             <button
                                                 key={r}
                                                 onClick={() => setAssignRole(r)}
-                                                className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[#A8D500] text-black border-transparent' : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D50050]'
+                                                className={`text-[9px] px-2.5 py-1.5 rounded-lg border font-bold transition-all ${assignRole === r ? 'bg-[var(--accent)] text-black border-transparent' : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[var(--accent)50]'
                                                     }`}
                                             >{r}</button>
                                         ))}
@@ -69,7 +69,7 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
                                 placeholder="Nombre del miembro..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-[#222] border border-[#333] rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-[#A8D500]"
+                                className="w-full bg-[#222] border border-[#333] rounded-xl pl-10 pr-4 py-3 text-white outline-none focus:border-[var(--accent)]"
                             />
                         </div>
                         <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
@@ -77,7 +77,7 @@ const ModalAsignarMiembro: React.FC<ModalAsignarMiembroProps> = ({
                                 <button
                                     key={m.id}
                                     onClick={() => onAssign(m.id)}
-                                    className="w-full flex items-center gap-3 p-3 bg-[#252525] hover:bg-[#A8D500] hover:text-black rounded-xl transition-all group group"
+                                    className="w-full flex items-center gap-3 p-3 bg-[#252525] hover:bg-[var(--accent)] hover:text-black rounded-xl transition-all group group"
                                 >
                                     <div className="w-8 h-8 bg-[#333] rounded-full overflow-hidden flex items-center justify-center">
                                         {m.foto_url ? <img src={m.foto_url} className="w-full h-full object-cover" /> : <User size={14} />}

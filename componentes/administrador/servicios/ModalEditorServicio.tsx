@@ -71,7 +71,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                     type="date"
                                     value={fecha}
                                     onChange={e => setFecha(e.target.value)}
-                                    className="bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none focus:border-[#A8D500] transition-all cursor-pointer [color-scheme:dark]"
+                                    className="bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-white text-sm outline-none focus:border-[var(--accent)] transition-all cursor-pointer [color-scheme:dark]"
                                 />
                             </div>
                             <div className="flex flex-col">
@@ -88,8 +88,8 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                                     setHorario(updated.join(', '));
                                                 }}
                                                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${selected
-                                                    ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_10px_rgba(168,213,0,0.3)]'
-                                                    : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D50050]'
+                                                    ? 'bg-[var(--accent)] text-black border-transparent shadow-[0_0_10px_rgba(168,213,0,0.3)]'
+                                                    : 'bg-[#222] text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[var(--accent)50]'
                                                     }`}
                                             >
                                                 {h}
@@ -100,7 +100,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                     <input
                                         type="time"
                                         id="custom-time-input"
-                                        className="bg-[#222] border border-[#333] rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[#A8D500] transition-all w-28 cursor-pointer [color-scheme:dark]"
+                                        className="bg-[#222] border border-[#333] rounded-xl px-3 py-2 text-white text-xs outline-none focus:border-[var(--accent)] transition-all w-28 cursor-pointer [color-scheme:dark]"
                                     />
                                     <button
                                         onClick={() => {
@@ -114,7 +114,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                                 input.value = '';
                                             }
                                         }}
-                                        className="bg-[#333] text-[#A8D500] px-3 py-2 rounded-xl text-xs font-bold hover:bg-[#A8D500] hover:text-black transition-all border border-[#444]"
+                                        className="bg-[#333] text-[var(--accent)] px-3 py-2 rounded-xl text-xs font-bold hover:bg-[var(--accent)] hover:text-black transition-all border border-[#444]"
                                     >
                                         + Agregar
                                     </button>
@@ -122,14 +122,14 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                 {horario && (
                                     <div className="flex flex-wrap gap-1.5 mt-2">
                                         {horario.split(', ').filter(Boolean).map(h => (
-                                            <span key={h} className="flex items-center gap-1 bg-[#A8D50015] text-[#A8D500] text-[10px] font-bold px-2.5 py-1 rounded-lg border border-[#A8D50030]">
+                                            <span key={h} className="flex items-center gap-1 bg-[var(--accent)15] text-[var(--accent)] text-[10px] font-bold px-2.5 py-1 rounded-lg border border-[var(--accent)30]">
                                                 🕐 {h}
                                                 <button
                                                     onClick={() => {
                                                         const updated = horario.split(', ').filter(Boolean).filter(x => x !== h);
                                                         setHorario(updated.join(', '));
                                                     }}
-                                                    className="text-[#A8D500] hover:text-red-400 ml-1"
+                                                    className="text-[var(--accent)] hover:text-red-400 ml-1"
                                                 >×</button>
                                             </span>
                                         ))}
@@ -142,14 +142,14 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                 </div>
 
                 {!selectedSchedule && assignedStaff.length === 0 && (
-                    <div className="bg-[#A8D50010] p-4 flex items-center justify-between border-b border-[#A8D50020]">
+                    <div className="bg-[var(--accent)10] p-4 flex items-center justify-between border-b border-[var(--accent)20]">
                         <div className="flex items-center gap-3">
-                            <div className="bg-[#A8D500] text-black p-2 rounded-lg"><CheckCircle2 size={16} /></div>
-                            <p className="text-[#A8D500] text-xs font-bold uppercase tracking-widest">¿Quieres cargar una estructura predefinida?</p>
+                            <div className="bg-[var(--accent)] text-black p-2 rounded-lg"><CheckCircle2 size={16} /></div>
+                            <p className="text-[var(--accent)] text-xs font-bold uppercase tracking-widest">¿Quieres cargar una estructura predefinida?</p>
                         </div>
                         <button
                             onClick={onShowTemplatePicker}
-                            className="bg-[#A8D500] text-black px-4 py-1.5 rounded-lg text-[10px] font-black hover:scale-105 transition-all"
+                            className="bg-[var(--accent)] text-black px-4 py-1.5 rounded-lg text-[10px] font-black hover:scale-105 transition-all"
                         >
                             USAR PLANTILLA
                         </button>
@@ -166,7 +166,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                         />
 
                         <div>
-                            <h4 className="text-[#A8D500] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
+                            <h4 className="text-[var(--accent)] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
                                 <Music size={14} /> Canciones Asignadas
                             </h4>
                             <div className="grid grid-cols-1 gap-2">
@@ -187,7 +187,7 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                 })}
                                 <button
                                     onClick={onShowSongPicker}
-                                    className="p-4 border-2 border-dashed border-[#333] rounded-xl text-[rgba(255,255,255,0.5)] hover:border-[#A8D500] hover:text-[#A8D500] transition-all flex items-center justify-center gap-2 font-bold text-xs"
+                                    className="p-4 border-2 border-dashed border-[#333] rounded-xl text-[rgba(255,255,255,0.5)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-all flex items-center justify-center gap-2 font-bold text-xs"
                                 >
                                     <Plus size={16} /> SELECCIONAR CANCIONES
                                 </button>
@@ -207,12 +207,12 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                         />
 
                         <div>
-                            <h4 className="text-[#A8D500] text-[10px] font-black uppercase mb-4 tracking-[0.2em]">Notas del Director</h4>
+                            <h4 className="text-[var(--accent)] text-[10px] font-black uppercase mb-4 tracking-[0.2em]">Notas del Director</h4>
                             <textarea
                                 value={notas}
                                 onChange={e => setNotas(e.target.value)}
                                 placeholder="Indicaciones generales para el equipo..."
-                                className="w-full bg-[#1A1A1A] border border-[#333] rounded-2xl p-4 text-white text-sm h-24 outline-none focus:border-[#A8D500] resize-none mb-4"
+                                className="w-full bg-[#1A1A1A] border border-[#333] rounded-2xl p-4 text-white text-sm h-24 outline-none focus:border-[var(--accent)] resize-none mb-4"
                             />
                         </div>
                     </div>
@@ -226,11 +226,11 @@ const ModalEditorServicio: React.FC<ModalEditorServicioProps> = ({
                                 type="checkbox"
                                 checked={notificarAlGuardar}
                                 onChange={e => setNotificarAlGuardar(e.target.checked)}
-                                className="w-4 h-4 accent-[#A8D500]"
+                                className="w-4 h-4 accent-[var(--accent)]"
                             />
                             NOTIFICAR AL GUARDAR
                         </label>
-                        <button onClick={onSave} className="px-10 py-3 bg-[#A8D500] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.5)] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"><Save size={18} /> Guardar Plan</button>
+                        <button onClick={onSave} className="px-10 py-3 bg-[var(--accent)] text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(168,213,0,0.5)] transition-all flex items-center gap-2 uppercase tracking-widest text-sm"><Save size={18} /> Guardar Plan</button>
                     </div>
                 </div>
             </div>

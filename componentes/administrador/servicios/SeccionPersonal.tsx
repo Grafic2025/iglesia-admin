@@ -29,7 +29,7 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
 
     return (
         <div>
-            <h4 className="text-[#A8D500] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
+            <h4 className="text-[var(--accent)] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
                 <Users2 size={14} /> Equipo / Staff
             </h4>
             <div className="space-y-6">
@@ -48,9 +48,9 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
 
                     return (
                         <div key={catName} className="space-y-3">
-                            <h5 className="text-[10px] text-[#A8D500] font-black uppercase tracking-widest flex items-center gap-2">
+                            <h5 className="text-[10px] text-[var(--accent)] font-black uppercase tracking-widest flex items-center gap-2">
                                 {catName}
-                                <div className="h-px bg-[#A8D50020] flex-1"></div>
+                                <div className="h-px bg-[var(--accent)20] flex-1"></div>
                             </h5>
                             <div className="space-y-2">
                                 {miembrosInCat.map((s, idx) => (
@@ -77,7 +77,7 @@ const SeccionPersonal: React.FC<SeccionPersonalProps> = ({
                                                             onChange={(newRoles) => updateRole(s.miembro_id, newRoles.join(', '))}
                                                         />
                                                     ) : (
-                                                        <p className="text-[#A8D500] text-[10px] font-black uppercase">{s.specificRol}</p>
+                                                        <p className="text-[var(--accent)] text-[10px] font-black uppercase">{s.specificRol}</p>
                                                     )}
                                                 </div>
                                                 <div className={`p-1 rounded-full ${s.estado === 'confirmado' ? 'bg-green-500/20 text-green-500' :

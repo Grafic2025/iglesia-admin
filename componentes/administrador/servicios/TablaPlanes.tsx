@@ -10,7 +10,7 @@ interface TablaPlanesProps {
 const TablaPlanes: React.FC<TablaPlanesProps> = ({ detailedRows, setDetailedRows, addDetailedRow }) => {
     return (
         <div>
-            <h4 className="text-[#A8D500] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
+            <h4 className="text-[var(--accent)] text-[10px] font-black uppercase mb-4 tracking-[0.2em] flex items-center gap-2">
                 Minuto a Minuto (Detailed Plan)
             </h4>
             <div className="bg-[#1A1A1A] rounded-2xl border border-[#333] overflow-hidden">
@@ -64,7 +64,7 @@ const TablaPlanes: React.FC<TablaPlanesProps> = ({ detailedRows, setDetailedRows
                 </table>
                 <button
                     onClick={addDetailedRow}
-                    className="w-full p-3 text-[rgba(255,255,255,0.5)] hover:text-[#A8D500] hover:bg-[#A8D50010] transition-all text-[10px] font-bold uppercase"
+                    className="w-full p-3 text-[rgba(255,255,255,0.5)] hover:text-[var(--accent)] hover:bg-[var(--accent)10] transition-all text-[10px] font-bold uppercase"
                 >
                     + Agregar Momento
                 </button>

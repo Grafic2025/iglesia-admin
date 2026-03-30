@@ -4,7 +4,7 @@ export default function PrivacyPolicy() {
             <div className="max-w-4xl mx-auto space-y-12">
                 {/* Header */}
                 <header className="border-b border-[#333] pb-10">
-                    <h1 className="text-4xl md:text-5xl font-black text-[#A8D500] mb-4">
+                    <h1 className="text-4xl md:text-5xl font-black text-[var(--accent)] mb-4">
                         POLÍTICA DE PRIVACIDAD
                     </h1>
                     <p className="text-[#888] text-lg">
@@ -14,7 +14,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Introduction */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl font-bold border-l-4 border-[#A8D500] pl-4">1. Introducción</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-[var(--accent)] pl-4">1. Introducción</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         En <strong>Iglesia del Salvador</strong>, valoramos y respetamos la privacidad de nuestra comunidad.
                         Esta política describe cómo nuestra aplicación móvil ("la App") recopila, utiliza y protege su información personal.
@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Data Collection */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl font-bold border-l-4 border-[#A8D500] pl-4">2. Información que Recopilamos</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-[var(--accent)] pl-4">2. Información que Recopilamos</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         Recopilamos información limitada que es estrictamente necesaria para el funcionamiento de los servicios de la iglesia:
                     </p>
@@ -38,7 +38,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Purpose */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl font-bold border-l-4 border-[#A8D500] pl-4">3. Uso de la Información</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-[var(--accent)] pl-4">3. Uso de la Información</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         Sus datos se utilizan exclusivamente para:
                     </p>
@@ -52,7 +52,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Data Deletion */}
                 <section className="space-y-6 bg-[#1a1a1a] p-8 rounded-2xl border border-[#333]">
-                    <h2 className="text-2xl font-bold text-[#A8D500]">4. Eliminación de Datos y Cuenta</h2>
+                    <h2 className="text-2xl font-bold text-[var(--accent)]">4. Eliminación de Datos y Cuenta</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         De acuerdo con las normativas de Apple y Google, ofrecemos total control sobre sus datos:
                     </p>
@@ -70,7 +70,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Security */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl font-bold border-l-4 border-[#A8D500] pl-4">5. Seguridad de Datos</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-[var(--accent)] pl-4">5. Seguridad de Datos</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         Utilizamos servicios de infraestructura líder en el mercado (Supabase/PostgreSQL) con cifrado en tránsito para asegurar que sus datos
                         estén protegidos contra accesos no autorizados. No compartimos ni vendemos su información a terceros con fines comerciales.
@@ -79,7 +79,7 @@ export default function PrivacyPolicy() {
 
                 {/* Section: Contact */}
                 <section className="space-y-4">
-                    <h2 className="text-2xl font-bold border-l-4 border-[#A8D500] pl-4">6. Contacto</h2>
+                    <h2 className="text-2xl font-bold border-l-4 border-[var(--accent)] pl-4">6. Contacto</h2>
                     <p className="text-[#aaa] leading-relaxed">
                         Si tiene preguntas sobre esta política o desea ejercer sus derechos sobre sus datos, puede contactarnos a través de la sección de soporte
                         de la aplicación o visitándonos en nuestra sede física.

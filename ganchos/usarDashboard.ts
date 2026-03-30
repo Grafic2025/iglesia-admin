@@ -8,7 +8,7 @@ const RANGOS_CRECIMIENTO = [
     { clave: '12M', etiqueta: '12 meses', meses: 12 },
 ];
 
-const COLORES = ['#A8D500', '#00D9FF', '#FFB400', '#9333EA', '#FF4444', '#3B82F6'];
+const COLORES = ['var(--accent)', '#00D9FF', '#FFB400', '#9333EA', '#FF4444', '#3B82F6'];
 
 interface PropiedadesDashboard {
     asistencias: Asistencia[];

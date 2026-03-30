@@ -36,7 +36,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
                     <h2 className="text-3xl font-black text-white tracking-tighter flex items-center gap-3">
-                        <div className="p-2 bg-[#A8D50015] rounded-xl"><Bot className="text-[#A8D500]" size={28} /></div>
+                        <div className="p-2 bg-[var(--accent)15] rounded-xl"><Bot className="text-[var(--accent)]" size={28} /></div>
                         IDS BOT: Área de Entrenamiento
                     </h2>
                     <p className="text-[rgba(255,255,255,0.7)] text-sm mt-1">Gestiona el cerebro y el aprendizaje de la Inteligencia Del Salvador.</p>
@@ -45,13 +45,13 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                 <div className="flex bg-[#1E1E1E] p-1.5 rounded-2xl border border-[#333]">
                     <button
                         onClick={() => setActiveTab('aprendizaje')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'aprendizaje' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'aprendizaje' ? 'bg-[var(--accent)] text-black shadow-lg shadow-[var(--accent)15]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
                     >
                         <Sparkles size={14} /> LO QUE NO SÉ ({aprendizaje.length})
                     </button>
                     <button
                         onClick={() => setActiveTab('cerebro')}
-                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'cerebro' ? 'bg-[#A8D500] text-black shadow-lg shadow-[#A8D50015]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
+                        className={`px-6 py-2.5 rounded-xl text-xs font-black transition-all flex items-center gap-2 ${activeTab === 'cerebro' ? 'bg-[var(--accent)] text-black shadow-lg shadow-[var(--accent)15]' : 'text-[rgba(255,255,255,0.7)] hover:text-white'}`}
                     >
                         <Brain size={14} /> MI CEREBRO ({cerebro.length})
                     </button>
@@ -66,7 +66,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                         <div className="bg-[#1E1E1E] p-8 rounded-3xl border border-[#333] shadow-xl">
                             <div className="flex items-center justify-between mb-8">
                                 <h3 className="text-white text-xl font-bold flex items-center gap-3">
-                                    <History className="text-[#A8D500]" size={22} /> Consultas pendientes de aprendizaje
+                                    <History className="text-[var(--accent)]" size={22} /> Consultas pendientes de aprendizaje
                                 </h3>
                             </div>
 
@@ -77,7 +77,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                     </div>
                                 ) : (
                                     aprendizaje.map((a) => (
-                                        <div key={a.id} className="bg-[#151515] p-5 rounded-2xl border border-[#252525] hover:border-[#A8D50050] transition-all flex items-center justify-between group">
+                                        <div key={a.id} className="bg-[#151515] p-5 rounded-2xl border border-[#252525] hover:border-[var(--accent)50] transition-all flex items-center justify-between group">
                                             <div className="flex items-center gap-5">
                                                 <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
                                                     <MessageSquare size={18} />
@@ -92,7 +92,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                             <div className="flex items-center gap-3">
                                                 <button
                                                     onClick={() => openEnseñar(a)}
-                                                    className="bg-[#A8D500] text-black px-5 py-2.5 rounded-xl font-black text-[10px] hover:scale-105 transition-all flex items-center gap-2 shadow-lg shadow-[#A8D50015]"
+                                                    className="bg-[var(--accent)] text-black px-5 py-2.5 rounded-xl font-black text-[10px] hover:scale-105 transition-all flex items-center gap-2 shadow-lg shadow-[var(--accent)15]"
                                                 >
                                                     ENSEÑAR <ArrowRight size={14} />
                                                 </button>
@@ -109,11 +109,11 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                         <div className="bg-[#1E1E1E] p-8 rounded-3xl border border-[#333] shadow-xl">
                             <div className="flex items-center justify-between mb-8">
                                 <h3 className="text-white text-xl font-bold flex items-center gap-3">
-                                    <CheckCircle2 className="text-[#A8D500]" size={22} /> Conocimiento adquirido
+                                    <CheckCircle2 className="text-[var(--accent)]" size={22} /> Conocimiento adquirido
                                 </h3>
                                 <button
                                     onClick={() => { setCurrentKnowledge(null); setPalabrasClave(''); setRespuesta(''); setShowModal(true); }}
-                                    className="bg-[#252525] text-white px-5 py-2.5 rounded-xl font-black text-[10px] border border-[#333] hover:bg-[#A8D500] hover:text-black transition-all"
+                                    className="bg-[#252525] text-white px-5 py-2.5 rounded-xl font-black text-[10px] border border-[#333] hover:bg-[var(--accent)] hover:text-black transition-all"
                                 >
                                     + AGREGAR MANUALMENTE
                                 </button>
@@ -121,9 +121,9 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {cerebro.map((c) => (
-                                    <div key={c.id} className="bg-[#151515] p-6 rounded-2xl border border-[#252525] hover:border-[#A8D50030] transition-all relative group">
+                                    <div key={c.id} className="bg-[#151515] p-6 rounded-2xl border border-[#252525] hover:border-[var(--accent)30] transition-all relative group">
                                         <div className="mb-4">
-                                            <label className="text-[9px] font-black text-[#A8D500] uppercase tracking-widest block mb-1">Palabras Clave</label>
+                                            <label className="text-[9px] font-black text-[var(--accent)] uppercase tracking-widest block mb-1">Palabras Clave</label>
                                             <p className="text-white font-bold">{c.palabras_clave}</p>
                                         </div>
                                         <div>
@@ -152,7 +152,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
             {showModal && (
                 <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
                     <div className="bg-[#1A1A1A] w-full max-w-2xl rounded-[32px] border border-[#333] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="bg-[#A8D500] p-6 flex items-center gap-4">
+                        <div className="bg-[var(--accent)] p-6 flex items-center gap-4">
                             <div className="bg-black/10 p-2.5 rounded-2xl"><Sparkles className="text-black" size={24} /></div>
                             <div>
                                 <h3 className="text-black font-black text-xl tracking-tight">
@@ -169,7 +169,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                     value={palabrasClave}
                                     onChange={e => setPalabrasClave(e.target.value)}
                                     placeholder="Ej: horario reunion, cuando empieza..."
-                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-4 text-white outline-none focus:border-[#A8D500] transition-all"
+                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-4 text-white outline-none focus:border-[var(--accent)] transition-all"
                                 />
                                 <p className="text-[rgba(255,255,255,0.5)] text-[10px] mt-2 italic font-medium">El bot buscará coincidencias entre estas palabras y lo que escriba el usuario.</p>
                             </div>
@@ -181,7 +181,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                     onChange={e => setRespuesta(e.target.value)}
                                     placeholder="Escribe aquí la respuesta que dará el bot..."
                                     rows={5}
-                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-4 text-white outline-none focus:border-[#A8D500] transition-all resize-none"
+                                    className="w-full bg-[#222] border border-[#333] rounded-2xl px-5 py-4 text-white outline-none focus:border-[var(--accent)] transition-all resize-none"
                                 />
                             </div>
 
@@ -194,7 +194,7 @@ const VistaBot = ({ supabase, registrarAuditoria }: VistaBotProps) => {
                                 </button>
                                 <button
                                     onClick={handleSaveKnowledge}
-                                    className="flex-3 py-4 bg-[#A8D500] text-black font-black text-xs rounded-2xl shadow-xl shadow-[#A8D50020] hover:scale-[1.02] active:scale-[0.98] transition-all"
+                                    className="flex-3 py-4 bg-[var(--accent)] text-black font-black text-xs rounded-2xl shadow-xl shadow-[var(--accent)20] hover:scale-[1.02] active:scale-[0.98] transition-all"
                                 >
                                     GUARDAR CONOCIMIENTO
                                 </button>

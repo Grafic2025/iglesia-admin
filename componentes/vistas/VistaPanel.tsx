@@ -102,7 +102,7 @@ const VistaPanel = ({
                 />
                 <button 
                     onClick={() => generarReporteAsistenciaPDF(asistencias, fechaSeleccionada)}
-                    className="group bg-white/5 hover:bg-[#A8D500] text-white hover:text-black border border-white/10 hover:border-transparent px-6 py-3 rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 shadow-xl"
+                    className="group bg-white/5 hover:bg-[var(--accent)] text-white hover:text-black border border-white/10 hover:border-transparent px-6 py-3 rounded-2xl font-black text-sm tracking-widest uppercase transition-all flex items-center gap-3 shadow-xl"
                 >
                     <FileText size={18} className="transition-transform group-hover:scale-110" />
                     Generar Reporte PDF
@@ -114,7 +114,7 @@ const VistaPanel = ({
                 <TarjetaEstado
                     label="Total Hoy"
                     value={conteoHoy}
-                    color="#A8D500"
+                    color="var(--accent)"
                     isActive={conteoHoy > 0}
                     icon={<LayoutDashboard size={18} />}
                     trend={tendenciaHoy}

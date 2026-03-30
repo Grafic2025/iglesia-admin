@@ -11,7 +11,7 @@ const PremiosMiembros: React.FC<PremiosMiembrosProps> = ({ premiosPendientes, pr
         { level: 30, title: 'Entrada a Retiro (30+ asistencias)', icon: '🎟️', color: '#9333EA', key: 'nivel30' },
         { level: 20, title: 'Libro Cristiano (20-29 asistencias)', icon: '📚', color: '#3B82F6', key: 'nivel20' },
         { level: 10, title: 'Café Gratis (10-19 asistencias)', icon: '☕', color: '#FFB400', key: 'nivel10' },
-        { level: 5, title: 'Sticker IDS (5-9 asistencias)', icon: '⭐', color: '#A8D500', key: 'nivel5' },
+        { level: 5, title: 'Sticker IDS (5-9 asistencias)', icon: '⭐', color: 'var(--accent)', key: 'nivel5' },
     ];
 
     const hasAnyRewards = rewardLevels.some(rl => premiosPendientes[rl.key]?.length > 0);
@@ -50,7 +50,7 @@ const PremiosMiembros: React.FC<PremiosMiembrosProps> = ({ premiosPendientes, pr
                                                 <span className="text-[10px] font-bold" style={{ color: rl.color }}>🔥 {m.racha}</span>
                                             </div>
                                             {yaEntregado ? (
-                                                <span className="text-[#A8D500]">✅</span>
+                                                <span className="text-[var(--accent)]">✅</span>
                                             ) : (
                                                 <button
                                                     onClick={() => marcarComoEntregado(m.id, rl.level, `${m.nombre} ${m.apellido}`)}

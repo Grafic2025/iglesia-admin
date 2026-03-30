@@ -10,14 +10,14 @@ const ServiceQuickInfo: React.FC<ServiceQuickInfoProps> = ({ lastServiceDate, ne
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-[#1E1E1E] p-5 rounded-2xl border border-[#333] flex items-center gap-4">
-                <div className="p-3 bg-[#A8D50015] rounded-xl">
-                    <CalendarDays size={24} className="text-[#A8D500]" />
+                <div className="p-3 bg-[var(--accent)15] rounded-xl">
+                    <CalendarDays size={24} className="text-[var(--accent)]" />
                 </div>
                 <div>
                     <p className="text-[rgba(255,255,255,0.7)] text-[10px] font-bold uppercase tracking-widest">Último Servicio con Asistencia</p>
                     {lastServiceDate ? (
                         <p className="text-white font-bold text-lg">
-                            {lastServiceDate.dia} — <span className="text-[#A8D500]">{lastServiceDate.total} personas</span>
+                            {lastServiceDate.dia} — <span className="text-[var(--accent)]">{lastServiceDate.total} personas</span>
                         </p>
                     ) : (
                         <p className="text-[rgba(255,255,255,0.5)] text-sm italic">Sin datos recientes</p>

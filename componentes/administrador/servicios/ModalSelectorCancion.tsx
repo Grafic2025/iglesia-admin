@@ -32,7 +32,7 @@ const ModalSelectorCancion: React.FC<ModalSelectorCancionProps> = ({
                         placeholder="Buscar canción por título o artista..."
                         value={songSearch}
                         onChange={e => setSongSearch(e.target.value)}
-                        className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[#A8D500] transition-all"
+                        className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[var(--accent)] transition-all"
                     />
                 </div>
                 <div className="overflow-y-auto flex-1 space-y-2 pr-2 custom-scrollbar">
@@ -43,7 +43,7 @@ const ModalSelectorCancion: React.FC<ModalSelectorCancionProps> = ({
                         <button
                             key={s.id}
                             onClick={() => toggleSong(s.id)}
-                            className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${selectedSongIds.includes(s.id) ? 'bg-[#A8D500] border-transparent text-black' : 'bg-[#222] border-[#333] text-white hover:border-[#A8D500]'}`}
+                            className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all text-left ${selectedSongIds.includes(s.id) ? 'bg-[var(--accent)] border-transparent text-black' : 'bg-[#222] border-[#333] text-white hover:border-[var(--accent)]'}`}
                         >
                             <div className="flex-1">
                                 <p className="font-bold text-sm">{s.titulo}</p>
@@ -55,7 +55,7 @@ const ModalSelectorCancion: React.FC<ModalSelectorCancionProps> = ({
                 </div>
                 <button
                     onClick={onClose}
-                    className="w-full py-4 bg-[#A8D500] text-black font-black rounded-xl mt-6 uppercase tracking-widest text-xs"
+                    className="w-full py-4 bg-[var(--accent)] text-black font-black rounded-xl mt-6 uppercase tracking-widest text-xs"
                 >
                     Listo
                 </button>

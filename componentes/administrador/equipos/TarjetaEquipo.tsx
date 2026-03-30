@@ -12,7 +12,7 @@ const TarjetaEquipo: React.FC<TarjetaEquipoProps> = ({ team, onSelect, onToggleB
     return (
         <div
             onClick={() => onSelect(team)}
-            className={`bg-[#1E1E1E] p-6 rounded-2xl border ${team.bloqueado ? 'border-red-500/50 grayscale' : 'border-[#333]'} hover:border-[#A8D50050] transition-all cursor-pointer group relative`}
+            className={`bg-[#1E1E1E] p-6 rounded-2xl border ${team.bloqueado ? 'border-red-500/50 grayscale' : 'border-[#333]'} hover:border-[var(--accent)50] transition-all cursor-pointer group relative`}
         >
             <div className="absolute top-4 right-4 flex gap-1">
                 <button
@@ -36,7 +36,7 @@ const TarjetaEquipo: React.FC<TarjetaEquipoProps> = ({ team, onSelect, onToggleB
                 {team.bloqueado && <span className="text-[10px] bg-red-500 text-white px-2 py-0.5 rounded-full font-black">BLOQUEADO</span>}
             </h4>
             <p className="text-[rgba(255,255,255,0.7)] text-sm mb-4">{team.miembros} Voluntarios</p>
-            <div className="text-[#A8D500] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="text-[var(--accent)] text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 {team.bloqueado ? 'EQUIPO EN MANTENIMIENTO' : 'VER VOLUNTARIOS'} <Plus size={12} />
             </div>
         </div>

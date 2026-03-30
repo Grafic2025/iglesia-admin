@@ -29,7 +29,7 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                 {selectedDateSchedule && (
                     <button
                         onClick={() => setSelectedDateSchedule(null)}
-                        className="text-[#A8D500] text-[10px] font-black uppercase hover:underline"
+                        className="text-[var(--accent)] text-[10px] font-black uppercase hover:underline"
                     >
                         Ver todos
                     </button>
@@ -39,15 +39,15 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                 {filteredList.length === 0 ? (
                     <div className="text-center py-10">
                         <p className="text-[rgba(255,255,255,0.5)] italic text-sm">No hay servicios próximos para mostrar.</p>
-                        <button onClick={() => setActiveTab?.('servicios')} className="text-[#A8D500] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
+                        <button onClick={() => setActiveTab?.('servicios')} className="text-[var(--accent)] text-xs font-bold mt-2">IR A PLANIFICAR →</button>
                     </div>
                 ) : (
                     filteredList.map(s => (
-                        <div key={s.id} className="bg-[#252525] p-5 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all">
+                        <div key={s.id} className="bg-[#252525] p-5 rounded-2xl border border-[#333] hover:border-[var(--accent)50] transition-all">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
                                     <div className="bg-[#111] p-3 rounded-xl border border-[#333] text-center min-w-[70px]">
-                                        <p className="text-[#A8D500] text-[10px] font-black uppercase">
+                                        <p className="text-[var(--accent)] text-[10px] font-black uppercase">
                                             {new Date(s.fecha + 'T12:00:00').toLocaleDateString('es-AR', { month: 'short' })}
                                         </p>
                                         <p className="text-white text-xl font-black">
@@ -69,7 +69,7 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                                             const foto = memberWithPhoto?.foto_url || staff.foto_url;
 
                                             return (
-                                                <div key={idx} className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#333] overflow-hidden flex items-center justify-center text-[10px] text-white border border-[#A8D50030]" title={`${staff.nombre} (${staff.rol})`}>
+                                                <div key={idx} className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#333] overflow-hidden flex items-center justify-center text-[10px] text-white border border-[var(--accent)30]" title={`${staff.nombre} (${staff.rol})`}>
                                                     {foto ? (
                                                         <img src={foto} alt="" className="w-full h-full object-cover" />
                                                     ) : (
@@ -79,7 +79,7 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                                             );
                                         })}
                                         {(s.equipo_ids || []).length > 10 && (
-                                            <div className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#444] flex items-center justify-center text-[10px] text-[#A8D500] font-bold">
+                                            <div className="inline-block h-8 w-8 rounded-full ring-2 ring-[#252525] bg-[#444] flex items-center justify-center text-[10px] text-[var(--accent)] font-bold">
                                                 +{(s.equipo_ids || []).length - 10}
                                             </div>
                                         )}
@@ -95,13 +95,13 @@ const ListaCronogramaEquipo: React.FC<ListaCronogramaEquipoProps> = ({
                                             setSelectedDateSchedule(s);
                                             setShowModalComposicionEquipo(true);
                                         }}
-                                        className="bg-[#252525] text-[#A8D500] border border-[#A8D50030] text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:bg-[#A8D500] hover:text-black active:scale-95"
+                                        className="bg-[#252525] text-[var(--accent)] border border-[var(--accent)30] text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:bg-[var(--accent)] hover:text-black active:scale-95"
                                     >
                                         VER EQUIPO
                                     </button>
                                     <button
                                         onClick={() => setActiveTab ? setActiveTab('servicios') : alert("Ve a Plan de Culto")}
-                                        className="bg-[#A8D500] text-black text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(168,213,0,0.4)] active:scale-95"
+                                        className="bg-[var(--accent)] text-black text-[10px] font-black px-5 py-2.5 rounded-xl transition-all hover:shadow-[0_0_15px_rgba(168,213,0,0.4)] active:scale-95"
                                     >
                                         EDITAR DÍA
                                     </button>

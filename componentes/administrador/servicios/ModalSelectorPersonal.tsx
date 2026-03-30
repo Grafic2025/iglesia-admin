@@ -36,7 +36,7 @@ const ModalSelectorPersonal: React.FC<ModalSelectorPersonalProps> = ({
                         placeholder="Buscar por nombre o apellido..."
                         value={staffSearch}
                         onChange={e => setStaffSearch(e.target.value)}
-                        className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[#A8D500] transition-all"
+                        className="w-full bg-[#222] border border-[#333] rounded-2xl py-3 pl-11 pr-4 text-white text-xs outline-none focus:border-[var(--accent)] transition-all"
                     />
                 </div>
                 <div className="overflow-y-auto flex-1 space-y-2 pr-2 custom-scrollbar">

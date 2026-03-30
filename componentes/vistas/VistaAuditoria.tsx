@@ -26,7 +26,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <History className="text-[#A8D500]" /> AUDITORÍA DE ACCIONES
+                        <History className="text-[var(--accent)]" /> AUDITORÍA DE ACCIONES
                     </h2>
                     <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Registro de seguridad y trazabilidad de cambios en el sistema</p>
                 </div>
@@ -44,7 +44,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                         placeholder="Buscar por acción, detalle, administrador o fecha..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                        className="w-full bg-[#1E1E1E] border border-[#333] rounded-2xl py-3 pl-12 pr-4 text-white outline-none focus:border-[#A8D500] transition-all text-sm"
+                        className="w-full bg-[#1E1E1E] border border-[#333] rounded-2xl py-3 pl-12 pr-4 text-white outline-none focus:border-[var(--accent)] transition-all text-sm"
                     />
                 </div>
                 <div className="relative">
@@ -52,7 +52,7 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                     <select
                         value={actionFilter}
                         onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-                        className="bg-[#1E1E1E] border border-[#333] rounded-2xl pl-9 pr-6 py-3 text-white text-sm outline-none focus:border-[#A8D500] appearance-none min-w-[200px]"
+                        className="bg-[#1E1E1E] border border-[#333] rounded-2xl pl-9 pr-6 py-3 text-white text-sm outline-none focus:border-[var(--accent)] appearance-none min-w-[200px]"
                     >
                         {actionTypes.map(type => (
                             <option key={type} value={type}>{type === 'Todas' ? '📋 Todas las acciones' : type}</option>
@@ -88,8 +88,8 @@ const VistaAuditoria = ({ logs }: VistaAuditoriaProps) => {
                                     </td>
                                     <td className="p-5">
                                         <div className="flex items-center gap-2">
-                                            <div className="p-1.5 bg-[#A8D50015] rounded-lg">
-                                                <User size={14} className="text-[#A8D500]" />
+                                            <div className="p-1.5 bg-[var(--accent)15] rounded-lg">
+                                                <User size={14} className="text-[var(--accent)]" />
                                             </div>
                                             <span className="text-[rgba(255,255,255,0.7)] font-bold">{log.administrador_id}</span>
                                         </div>

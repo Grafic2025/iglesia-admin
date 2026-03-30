@@ -15,12 +15,12 @@ const FiltrosMiembros = ({
                     placeholder="🔍 Buscar por nombre o apellido..."
                     value={busqueda}
                     onChange={(e) => handleBusqueda(e.target.value)}
-                    className="flex-1 bg-white/5 text-white px-5 py-3 rounded-2xl border border-white/10 outline-none focus:border-[#A8D500]/50 transition-all font-bold placeholder:text-white/20"
+                    className="flex-1 bg-white/5 text-white px-5 py-3 rounded-2xl border border-white/10 outline-none focus:border-[var(--accent)]/50 transition-all font-bold placeholder:text-white/20"
                 />
                 <select
                     value={filtroHorario}
                     onChange={(e) => handleFiltro(e.target.value)}
-                    className="bg-[#A8D500] text-black font-black px-6 py-3 rounded-2xl outline-none cursor-pointer shadow-lg shadow-[#A8D500]/20 hover:scale-105 transition-transform"
+                    className="bg-[var(--accent)] text-black font-black px-6 py-3 rounded-2xl outline-none cursor-pointer shadow-lg shadow-[var(--accent)]/20 hover:scale-105 transition-transform"
                 >
                     <option value="Todas">Todas las Reuniones</option>
                     {horariosDisponibles.map((h: string) => (

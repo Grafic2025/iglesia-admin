@@ -13,10 +13,10 @@ interface TarjetaServicioProps {
 
 const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDelete, onNotify, onToggleChat, onExport, searchQuery }) => {
     return (
-        <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[#A8D50050] transition-all group relative text-left">
+        <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333] hover:border-[var(--accent)50] transition-all group relative text-left">
             <div className="flex justify-between items-start mb-4">
-                <div className="p-2 bg-[#A8D50010] rounded-lg">
-                    <Calendar size={20} className="text-[#A8D500]" />
+                <div className="p-2 bg-[var(--accent)10] rounded-lg">
+                    <Calendar size={20} className="text-[var(--accent)]" />
                 </div>
                 <button onClick={() => onDelete(service.id)} className="text-red-600 opacity-0 group-hover:opacity-100 p-1 hover:bg-red-600/10 rounded">
                     <Trash2 size={16} />
@@ -25,7 +25,7 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
             <h3 className="text-white font-black text-lg uppercase">
                 {new Date(service.fecha + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'short' })}
             </h3>
-            <p className="text-[#A8D500] font-bold text-xs mb-3">{service.horario}</p>
+            <p className="text-[var(--accent)] font-bold text-xs mb-3">{service.horario}</p>
 
             <div className="flex gap-4 mt-4 border-t border-[#333] pt-4">
                 <div className="flex items-center gap-1 text-[rgba(255,255,255,0.7)] text-[10px] font-bold">
@@ -51,8 +51,8 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
                 });
                 if (matches.length > 0) {
                     return (
-                        <div className="mt-3 p-2 bg-[#A8D500]/10 rounded-lg border border-[#A8D500]/20">
-                            <p className="text-[#A8D500] text-[10px] font-bold mb-1 uppercase">Resultado de búsqueda:</p>
+                        <div className="mt-3 p-2 bg-[var(--accent)]/10 rounded-lg border border-[var(--accent)]/20">
+                            <p className="text-[var(--accent)] text-[10px] font-bold mb-1 uppercase">Resultado de búsqueda:</p>
                             {matches.map((m, i) => (
                                 <p key={i} className="text-[#eee] text-[10px] mb-0.5">• {m.replace(/\x1b/g, '')}</p>
                             ))}
@@ -65,20 +65,20 @@ const TarjetaServicio: React.FC<TarjetaServicioProps> = ({ service, onEdit, onDe
             <div className="flex gap-2 mt-4">
                 <button
                     onClick={() => onEdit(service)}
-                    className="flex-1 py-2 bg-[#252525] text-white text-[10px] font-bold rounded-lg border border-[#333] hover:bg-[#A8D500] hover:text-black transition-all uppercase"
+                    className="flex-1 py-2 bg-[#252525] text-white text-[10px] font-bold rounded-lg border border-[#333] hover:bg-[var(--accent)] hover:text-black transition-all uppercase"
                 >
                     <Plus size={12} className="inline mr-1" /> Editar
                 </button>
                 <button
                     onClick={() => onNotify(service)}
-                    className="p-2 bg-[#A8D500]/10 text-[#A8D500] rounded-lg border border-[#A8D500]/20 hover:bg-[#A8D500] hover:text-black transition-all"
+                    className="p-2 bg-[var(--accent)]/10 text-[var(--accent)] rounded-lg border border-[var(--accent)]/20 hover:bg-[var(--accent)] hover:text-black transition-all"
                     title="Notificar Equipo"
                 >
                     <Users2 size={14} />
                 </button>
                 <button
                     onClick={() => onToggleChat(service)}
-                    className={`p-2 rounded-lg border transition-all ${service.chat_activo ? 'bg-[#A8D500] text-black border-[#A8D500]' : 'bg-transparent text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[#A8D500] hover:text-[#A8D500]'}`}
+                    className={`p-2 rounded-lg border transition-all ${service.chat_activo ? 'bg-[var(--accent)] text-black border-[var(--accent)]' : 'bg-transparent text-[rgba(255,255,255,0.7)] border-[#333] hover:border-[var(--accent)] hover:text-[var(--accent)]'}`}
                     title={service.chat_activo ? "Cerrar Chat" : "Abrir Chat"}
                 >
                     <MessageSquare size={14} />

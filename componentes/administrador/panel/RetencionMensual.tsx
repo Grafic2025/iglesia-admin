@@ -33,7 +33,7 @@ const RetencionMensual = ({ tasa, activos, total }: RetencionMensualProps) => {
                         <span className="text-4xl text-white font-black">{tasa || 0}<span className="text-lg text-[rgba(255,255,255,0.7)]">%</span></span>
                     </div>
                 </div>
-                <p className="text-[#A8D500] text-[10px] font-black uppercase mt-1 flex items-center gap-1 justify-center relative"><Activity size={10} /> +5% este mes</p>
+                <p className="text-[var(--accent)] text-[10px] font-black uppercase mt-1 flex items-center gap-1 justify-center relative"><Activity size={10} /> +5% este mes</p>
             </div>
 
             <div className="bg-[#151515] p-3 border border-white/5 rounded-xl">

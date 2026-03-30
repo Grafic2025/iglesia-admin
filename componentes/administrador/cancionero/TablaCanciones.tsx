@@ -34,7 +34,7 @@ const TablaCanciones: React.FC<TablaCancionesProps> = ({ songs, loading, onEdit,
                                     <p className="text-[rgba(255,255,255,0.5)] text-xs">{song.artista || 'Artista desconocido'}</p>
                                 </td>
                                 <td className="px-6 py-4 text-center">
-                                    <span className="bg-[#A8D50020] text-[#A8D500] px-3 py-1 rounded-lg text-sm font-black border border-[#A8D50020]">
+                                    <span className="bg-[var(--accent)20] text-[var(--accent)] px-3 py-1 rounded-lg text-sm font-black border border-[var(--accent)20]">
                                         {song.tono}
                                     </span>
                                 </td>
@@ -60,11 +60,11 @@ const TablaCanciones: React.FC<TablaCancionesProps> = ({ songs, loading, onEdit,
                                         )}
                                         <div className="w-px h-4 bg-[#333] mx-2"></div>
                                         {song.acordes && (
-                                            <button onClick={() => onViewLyrics(song)} className="p-2 text-[#A8D500] bg-[#A8D50010] rounded-lg transition-all flex items-center gap-1 font-bold text-[10px]" title="Ver Letra y Acordes">
+                                            <button onClick={() => onViewLyrics(song)} className="p-2 text-[var(--accent)] bg-[var(--accent)10] rounded-lg transition-all flex items-center gap-1 font-bold text-[10px]" title="Ver Letra y Acordes">
                                                 <FileText size={16} /> ACORDES
                                             </button>
                                         )}
-                                        <button onClick={() => onEdit(song)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[#A8D500] hover:bg-[#A8D50010] rounded-lg transition-all" title="Editar">
+                                        <button onClick={() => onEdit(song)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-[var(--accent)] hover:bg-[var(--accent)10] rounded-lg transition-all" title="Editar">
                                             <Edit2 size={16} />
                                         </button>
                                         <button onClick={() => onDelete(song.id)} className="p-2 text-[rgba(255,255,255,0.7)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Eliminar">

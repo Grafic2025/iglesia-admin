@@ -83,13 +83,13 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Calendar className="text-[#A8D500]" /> PLANIFICACIÓN (CRONOGRAMAS)
+                        <Calendar className="text-[var(--accent)]" /> PLANIFICACIÓN (CRONOGRAMAS)
                     </h2>
                     <p className="text-[rgba(255,255,255,0.7)] text-sm italic">Organiza los cultos, equipos y canciones del domingo</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal()}
-                    className="bg-[#A8D500] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
+                    className="bg-[var(--accent)] text-black font-bold px-6 py-2.5 rounded-xl flex items-center gap-2 hover:shadow-[0_0_20px_rgba(168,213,0,0.4)] transition-all active:scale-95"
                 >
                     <Plus size={18} /> CREAR CRONOGRAMA
                 </button>
@@ -102,7 +102,7 @@ const VistaServicios = ({ supabase, enviarNotificacionIndividual, registrarAudit
                     placeholder="Buscar para ver asignar a: Músico, Vocalista, Sonido, Audiovisuales..."
                     value={musicianSearch}
                     onChange={(e) => setMusicianSearch(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 bg-[#1e1e1e] border border-white/5 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-1 focus:ring-[#A8D500] transition-all font-medium"
+                    className="w-full pl-12 pr-4 py-3 bg-[#1e1e1e] border border-white/5 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-1 focus:ring-[var(--accent)] transition-all font-medium"
                 />
             </div>
 

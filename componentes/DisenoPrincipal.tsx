@@ -37,10 +37,10 @@ export default function DisenoPrincipal({ children }: { children: React.ReactNod
     const accesoPermitido = tienePermiso();
 
     return (
-        <div className="flex h-screen bg-[#0F0F0F] text-white overflow-hidden font-sans selection:bg-[#A8D500]/30 selection:text-white relative">
+        <div className="flex h-screen bg-[#0F0F0F] text-white overflow-hidden font-sans selection:bg-[var(--accent)]/30 selection:text-white relative">
             {/* Efectos de Brillo (Fondo) */}
-            <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-[#A8D500]/[0.03] blur-[120px] pointer-events-none"></div>
-            <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-[#A8D500]/[0.02] blur-[120px] pointer-events-none"></div>
+            <div className="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] rounded-full bg-[var(--accent)]/[0.03] blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-[var(--accent)]/[0.02] blur-[120px] pointer-events-none"></div>
             <div className="absolute top-[30%] right-[-10%] w-[30%] h-[30%] rounded-full bg-indigo-500/[0.03] blur-[120px] pointer-events-none"></div>
 
             <BarraLateral onLogout={administrador.manejarCerrarSesion} />
@@ -75,7 +75,7 @@ export default function DisenoPrincipal({ children }: { children: React.ReactNod
                                     <p className="text-white/60 font-bold text-base max-w-xs mx-auto leading-relaxed">Lo sentimos, no tienes los permisos necesarios para ver esta sección. Contacta con el administrador principal.</p>
                                     <button 
                                         onClick={() => window.location.href = '/'}
-                                        className="mt-10 px-10 py-4 bg-white text-black hover:bg-[#A8D500] rounded-2xl font-black text-sm tracking-widest uppercase transition-all shadow-[0_10px_40px_rgba(255,255,255,0.1)] active:scale-95"
+                                        className="mt-10 px-10 py-4 bg-white text-black hover:bg-[var(--accent)] rounded-2xl font-black text-sm tracking-widest uppercase transition-all shadow-[0_10px_40px_rgba(255,255,255,0.1)] active:scale-95"
                                     >
                                         VOLVER AL INICIO
                                     </button>

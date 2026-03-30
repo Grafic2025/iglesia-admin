@@ -20,14 +20,14 @@ const ModalLetrasCancion: React.FC<ModalLetrasCancionProps> = ({
                 <div className="p-6 border-b border-[#333] flex items-center justify-between bg-[#111]">
                     <div>
                         <h3 className="text-white font-bold text-xl">{currentSong.titulo}</h3>
-                        <p className="text-[#A8D500] text-sm font-bold uppercase">{currentSong.artista} • {currentSong.tono} • {currentSong.bpm} BPM</p>
+                        <p className="text-[var(--accent)] text-sm font-bold uppercase">{currentSong.artista} • {currentSong.tono} • {currentSong.bpm} BPM</p>
                     </div>
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 bg-[#222] p-1 rounded-xl border border-[#333]">
                             <button onClick={() => setTransposedOffset(p => p - 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">-</button>
                             <div className="px-4 py-1 text-center">
                                 <p className="text-[10px] text-[rgba(255,255,255,0.5)] font-black uppercase">Tono</p>
-                                <p className="text-[#A8D500] font-black text-sm">{transposeChord(currentSong.tono, transposedOffset)}</p>
+                                <p className="text-[var(--accent)] font-black text-sm">{transposeChord(currentSong.tono, transposedOffset)}</p>
                             </div>
                             <button onClick={() => setTransposedOffset(p => p + 1)} className="w-10 h-10 rounded-lg hover:bg-[#333] text-white font-bold">+</button>
                         </div>
@@ -40,7 +40,7 @@ const ModalLetrasCancion: React.FC<ModalLetrasCancionProps> = ({
                             <div key={idx} className="mb-2">
                                 {line.split(/(\[[^\]]*\])/).map((part, i) => (
                                     part.startsWith('[') ?
-                                        <span key={i} className="text-[#A8D500] font-black">{part.slice(1, -1)}</span> :
+                                        <span key={i} className="text-[var(--accent)] font-black">{part.slice(1, -1)}</span> :
                                         <span key={i}>{part}</span>
                                 ))}
                             </div>

@@ -45,7 +45,7 @@ export async function POST(request: Request) {
                 subject: 'IDS: Código de Recuperación de Acceso',
                 html: `
                     <div style="font-family: sans-serif; padding: 20px; color: #111;">
-                        <h2 style="color: #A8D500;">Recuperación de Acceso</h2>
+                        <h2 style="color: var(--accent);">Recuperación de Acceso</h2>
                         <p>Hola <strong>${user.usuario}</strong>,</p>
                         <p>Has solicitado restablecer tu contraseña. Tu código de seguridad es:</p>
                         <div style="background: #f4f4f4; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; border-radius: 10px;">

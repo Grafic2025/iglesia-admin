@@ -11,7 +11,7 @@ interface TarjetaEstadoProps {
     trend?: number | null; // percentage change vs previous period
 }
 
-const TarjetaEstado = ({ label, value, color = '#A8D500', icon, isActive, trend }: TarjetaEstadoProps) => {
+const TarjetaEstado = ({ label, value, color = 'var(--accent)', icon, isActive, trend }: TarjetaEstadoProps) => {
     const trendColor = trend && trend > 0 ? '#22c55e' : trend && trend < 0 ? '#ef4444' : 'rgba(255,255,255,0.7)';
     const TrendIcon = trend && trend > 0 ? TrendingUp : trend && trend < 0 ? TrendingDown : Minus;
 
