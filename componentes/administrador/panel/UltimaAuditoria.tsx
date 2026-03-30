@@ -1,7 +1,5 @@
 import React from 'react';
 import { History, User, Activity, Clock } from 'lucide-react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 interface AuditLog {
     id: string;
@@ -61,7 +59,7 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
                                     </span>
                                     <div className="flex items-center gap-1 text-[10px] text-white/20 font-medium whitespace-nowrap">
                                         <Clock size={10} />
-                                        {format(new Date(log.created_at), 'HH:mm', { locale: es })}
+                                        {new Date(log.created_at).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
                                     </div>
                                 </div>
                                 <p className="text-sm text-white/70 font-medium line-clamp-1 group-hover:line-clamp-none transition-all">
@@ -72,7 +70,7 @@ const UltimaAuditoria = ({ logsAuditoria }: UltimaAuditoriaProps) => {
                                         Admin: {log.administrador_id}
                                     </span>
                                     <span className="text-[9px] font-medium text-white/10 italic">
-                                        {format(new Date(log.created_at), "d 'de' MMMM", { locale: es })}
+                                        {new Date(log.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' })}
                                     </span>
                                 </div>
                             </div>
