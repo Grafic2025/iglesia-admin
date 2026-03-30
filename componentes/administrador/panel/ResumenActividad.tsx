@@ -11,7 +11,7 @@ const ResumenActividad: React.FC<ResumenActividadProps> = ({ oracionesActivas, n
     return (
         <div className="grid grid-cols-1 gap-6">
             <div className="bg-[#1E1E1E] p-6 rounded-2xl border border-[#333]">
-                <h3 className="text-white text-sm font-medium mb-6 flex items-center gap-2">
+                <h3 className="text-white/90 text-sm font-bold mb-6 flex items-center gap-2 uppercase tracking-widest">
                     <Users2 size={18} className="text-[#A8D500]" /> Resumen de Actividad
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

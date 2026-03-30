@@ -34,7 +34,7 @@ const CabeceraAdmin: React.FC = () => {
                     <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
                         {TAB_LABELS[activeTab]}
                     </h2>
-                    <p className="text-[10px] md:text-xs text-white/40 font-bold uppercase tracking-widest leading-none">Iglesia del Salvador</p>
+                    <p className="text-[10px] md:text-xs text-white/70 font-black uppercase tracking-widest leading-none">Iglesia del Salvador</p>
                 </div>
             </div>
 

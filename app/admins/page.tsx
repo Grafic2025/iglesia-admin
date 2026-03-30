@@ -199,7 +199,7 @@ export default function AdminsPage() {
                             <h2 className="text-3xl font-black tracking-tighter">
                                 {editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
                             </h2>
-                            <button onClick={() => setModalAbierto(false)} className="text-white/30 hover:text-white">
+                            <button onClick={() => setModalAbierto(false)} className="text-white/60 hover:text-white">
                                 <Shield size={24} />
                             </button>
                         </div>
@@ -207,41 +207,43 @@ export default function AdminsPage() {
                         <form onSubmit={manejarGuardar} className="space-y-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Nombre de Usuario</label>
+                                    <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-2 px-1">Nombre de Usuario</label>
                                     <input 
                                         required 
                                         value={formUsuario} 
                                         onChange={e => setFormUsuario(e.target.value)} 
                                         type="text" 
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors"
+                                        placeholder="Ej: juan.perez"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Contraseña {editingUser && '(Dejar vacío para no cambiar)'}</label>
+                                    <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-2 px-1">Contraseña {editingUser && '(Dejar vacío p/ no cambiar)'}</label>
                                     <input 
                                         required={!editingUser} 
                                         value={formPassword} 
                                         onChange={e => setFormPassword(e.target.value)} 
                                         type="password" 
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors"
+                                        placeholder="••••••••"
+                                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-[#A8D500]/50 transition-colors placeholder:text-white/10"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Rol en el Sistema</label>
+                                <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-4 px-1">Rol en el Sistema</label>
                                 <div className="flex gap-4">
                                     <button 
                                         type="button"
                                         onClick={() => setFormRol('editor')}
-                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-bold ${formRol === 'editor' ? 'bg-[#A8D500] text-black border-transparent' : 'bg-white/5 border-white/10 text-white/40'}`}
+                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'editor' ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
                                     >
                                         Editor Estándar
                                     </button>
                                     <button 
                                         type="button"
                                         onClick={() => setFormRol('superadmin')}
-                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-bold ${formRol === 'superadmin' ? 'bg-[#A8D500] text-black border-transparent' : 'bg-white/5 border-white/10 text-white/40'}`}
+                                        className={`flex-1 p-4 rounded-2xl border transition-all text-center font-black ${formRol === 'superadmin' ? 'bg-[#A8D500] text-black border-transparent shadow-[0_0_20px_rgba(168,213,0,0.2)]' : 'bg-white/5 border-white/10 text-white/60 hover:border-white/20'}`}
                                     >
                                         Súper Admin
                                     </button>
@@ -250,16 +252,16 @@ export default function AdminsPage() {
 
                             {formRol !== 'superadmin' && (
                                 <div>
-                                    <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-4">Seleccionar Permisos de Menú</label>
+                                    <label className="block text-xs font-black text-white/80 uppercase tracking-[2px] mb-4 px-1">Seleccionar Permisos de Menú</label>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         {MENU_OPTIONS.map(opt => (
                                             <div 
                                                 key={opt.id} 
                                                 onClick={() => toggleMenu(opt.id)}
-                                                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${formMenus.includes(opt.id) ? 'bg-[#A8D500]/10 border-[#A8D500]/30 text-[#A8D500]' : 'bg-white/5 border-white/5 text-white/40 hover:border-white/10'}`}
+                                                className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${formMenus.includes(opt.id) ? 'bg-[#A8D500]/10 border-[#A8D500]/30 text-[#A8D500] font-black' : 'bg-white/5 border-white/5 text-white/70 hover:border-white/20 font-bold'}`}
                                             >
-                                                <span className="font-bold text-sm tracking-tight">{opt.label}</span>
-                                                {formMenus.includes(opt.id) ? <CheckCircle2 size={18} /> : <Circle size={18} />}
+                                                <span className="text-sm tracking-tight">{opt.label}</span>
+                                                {formMenus.includes(opt.id) ? <CheckCircle2 size={18} /> : <Circle size={18} className="text-white/20" />}
                                             </div>
                                         ))}
                                     </div>
