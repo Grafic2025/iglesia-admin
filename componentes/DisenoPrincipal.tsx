@@ -4,9 +4,35 @@ import BarraLateral from './BarraLateral';
 import CabeceraAdmin from './diseno/CabeceraAdmin';
 import ModalExportar from './diseno/ModalExportar';
 import { useContextoAdmin } from '../contextos/ContextoAdmin';
+import { usePathname } from 'next/navigation';
+import { ShieldAlert } from 'lucide-react';
 
 export default function DisenoPrincipal({ children }: { children: React.ReactNode }) {
     const administrador = useContextoAdmin();
+    const pathname = usePathname();
+
+    // Lógica de Guardia de URL
+    const userInfoRaw = typeof window !== 'undefined' ? localStorage.getItem('admin_user_info') : null;
+    const userInfo = userInfoRaw ? JSON.parse(userInfoRaw) : null;
+
+    const tienePermiso = () => {
+        if (!userInfo) return false;
+        if (userInfo.rol === 'superadmin') return true;
+        
+        // Pagina de inicio siempre permitida
+        if (pathname === '/') return true;
+
+        // Limpiamos el pathname de la barra inicial (ej: /videos -> videos)
+        const pathSlug = pathname.split('/')[1];
+        if (!pathSlug) return true;
+
+        // Pagina de admins solo para superadmin
+        if (pathSlug === 'admins') return false;
+
+        return userInfo.menus?.includes(pathSlug);
+    };
+
+    const accesoPermitido = tienePermiso();
 
     return (
         <div className="flex h-screen bg-[#0F0F0F] text-white overflow-hidden font-sans selection:bg-[#A8D500]/30 selection:text-white relative">
@@ -25,7 +51,23 @@ export default function DisenoPrincipal({ children }: { children: React.ReactNod
                     </div>
                 )}
                 <div className="flex-1 overflow-y-auto p-10 custom-scrollbar relative">
-                    {children}
+                    {accesoPermitido ? (
+                        children
+                    ) : (
+                        <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto animate-in zoom-in-95 duration-500">
+                            <div className="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500 mb-6 border border-red-500/20">
+                                <ShieldAlert size={40} />
+                            </div>
+                            <h2 className="text-3xl font-black tracking-tight mb-2 uppercase italic">Acceso Restringido</h2>
+                            <p className="text-white/40 font-medium">Lo sentimos, no tienes los permisos necesarios para ver esta sección. Contacta con el administrador principal.</p>
+                            <button 
+                                onClick={() => window.location.href = '/'}
+                                className="mt-8 px-6 py-3 bg-white/5 hover:bg-white/10 rounded-xl font-bold text-sm border border-white/5 transition-all"
+                            >
+                                VOLVER AL INICIO
+                            </button>
+                        </div>
+                    )}
                 </div>
                 <ModalExportar
                     showModalExportar={administrador.mostrarModalExportacion}

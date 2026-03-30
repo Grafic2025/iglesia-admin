@@ -11,6 +11,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!administrador.autorizado) {
         return (
             <PantallaLogin
+                usuario={administrador.usuario}
+                setUsuario={administrador.establecerUsuario}
                 password={administrador.contrasena}
                 setPassword={administrador.establecerContrasena}
                 handleLogin={administrador.manejarInicioSesion}

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export function usarAdminAuth() {
     const [autorizado, establecerAutorizado] = useState(false);
+    const [usuario, establecerUsuario] = useState('');
     const [contrasena, establecerContrasena] = useState('');
     const [intentosInicioSesion, establecerIntentosInicioSesion] = useState(0);
     const [inicioSesionBloqueado, establecerInicioSesionBloqueado] = useState(false);
@@ -51,7 +52,7 @@ export function usarAdminAuth() {
             const respuesta = await fetch('/api/autenticacion', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password: contrasena }),
+                body: JSON.stringify({ usuario, password: contrasena }),
             });
 
             const datos = await respuesta.json();
@@ -59,6 +60,7 @@ export function usarAdminAuth() {
             if (respuesta.ok && datos.success) {
                 establecerAutorizado(true);
                 localStorage.setItem('administrador_autenticacion', 'true');
+                if (datos.usuario) localStorage.setItem('admin_user_info', JSON.stringify(datos.usuario));
                 establecerIntentosInicioSesion(0);
             } else {
                 const nuevosIntentos = intentosInicioSesion + 1;
@@ -96,6 +98,8 @@ export function usarAdminAuth() {
 
     return {
         autorizado,
+        usuario,
+        establecerUsuario,
         contrasena,
         establecerContrasena,
         inicioSesionBloqueado,

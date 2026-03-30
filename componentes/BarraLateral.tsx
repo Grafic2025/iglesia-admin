@@ -46,7 +46,26 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
         { id: 'cancionero', label: 'Cancionero', icon: Music },
         { id: 'agenda_config', label: 'Config. Agenda', icon: Clock },
         { id: 'auditoria', label: 'Auditoría', icon: History },
+        { id: 'admins', label: '🔑 Admins', icon: ShieldAlert }, // Usamos ShieldAlert o alguno similar
     ];
+
+    // Filtrar menús según permisos
+    const userInfoRaw = typeof window !== 'undefined' ? localStorage.getItem('admin_user_info') : null;
+    const userInfo = userInfoRaw ? JSON.parse(userInfoRaw) : null;
+
+    const filteredMenuItems = menuItems.filter(item => {
+        if (!userInfo) return false;
+        if (userInfo.rol === 'superadmin') return true;
+        
+        // El dashboard siempre es visible? O depende de 'panel'
+        if (item.id === 'panel') return true;
+
+        // Admins solo para superadmin
+        if (item.id === 'admins') return false;
+
+        // Verificar si el id del menú está en la lista de permitidos
+        return userInfo.menus?.includes(item.id);
+    });
 
     return (
         <>
@@ -73,7 +92,7 @@ const BarraLateral = ({ onLogout }: BarraLateralProps) => {
                 </div>
 
                 <nav className="flex-1 px-4 space-y-2 py-4 overflow-y-auto no-scrollbar">
-                    {menuItems.map((item) => {
+                    {filteredMenuItems.map((item) => {
                         const Icon = item.icon;
                         const isActive = pathname === `/${item.id}` || (pathname === '/' && item.id === 'panel');
                         return (

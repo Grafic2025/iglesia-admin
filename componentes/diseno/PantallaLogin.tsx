@@ -2,6 +2,8 @@
 import React from 'react';
 
 interface PantallaLoginProps {
+    usuario: string;
+    setUsuario: (usuario: string) => void;
     password: string;
     setPassword: (password: string) => void;
     handleLogin: (e: React.FormEvent) => void;
@@ -10,6 +12,8 @@ interface PantallaLoginProps {
 }
 
 const PantallaLogin = ({
+    usuario,
+    setUsuario,
     password,
     setPassword,
     handleLogin,
@@ -32,6 +36,19 @@ const PantallaLogin = ({
                     Panel Principal
                 </h1>
                 <form onSubmit={handleLogin} className="space-y-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-400 mb-2 px-1">
+                            Usuario
+                        </label>
+                        <input
+                            type="text"
+                            value={usuario}
+                            onChange={(e) => setUsuario(e.target.value)}
+                            placeholder="Nombre de usuario"
+                            className="w-full p-4 bg-[#2a2a2a] border border-white/5 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-[#A8D500]/50 transition-all font-medium"
+                            disabled={loginLocked}
+                        />
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-2 px-1">
                             Contraseña de Acceso
